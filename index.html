@@ -351,6 +351,42 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 @media (prefers-reduced-motion:reduce){.hl{animation:none}}
 @media (max-width:760px){.inst-hero{grid-template-columns:minmax(0,1fr)}.inst-hero h2{font-size:24px}.tuto{grid-template-columns:minmax(0,1fr)}.tstep{flex-direction:row;align-items:flex-start;flex-wrap:wrap}.tstep .ttxt{flex:1;min-width:0}.tmock{width:100%}}
 @media (max-width:420px){.share-card{flex-direction:column;align-items:stretch}.qr{margin:0 auto}}
+.imp-hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+.imp-hero h2{font-size:30px;line-height:1.1}
+.imp-hero p{margin:0;color:var(--muted)}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;border:2px dashed color-mix(in srgb,var(--accent) 50%,var(--line));background:var(--accent-soft);border-radius:20px;padding:26px 16px;cursor:pointer;min-height:170px;transition:background .15s,border-color .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent-soft) 70%,var(--surface))}
+.drop b{font-family:var(--f-display);font-size:20px;color:var(--accent)}
+.drop .tile{width:52px;height:52px;border-radius:16px}
+.imp-list{display:flex;flex-direction:column;gap:12px}
+.imp-doc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.imp-h{display:flex;gap:12px;align-items:center}
+.imp-h .tile{width:40px;height:40px;border-radius:12px}
+.imp-n{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.imp-t{display:block;font-size:13px;color:var(--muted)}
+.imp-bar{height:4px;border-radius:99px;background:var(--sunk);overflow:hidden}
+.imp-bar i{display:block;height:100%;width:40%;background:var(--accent);border-radius:99px;animation:impb 1.1s ease-in-out infinite}
+@keyframes impb{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
+.imp-sel{display:flex;gap:10px;flex-wrap:wrap}
+.imp-sel label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);font-weight:600;flex:1;min-width:180px}
+.imp-sel select{border:1.5px solid var(--line);border-radius:10px;background:var(--surface);padding:8px 10px;font-size:14px;color:var(--ink)}
+.imp-rows{display:flex;flex-direction:column;gap:6px}
+.imp-row{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(120px,170px);gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--sunk);cursor:pointer}
+.imp-row.off{opacity:.5}
+.imp-row input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
+.imp-l{font-size:14px;font-weight:600}
+.imp-l small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.inp.sm input{padding:7px 9px;font-size:14.5px}
+.imp-flag{font-weight:700;color:var(--accent);text-align:right;font-size:14px}
+.imp-apply{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--ink);color:var(--bg);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow);z-index:5}
+.imp-apply small{opacity:.75}
+.imp-apply .btn:disabled{opacity:.5}
+.imp-cta{display:flex;gap:12px;align-items:center;margin:18px 20px 0;padding:12px 14px;border-radius:16px;background:var(--accent-soft);color:var(--ink);text-decoration:none;font-weight:400}
+.imp-cta b{display:block;font-size:15px}
+.imp-cta .tile{width:40px;height:40px;border-radius:12px}
+.imp-cta>span:last-child svg{color:var(--accent)}
+@media (max-width:760px){.imp-hero{grid-template-columns:minmax(0,1fr)}.imp-hero h2{font-size:24px}.imp-apply{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}.imp-row{grid-template-columns:auto minmax(0,1fr);}.imp-row .inp,.imp-row .imp-flag{grid-column:2}}
+@media (prefers-reduced-motion:reduce){.imp-bar i{animation:none;width:100%}}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -426,7 +462,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   </div>
   <div class="banner" id="exampleBanner" hidden>
     <span class="t"><span data-ic="info"></span><span><b>Ceci est un exemple.</b> Une famille avec 2 enfants, un appartement en location, des crédits et des placements.</span></span>
-    <button class="btn primary" id="clearBtn" type="button"><span data-ic="arrow"></span>Saisir ma situation</button>
+    <span class="row"><a class="btn primary" href="#importer"><span data-ic="upload"></span>Importer mes PDF</a><button class="btn" id="clearBtn" type="button"><span data-ic="arrow"></span>Tout saisir à la main</button></span>
   </div>
 
   <section class="view" id="v-plan" aria-label="Mon plan">
@@ -463,6 +499,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   <section class="view" id="v-situation" aria-label="Ma situation" hidden>
     <div class="sit-grid">
       <div class="form">
+        <a class="imp-cta" href="#importer"><span class="tile c-epargne"><span data-ic="upload"></span></span><span style="min-width:0;flex:1"><b>Pas envie de tout taper ?</b><span class="muted">Importe tes PDF (avis d'impôt, paies, prêts...) : l'appli remplit pour toi.</span></span><span data-ic="arrow"></span></a>
         <div class="form-top">
           <div class="mode" role="group" aria-label="Niveau de détail" id="modeSw">
             <button type="button" data-mode="rapide"><span>Rapide</span><small>2 minutes, ordres de grandeur</small></button>
@@ -495,6 +532,37 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
     <div class="sec-h"><h2>L'année fiscale en un coup d'œil</h2><p>En vert, tes actions. En rouge, les dates à ne pas rater.</p></div>
     <div class="months" id="months"></div>
     <div class="note"><span data-ic="bulb"></span><span><b>À tout moment :</b> mariage, Pacs, naissance, séparation, perte d'emploi, gros changement de revenus ? Signale-le dans les 60 jours sur impots.gouv.fr, rubrique "Gérer mon prélèvement à la source". Ton taux est recalculé tout de suite.</span></div>
+  </section>
+
+  <section class="view" id="v-importer" aria-label="Importer mes documents" hidden>
+    <div class="imp-hero">
+      <div style="min-width:0;display:flex;flex-direction:column;gap:10px">
+        <span class="eyebrow"><span data-ic="lock"></span>Lu sur ton appareil · rien n'est envoyé</span>
+        <h2>Donne tes documents, l'appli remplit tout</h2>
+        <p>Avis d'impôt, déclaration, fiches de paie, taxe foncière, tableaux de prêt, relevés de placements... Choisis-en plusieurs d'un coup. Tu vérifies ce qui a été trouvé, puis tu valides.</p>
+      </div>
+      <label class="drop" id="impDrop" for="impFiles">
+        <span class="tile c-epargne"><span data-ic="upload"></span></span>
+        <b>Choisir mes PDF</b>
+        <span class="muted">Depuis ton téléphone, ton ordinateur ou Google Drive</span>
+        <input type="file" id="impFiles" accept="application/pdf,.pdf" multiple hidden>
+      </label>
+    </div>
+    <div class="note"><span data-ic="info"></span><span><b>Tes PDF sont sur Google Drive ?</b> Touche "Choisir mes PDF". Sur Android, ouvre le menu ☰ de la fenêtre puis "Drive". Sur iPhone, touche "Parcourir" puis "Google Drive". L'appli ne reçoit que les fichiers que tu choisis, pas l'accès à tout ton Drive.</span></div>
+    <div id="impList" class="imp-list"></div>
+    <div id="impApply"></div>
+    <div class="box">
+      <h3><span data-ic="receipt"></span>Documents que l'appli sait lire</h3>
+      <ul class="skip-list">
+        <li><span data-ic="check"></span><span><b>Avis d'impôt</b><span>Revenu fiscal, impôt payé, plafond épargne retraite, situation.</span></span></li>
+        <li><span data-ic="check"></span><span><b>Déclaration de revenus (PDF de ta déclaration en ligne)</b><span>Salaires, pensions, loyers, dons, garde, aide à domicile...</span></span></li>
+        <li><span data-ic="check"></span><span><b>Fiches de paie</b><span>Net imposable (celle de décembre donne l'année entière).</span></span></li>
+        <li><span data-ic="check"></span><span><b>Avis de taxe foncière</b><span>Montant, à rattacher à ton logement ou à ta location.</span></span></li>
+        <li><span data-ic="check"></span><span><b>Tableau d'amortissement ou offre de prêt</b><span>Reste à rembourser, taux, assurance, fin du prêt.</span></span></li>
+        <li><span data-ic="check"></span><span><b>Relevés de placements et relevé fiscal (IFU)</b><span>Assurance vie, PEA, PER, livrets, dividendes et intérêts.</span></span></li>
+      </ul>
+      <p>Les documents scannés ou pris en photo ne peuvent pas être lus : télécharge plutôt les PDF officiels depuis tes espaces en ligne (impots.gouv.fr, ta banque, ton employeur).</p>
+    </div>
   </section>
 
   <section class="view" id="v-installer" aria-label="Installer l'application" hidden>
@@ -665,7 +733,7 @@ function derive(p,mode){
   d.epargne=sumP("courant")+sumP("livretA")+sumP("ldds")+sumP("lep");
   d.hasPEA=P.some(x=>x.type==="pea");d.hasAV=P.some(x=>x.type==="av");
   let cap=0;P.forEach(x=>{if(x.type==="cto"||x.type==="cat"||(x.type==="pel"&&(+x.annee||0)>=2018))cap+=txOf(x)/100*(+x.montant||0)});
-  d.capitaux=Math.round(cap);
+  d.capitaux=p.capFromDoc?(+p.capitaux||0):Math.round(cap);
   const scpiRev=P.filter(x=>x.type==="scpi").reduce((s,x)=>s+txOf(x)/100*(+x.montant||0),0);
   const interets=t=>C.filter(c=>c.type===t).reduce((s,c)=>s+(+c.capital||0)*((+c.taux||0)+(+c.assurance||0))/100,0);
   d.loyersNu=Math.round(B.filter(b=>b.type==="nu").reduce((s,b)=>s+(+b.loyers||0),0)+scpiRev);
@@ -813,8 +881,8 @@ function rules(p,base,mode,raw){
       what:"Ouvre un plan d'épargne en actions dans une banque en ligne et verse une petite somme.",why:"Après 5 ans, plus d'impôt sur le revenu sur les gains. Le compteur démarre à l'ouverture.",whenTxt:"Maintenant, même avec très peu.",how:["Banque en ligne sans frais de tenue.","Verse 10 à 50 €.","Plus tard, investis régulièrement (fonds indiciels)."],cases:[],link:SP("plan d'épargne en actions")});
   if(!p.hasAV&&p.epargne>=2000)add({id:"av",k:"epargne",ic:"shield",title:"Ouvrir une assurance vie pour lancer le compteur des 8 ans",gain:null,gainTxt:"Gain futur",when:any("Dès maintenant"),tags:["epargne"],
       what:"Ouvre une assurance vie sans frais sur versements, avec un petit montant.",why:"Après 8 ans, 4 600 € de gains par an sans impôt (9 200 € en couple). Et 152 500 € transmis par bénéficiaire sans droits.",whenTxt:"Maintenant : les 8 ans démarrent au premier versement.",how:["Contrat en ligne sans frais d'entrée.","Premier versement.","Désigne tes bénéficiaires."],cases:[],link:SP("assurance vie fiscalité")});
-  const lepPlaf=23028+(base.parts-1)*2*6150;
-  if(mode!=="complet"&&base.R>0&&base.R<=lepPlaf&&p.epargne>0)add({id:"lep",k:"epargne",ic:"piggy",title:"Ouvrir un Livret d'épargne populaire (LEP)",gain:null,gainTxt:"Meilleur livret",when:any("Dès maintenant"),tags:["epargne"],
+  const lepPlaf=23028+(base.parts-1)*2*6150;const lepRef=p.rfr>0?p.rfr:base.R;
+  if(mode!=="complet"&&lepRef>0&&lepRef<=lepPlaf&&p.epargne>0)add({id:"lep",k:"epargne",ic:"piggy",title:"Ouvrir un Livret d'épargne populaire (LEP)",gain:null,gainTxt:"Meilleur livret",when:any("Dès maintenant"),tags:["epargne"],
       what:"Le LEP rapporte plus que le Livret A, sans impôt, jusqu'à 10 000 €.",why:"Tes revenus semblent sous le plafond (environ "+fmt(lepPlaf)+" de revenu fiscal de référence).",whenTxt:"Dès maintenant.",how:["Prends ton dernier avis d'impôt.","Demande un LEP à ta banque."],cases:[],link:SP("livret d'épargne populaire")});
   const kidsAll=p.enfants+p.enfMaj;
   if(kidsAll>0&&p.epargne>=30000&&YEAR<=2026)add({id:"don26",k:"famille",ic:"gift",title:"Donner jusqu'à 100 000 € sans droits pour un logement neuf",gain:null,gainTxt:"Fin le 31/12/2026",when:yEnd,tags:["famille"],
@@ -845,7 +913,7 @@ function rules(p,base,mode,raw){
     if(available>=5000&&roomA+roomD===0)add({id:"surplus",k:"epargne",ic:"coins",pro:true,title:"Placer ton surplus d'épargne à plus long terme",gain:null,gainTxt:"Gain futur",when:any("Dès maintenant"),tags:["epargne"],
       what:"Tes livrets sont pleins et "+fmt(available)+" restent sur ton compte courant. Place ce que tu n'utiliseras pas avant 5 ans.",why:"Assurance vie ou PEA rapportent plus sur la durée, avec des avantages fiscaux.",whenTxt:"Dès maintenant, de préférence en plusieurs fois.",
       how:["Garde 3 à 6 mois de dépenses sur les livrets.","Le reste : assurance vie ou PEA."],cases:[],link:SP("assurance vie")});
-    if(base.R>0&&base.R<=lepPlaf&&lep<10000){const amt=Math.min(10000-lep,la+ld+Math.max(0,cc-SAFE)),rL=rateOf("lep");
+    if(lepRef>0&&lepRef<=lepPlaf&&lep<10000){const amt=Math.min(10000-lep,la+ld+Math.max(0,cc-SAFE)),rL=rateOf("lep");
       if(amt>=500)add({id:"lep2",k:"epargne",ic:"piggy",pro:true,money:true,title:"Déplacer "+fmt(amt)+" vers un LEP",gain:amt*(rL-rA)/100,when:any("Dès maintenant"),tags:["epargne"],
         what:"Ouvre un Livret d'épargne populaire et transfère-y "+fmt(amt)+" depuis tes autres livrets.",why:"Le LEP rapporte "+pct(rL)+" contre "+pct(rA)+" pour le Livret A, toujours sans impôt. Tes revenus semblent sous le plafond (environ "+fmt(lepPlaf)+").",
         whenTxt:"Dès maintenant.",how:["Prends ton dernier avis d'impôt.","Demande un LEP à ta banque : elle vérifie ton droit."],cases:[],link:SP("livret d'épargne populaire")});}
@@ -910,12 +978,12 @@ applyTheme();
 
 /* ===== Navigation ===== */
 const VIEWS=[["plan","Mon plan","target"],["situation","Ma situation","list"],["calendrier","Calendrier","calendar"],["moi","Moi","user"]];
-const ALLV=[...VIEWS.map(v=>v[0]),"installer"];
+const ALLV=[...VIEWS.map(v=>v[0]),"installer","importer"];
 const currentView=()=>{const h=location.hash.replace("#","");return ALLV.includes(h)?h:"plan"};
 function renderNav(urgent){const v=currentView();
   const h=VIEWS.map(([id,l,i])=>`<a href="#${id}" ${v===id?'aria-current="page"':""}>${ic(i)}<span>${l}</span>${id==="plan"&&urgent?`<span class="dot">${urgent}</span>`:""}</a>`).join("");
   $("nav").innerHTML=h;$("bnav").innerHTML=h}
-function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();window.scrollTo(0,0)}
+function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 
 /* ===== Formulaire ===== */
@@ -1096,7 +1164,7 @@ const DOCS=[
  {id:"att",n:"Attestations : crèche, aide à domicile, dons",ic:"gift",d:"Vérifier que tous tes crédits d'impôt sont bien comptés.",w:"Pajemploi, CESU, la crèche, les associations"}];
 function docsHTML(){const have=S.docs||{},n=DOCS.filter(d=>have[d.id]).length;
   return `<h3>${ic("receipt")}Mes documents <span class="pill ${n===DOCS.length?"ok":""}">${n} / ${DOCS.length}</span></h3>
-  <p>Plus tu rassembles de documents, plus les conseils sont précis. Le plus simple : <b>envoie-les à Claude dans la conversation où tu as créé l'appli</b>. Il remplit ta situation et te donne un code à coller dans "Mes données" → "Restaurer".</p>
+  <p>Plus tu rassembles de documents, plus les conseils sont précis. Le plus simple : <b>importe-les directement</b>, l'appli lit les PDF et remplit ta situation toute seule.</p><a class="btn primary" href="#importer">${ic("upload")}Importer mes PDF</a>
   <ul class="docs">${DOCS.map(d=>`<li class="doc${have[d.id]?" ok":""}"><span class="tile c-case">${ic(d.ic)}</span><span style="min-width:0;flex:1"><b>${d.n}</b><span class="dd">${d.d}</span><span class="dw">${ic("compass")}${d.w}</span></span><button type="button" class="switch" role="switch" aria-checked="${!!have[d.id]}" aria-label="J'ai ce document" data-doc="${d.id}"></button></li>`).join("")}</ul>`}
 
 /* ===== Plan ===== */
@@ -1157,12 +1225,12 @@ function update(){
   if(mode()!=="complet")side+=`<div class="box upgrade"><h3>${ic("spark")}Passe au mode complet</h3><p>Ajoute tes placements, crédits et biens un par un. On repère l'argent qui dort, les crédits trop chers, l'assurance de prêt à changer...</p><a class="btn" href="#situation" data-gomode="1">${ic("arrow")}Compléter</a></div>`;
   if(base.red+base.cred>10000)side+=`<div class="box"><h3>${ic("alert")}Plafond des niches</h3><p>Tes avantages fiscaux dépassent 10 000 €. Au-delà, ils sont plafonnés.</p></div>`;
   side+=`<div class="box"><h3>${ic("receipt")}Ton impôt en bref</h3><p>Revenu imposable : <b>${fmt(base.R)}</b><br>${base.sep?"2 déclarations séparées":String(base.parts).replace(".",",")+" part"+(base.parts>1?"s":"")}<br>Impôt sur le revenu : <b>${fmt(Math.max(0,base.ir))}</b>${base.ir<0?`<br>Remboursement attendu : <b>${fmt(-base.ir)}</b>`:""}${base.pfu>0?`<br>Impôt sur placements : <b>${fmt(base.pfu)}</b>`:""}${base.psFonc>0?`<br>Prélèv. sociaux sur loyers : <b>${fmt(base.psFonc)}</b>`:""}</p></div>`;
-  {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn" href="#moi">${ic("arrow")}Voir la liste</a></div>`}
+  {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn primary" href="#importer">${ic("upload")}Importer mes PDF</a></div>`}
   if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
   $("side").innerHTML=side;
   $("lGain").innerHTML=fmt(annual).replace(" €","<small>€</small>");
   $("lSub").textContent=`par an · ${todo.length} action${todo.length>1?"s":""} trouvée${todo.length>1?"s":""} · impôt estimé ${fmt(tax)}`;
-  $("exampleBanner").hidden=!S.example;
+  $("exampleBanner").hidden=!S.example||["importer","installer"].includes(currentView());
   renderNav(todo.filter(o=>o.when.grp==="annee").length);
   renderCal();renderMe();save();
 }
@@ -1225,6 +1293,186 @@ function renderMe(){
     <a class="btn primary" href="#installer">${ic("phone")}Voir le tuto en images</a>
     <div class="link-row"><code id="appLink">${esc(appUrl())}</code><button class="btn" type="button" id="copyLink">${ic("copy")}Copier</button></div>`;
 }
+/* ===== Import de documents PDF (lus sur l'appareil, rien n'est envoyé) ===== */
+const PDFJS_CDN="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+let pdfReady=null;
+function loadPdf(){if(pdfReady)return pdfReady;
+  pdfReady=new Promise((res,rej)=>{const base=window.BOUSSOLE_PWA?"lib/":PDFJS_CDN;const s=document.createElement("script");s.src=base+"pdf.min.js";
+    s.onload=()=>{try{pdfjsLib.GlobalWorkerOptions.workerSrc=base+"pdf.worker.min.js";res(pdfjsLib)}catch(e){pdfReady=null;rej(e)}};
+    s.onerror=()=>{pdfReady=null;rej(new Error("lib"))};document.head.appendChild(s)});
+  return pdfReady}
+async function pdfLines(file){
+  const lib=await loadPdf();const doc=await lib.getDocument({data:await file.arrayBuffer()}).promise;const lines=[];
+  for(let i=1;i<=Math.min(doc.numPages,40);i++){const pg=await doc.getPage(i);const tc=await pg.getTextContent();const rows=new Map();
+    tc.items.forEach(it=>{if(!it.str||!it.str.trim())return;const y=Math.round(it.transform[5]/3);const r=rows.get(y)||[];r.push({x:it.transform[4],s:it.str});rows.set(y,r)});
+    [...rows.entries()].sort((a,b)=>b[0]-a[0]).forEach(([,r])=>lines.push(r.sort((a,b)=>a.x-b.x).map(o=>o.s).join(" ").replace(/\s+/g," ").trim()))}
+  return lines}
+const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+function numsOf(s){s=String(s).replace(/\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}/g," ").replace(/\d+(?:[,.]\d+)?\s*%/g," ");const out=[];
+  (s.match(/\d{1,3}(?:[   .]\d{3})+(?:,\d{1,2})?|\d+(?:,\d{1,2})?/g)||[]).forEach(r=>{if(/^(19|20)\d\d$/.test(r))return;const n=parseFloat(r.replace(/[   .]/g,"").replace(",","."));if(!isNaN(n))out.push(n)});return out}
+function after(L,re,o={}){for(let i=0;i<L.length;i++){const m=L[i].match(re);if(!m)continue;
+  let ns=numsOf(L[i].slice(m.index+m[0].length));if(!ns.length&&L[i+1]&&!o.same)ns=numsOf(L[i+1]);
+  ns=ns.filter(n=>n>=(o.min??0)&&n<=(o.max??1e9));if(ns.length)return o.pick==="last"?ns[ns.length-1]:o.pick==="max"?Math.max(...ns):ns[0]}return null}
+function pctOf(L,re,not,lo,hi){for(const l of L){const rx=/(\d+(?:[,.]\d+)?)\s*%/g;let m,prev=0;while((m=rx.exec(l))){const lab=l.slice(prev,m.index);prev=m.index+m[0].length;
+  if(!re.test(lab)||(not&&not.test(lab)))continue;const v=parseFloat(m[1].replace(",","."));if(v>=lo&&v<=hi)return v}}return null}
+function codeOf(L,c){const re=new RegExp("(^|[^A-Z0-9])"+c+"([^A-Z0-9]|$)");for(const l of L){const u=l.toUpperCase(),m=u.match(re);if(m){const ns=numsOf(l.slice(m.index+m[0].length));if(ns.length)return ns[0]}}return null}
+function openYear(L){for(const l of L){if(/date d.(ouverture|effet|adh[ée]sion|souscription)|ouvert le|souscrit le|adh[ée]sion le/i.test(l)){const m=l.match(/\d{1,2}[\/.-]\d{1,2}[\/.-]((?:19|20)\d\d)/)||l.match(/\b((?:19|20)\d\d)\b/);if(m)return +m[1]}}return null}
+function detectType(L){const T=L.join(" ").toLowerCase();
+  if(/avis d.imp[ôo]t/.test(T)&&/revenu fiscal de r[ée]f[ée]rence/.test(T))return"avis";
+  if(/d[ée]claration/.test(T)&&/(^|[^a-z0-9])1aj([^a-z0-9]|$)/.test(T))return"decl";
+  if(/taxe fonci[èe]re/.test(T))return"tf";
+  if(/tableau d.amortissement|capital restant d[ûu]|offre de pr[êe]t|[ée]ch[ée]ancier/.test(T))return"pret";
+  if(/bulletin de (paie|salaire)|net [àa] payer|net imposable|salaire de base/.test(T))return"paie";
+  if(/imprim[ée] fiscal unique|(^|[^a-z0-9])ifu([^a-z0-9]|$)|(^|[^a-z0-9])2dc([^a-z0-9]|$)|(^|[^a-z0-9])2tr([^a-z0-9]|$)/.test(T))return"ifu";
+  if(/assurance[- ]vie|valeur de rachat|(^|[^a-z])pea([^a-z]|$)|plan d.[ée]pargne|livret|compte[- ]titres|(^|[^a-z])per([^a-z]|$)|[ée]pargne salariale/.test(T))return"plac";
+  if(/revenu fiscal de r[ée]f[ée]rence/.test(T))return"avis";
+  return"inconnu"}
+function placTypeOf(L){const T=L.join(" ").toLowerCase();
+  if(/plan d.[ée]pargne retraite|(^|[^a-z])per (individuel|assurance|bancaire)|(^|[^a-z])per([^a-z]|$)/.test(T))return"per";
+  if(/assurance[- ]vie|valeur de rachat|contrat d.assurance/.test(T))return"av";
+  if(/plan d.[ée]pargne en actions|(^|[^a-z])pea([^a-z]|$)/.test(T))return"pea";
+  if(/[ée]pargne salariale|plan d.[ée]pargne (d.)?entreprise|(^|[^a-z])pee([^a-z]|$)/.test(T))return"pee";
+  if(/compte[- ]titres/.test(T))return"cto";
+  if(/livret d.[ée]pargne populaire|(^|[^a-z])lep([^a-z]|$)/.test(T))return"lep";
+  if(/ldds|d[ée]veloppement durable/.test(T))return"ldds";
+  if(/livret a([^a-z]|$)/.test(T))return"livretA";
+  if(/plan [ée]pargne logement|(^|[^a-z])pel([^a-z]|$)|(^|[^a-z])cel([^a-z]|$)/.test(T))return"pel";
+  if(/scpi/.test(T))return"scpi";
+  return"courant"}
+function upsert(list,type,patch){let it=list.find(x=>x.type===type&&!x._new);if(!it){it={id:nid(),type};list.push(it)}Object.assign(it,patch);return it}
+const DT={avis:["Avis d'impôt","receipt","avis"],decl:["Déclaration de revenus","list","decl"],paie:["Fiche de paie","briefcase","paie"],tf:["Taxe foncière","home","tf"],
+  pret:["Prêt (tableau ou offre)","card","amort"],ifu:["Relevé fiscal de banque (IFU)","bank","ifu"],plac:["Relevé de placement","coins","plac"],inconnu:["Document non reconnu","alert",null]};
+let IMP=[];
+function extract(d){
+  const L=d.lines,T=L.join("\n"),f=[];d.finish=null;d.msg="";
+  const add=(label,v,unit,apply,note,on=true)=>{if(v==null||(typeof v==="number"&&(isNaN(v)||v<=0)))return;f.push({label,v:typeof v==="number"?Math.round(v*100)/100:v,unit,apply,note:note||"",on})};
+  const C=c=>codeOf(L,c),S2=(...cs)=>{let s=0,ok=false;cs.forEach(c=>{const v=C(c);if(v){s+=v;ok=true}});return ok?s:null};
+  switch(d.type){
+  case"avis":{
+    add("Revenu fiscal de référence",after(L,/revenu fiscal de r[ée]f[ée]rence/i),"€",(p,v)=>p.rfr=v,"Sert à vérifier ton droit au LEP");
+    add("Nombre de parts",after(L,/nombre de parts/i,{min:1,max:20}),"parts",(p,v)=>p.partsAvis=v,"Pour contrôler le calcul");
+    add("Impôt de l'an dernier",after(L,/imp[ôo]t (sur le revenu )?net|montant (net )?de (votre |l.)imp[ôo]t|total de (votre |l.)imp[ôo]t|imp[ôo]t (net )?[àa] payer/i),"€",(p,v)=>p.impAvis=v,"Pour comparer avec l'estimation");
+    for(const l of L){if(/salaires|traitements/i.test(l)&&!/frais|d[ée]duction/i.test(l)){const ns=numsOf(l.replace(/^.*?(salaires|traitements)/i,"")).filter(n=>n>=1000);
+      if(ns.length){add("Salaires (déclarant 1)",ns[0],"€/an",(p,v)=>p.sal1=v,"Revenus de l'an dernier, à vérifier");if(ns[1])add("Salaires (déclarant 2)",ns[1],"€/an",(p,v)=>p.sal2=v,"Revenus de l'an dernier, à vérifier");break}}}
+    let plaf=0,cnt=0;for(let i=0;i<L.length&&!cnt;i++){if(/plafond/i.test(L[i])&&/retraite|[ée]pargne|cotisations/i.test(L[i])){for(let j=i;j<Math.min(L.length,i+5)&&cnt<2;j++)numsOf(L[j].replace(/^.*?plafond/i,"")).filter(n=>n>=300).forEach(n=>{if(cnt<2){plaf+=n;cnt++}})}}
+    if(cnt)add("Plafond épargne retraite disponible",plaf,"€",(p,v)=>p.perPlafond=v,cnt>1?"Toi et ton conjoint additionnés":"");
+    if(/mari[ée]e?s?([^a-z]|$)/i.test(T))add("Situation : marié(e)","oui","flag",p=>p.situation="marie");
+    else if(/pacs[ée]e?s?([^a-z]|$)/i.test(T))add("Situation : pacsé(e)","oui","flag",p=>p.situation="pacse");
+    break}
+  case"decl":{
+    add("Salaires (déclarant 1)",C("1AJ"),"€/an",(p,v)=>p.sal1=v,"Année dernière");
+    add("Salaires (déclarant 2)",C("1BJ"),"€/an",(p,v)=>p.sal2=v,"Année dernière");
+    if(C("1AK"))add("Frais réels déjà déclarés","oui","flag",p=>p.fr1=true);
+    add("Retraites et pensions",S2("1AS","1BS"),"€/an",(p,v)=>p.pension=v);
+    add("Loyers de location vide",C("4BE"),"€/an",(p,v)=>{p.loyersNu=v;upsert(p.biens,"nu",{loyers:v})},"Régime micro-foncier");
+    add("Dividendes et intérêts",S2("2DC","2TR","2TS"),"€/an",(p,v)=>{p.capitaux=v;p.capFromDoc=true});
+    add("Gains sur actions",C("3VG"),"€",(p,v)=>p.pv=v,"Année dernière",false);
+    add("Dons",S2("7UF","7UD"),"€/an",(p,v)=>p.dons=v);
+    add("Aide à domicile",C("7DB"),"€/an",(p,v)=>p.domicile=v);
+    add("Frais de garde",S2("7GA","7GB","7GC"),"€/an",(p,v)=>p.garde=v);
+    add("Pension versée aux enfants majeurs",S2("6EL","6EM"),"€/an",(p,v)=>{p.pensionEnf=v;p.declPensionEnf=true});
+    add("Aide versée à un parent",C("6GU"),"€/an",(p,v)=>{p.aideParent=v;p.declAideParent=true});
+    add("Cotisations syndicales",C("7AC"),"€/an",(p,v)=>p.syndicat=v);
+    add("Versements PER (année dernière)",S2("6NS","6NT"),"€",()=>{},"Pour info : la déduction de cette année se fait sur les versements de cette année",false);
+    const ce=C("7EA"),cl=C("7EC"),cs=C("7EF");if(ce||cl||cs)add("Enfants au collège / lycée / études sup",[ce||0,cl||0,cs||0].join(" / "),"flag",p=>{p.college=ce||0;p.lycee=cl||0;p.sup=cs||0;p.scol=true});
+    break}
+  case"paie":{
+    const line=L.find(l=>/net\s*(fiscal\s*)?imposable/i.test(l));
+    if(line){const ns=numsOf(line.replace(/^.*?imposable/i,"")).filter(n=>n>=50);let month=null;
+      const per=T.match(/p[ée]riode[^0-9]{0,40}(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/i);if(per)month=+per[2];else{const mm=T.toLowerCase().match(new RegExp("("+MOIS.join("|")+")\\s+20\\d\\d"));if(mm)month=MOIS.indexOf(mm[1])+1}
+      let annual=null,note="";
+      if(ns.length>=2&&Math.max(...ns)>=2.5*Math.min(...ns)){const cum=Math.max(...ns);if(month&&month<12){annual=cum/month*12;note="Cumul de "+month+" mois ramené à 12 mois"}else{annual=cum;note=month===12?"Cumul annuel (paie de décembre)":"Cumul de l'année trouvé sur la fiche"}}
+      else if(ns.length){annual=ns[0]*12;note="Salaire du mois × 12 (sans les primes)"}
+      const k=d.target==="2"?"sal2":"sal1";add("Salaire net imposable sur l'année",annual,"€/an",(p,v)=>p[k]=v,note)}
+    else d.msg="Je n'ai pas trouvé la ligne \"net imposable\" sur cette fiche.";
+    add("Prime d'intéressement / participation",after(L,/int[ée]ressement|participation/i,{min:50,same:true}),"€",(p,v)=>p.prime=v,"À vérifier",false);
+    break}
+  case"tf":{
+    let v=after(L,/montant (net )?[àa] payer|total [àa] payer|net [àa] payer|montant de (votre|la) taxe|somme [àa] payer|montant de (votre |l.)(imposition|imp[ôo]t)|montant total|total des cotisations|reste [àa] payer/i,{min:20,max:30000,pick:"last"});
+    if(!v){L.filter(l=>/taxe fonci|montant|total/i.test(l)).forEach(l=>{const ns=numsOf(l).filter(n=>n>=50&&n<30000);if(ns.length)v=Math.max(v||0,...ns)})}
+    const tg=d.target||"rp";
+    add("Taxe foncière",v,"€/an",(p,v)=>{if(tg==="rp"){p.proprio=true;upsert(p.biens,"rp",{})}else{const b=upsert(p.biens,tg,{});b.charges=(+b.charges||0)+v;if(tg==="nu")p.chargesNu=(p.chargesNu||0)+v}},tg==="rp"?"Ta résidence principale : tu es propriétaire":"Ajoutée aux dépenses de ta location");
+    break}
+  case"pret":{
+    const taux=pctOf(L,/taux/i,/taeg|teg|effectif|assurance|usure/i,.1,15);
+    const assur=pctOf(L,/assurance/i,/taeg|effectif/i,.01,2);
+    const rows=L.map(l=>{const dm=l.match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/);if(!dm)return null;const ns=numsOf(l);if(ns.length<3)return null;return{d:new Date(+dm[3],+dm[2]-1,+dm[1]),ns}}).filter(Boolean).sort((a,b)=>a.d-b.d);
+    let cap=null,capNote="",fin=null;
+    if(rows.length>=4){const past=rows.filter(r=>r.d<=TODAY);const r=past.length?past[past.length-1]:rows[0];cap=r.ns[r.ns.length-1];capNote="Ligne du "+r.d.toLocaleDateString("fr-FR")+" du tableau";fin=rows[rows.length-1].d.getFullYear()}
+    else{cap=after(L,/capital restant d[ûu]/i,{min:100,pick:"last"});capNote="Capital restant dû";
+      if(!cap){cap=after(L,/montant (total )?(du |de votre |de l.)?(pr[êe]t|cr[ée]dit|emprunt)|capital emprunt[ée]|montant financ[ée]/i,{min:500});capNote="Montant emprunté au départ : remplace-le par ce qu'il reste à payer si tu le connais"}
+      const dur=after(L,/dur[ée]e/i,{min:6,max:420});const y0=(T.match(/\d{1,2}[\/.-]\d{1,2}[\/.-]((?:19|20)\d\d)/)||[])[1];if(dur&&y0)fin=+y0+Math.round(dur/12)}
+    const tg=d.target||"rp",ctx={};
+    add("Reste à rembourser",cap,"€",(p,v,c)=>c.capital=v,capNote);
+    add("Taux du prêt",taux,"%",(p,v,c)=>c.taux=v);
+    add("Assurance emprunteur",assur,"%/an",(p,v,c)=>c.assurance=v,"À vérifier sur ton certificat d'assurance");
+    add("Fin du prêt",fin,"année",(p,v,c)=>c.fin=v);
+    d.finish=(p,c)=>{if(c.capital||c.taux){p.credits.push(Object.assign({id:nid(),type:tg,capital:"",taux:"",assurance:"",fin:""},c))}};
+    break}
+  case"ifu":{
+    add("Dividendes et intérêts",S2("2DC","2TR","2TS","2FU"),"€/an",(p,v)=>{p.capitaux=v;p.capFromDoc=true});
+    add("Gains sur actions vendues",C("3VG"),"€",(p,v)=>p.pv=v);
+    add("Gains d'assurance vie retirés",C("2CH"),"€",()=>{},"Pour info",false);
+    break}
+  case"plac":{
+    const tg=d.target||placTypeOf(L);d.target=tg;
+    const mont=after(L,/valeur de rachat|valorisation|[ée]pargne (acquise|constitu[ée]e|atteinte)|montant (total|de votre [ée]pargne|disponible)|encours|solde (cr[ée]diteur|au)|nouveau solde|solde/i,{min:1,pick:"last"});
+    const an=openYear(L);const tx=pctOf(L,/rendement|taux (servi|net|de r[ée]mun[ée]ration|d.int[ée]r[êe]t)|r[ée]mun[ée]ration/i,/frais/i,0,15);
+    add("Montant",mont,"€",(p,v,c)=>c.montant=v,PLAC[tg]?PLAC[tg].l:"");
+    add("Ouvert en",an,"année",(p,v,c)=>c.annee=v);
+    add("Rendement",tx,"%/an",(p,v,c)=>c.taux=v);
+    d.finish=(p,c)=>{if(c.montant)upsert(p.placements,tg,c)};
+    break}
+  default:d.msg="Je ne reconnais pas ce document. Les documents pris en charge sont listés plus bas."}
+  if(!f.length&&!d.msg&&d.type!=="inconnu")d.msg="Document reconnu, mais je n'y ai trouvé aucun chiffre utilisable.";
+  d.fields=f}
+async function readFiles(files){
+  const arr=[...files].filter(x=>/pdf$/i.test(x.type)||/\.pdf$/i.test(x.name));
+  if(!arr.length){toast("Choisis des fichiers PDF");return}
+  arr.forEach(file=>IMP.push({id:nid(),file,name:file.name,status:"wait",fields:[],lines:[]}));renderImport();
+  for(const d of IMP.filter(x=>x.status==="wait")){d.status="read";renderImport();
+    try{d.lines=await pdfLines(d.file);
+      if(d.lines.join("").replace(/\s/g,"").length<40){d.status="scan";d.type="inconnu";d.fields=[];d.msg="Ce PDF est une image (document scanné ou photo) : je ne peux pas lire son texte. Télécharge plutôt la version PDF officielle depuis ton espace en ligne."}
+      else{d.type=detectType(d.lines);if(d.type==="paie")d.target=IMP.some(x=>x!==d&&x.type==="paie"&&x.target!=="2")?"2":"1";extract(d);d.status="ok"}}
+    catch(e){d.status="err";d.type="inconnu";d.fields=[];d.msg=e&&e.name==="PasswordException"?"Ce PDF est protégé par un mot de passe. Ouvre-le, enregistre-le sans mot de passe, puis réessaie.":e&&e.message==="lib"?"Impossible de charger le lecteur de PDF. Vérifie ta connexion internet et réessaie.":"Je n'ai pas réussi à ouvrir ce fichier."}
+    renderImport()}}
+const TARGETS={paie:[["1","Moi"],["2","Mon conjoint"]],tf:Object.entries(BIEN).map(([k,v])=>[k,v.l]),pret:Object.entries(CRED).map(([k,v])=>[k,v.l]),plac:Object.entries(PLAC).map(([k,v])=>[k,v.l])};
+const TLABEL={paie:"C'est la fiche de paie de",tf:"Ce bien est",pret:"C'est un",plac:"Type de placement"};
+function renderImport(){
+  if(currentView()!=="importer")return;
+  const list=$("impList");
+  list.innerHTML=IMP.map(d=>{const t=DT[d.type||"inconnu"]||DT.inconnu;
+    const head=`<div class="imp-h"><span class="tile ${d.type==="inconnu"||d.status==="err"||d.status==="scan"?"c-famille":"c-case"}">${ic(d.status==="read"||d.status==="wait"?"clock":t[1])}</span><div style="min-width:0;flex:1"><b class="imp-n">${esc(d.name)}</b><span class="imp-t">${d.status==="wait"?"En attente...":d.status==="read"?"Lecture en cours...":t[0]}</span></div><button type="button" class="icon-btn" data-imp-del="${d.id}" aria-label="Retirer">${ic("x")}</button></div>`;
+    if(d.status==="wait"||d.status==="read")return `<div class="imp-doc">${head}<div class="imp-bar"><i></i></div></div>`;
+    const sel=d.status==="ok"?`<div class="imp-sel"><label>C'est en fait :<select data-imp-type="${d.id}">${Object.entries(DT).filter(([k])=>k!=="inconnu").map(([k,v])=>`<option value="${k}" ${k===d.type?"selected":""}>${v[0]}</option>`).join("")}<option value="inconnu" ${d.type==="inconnu"?"selected":""}>Autre / ignorer</option></select></label>
+      ${TARGETS[d.type]?`<label>${TLABEL[d.type]} :<select data-imp-target="${d.id}">${TARGETS[d.type].map(([k,l])=>`<option value="${k}" ${k===(d.target||TARGETS[d.type][0][0])?"selected":""}>${l}</option>`).join("")}</select></label>`:""}</div>`:"";
+    const rows=d.fields.map((fl,i)=>`<label class="imp-row${fl.on?"":" off"}"><input type="checkbox" data-imp-on="${d.id}|${i}" ${fl.on?"checked":""}><span class="imp-l">${fl.label}${fl.note?`<small>${fl.note}</small>`:""}</span>${fl.unit==="flag"?`<span class="imp-flag">${esc(fl.v)}</span>`:`<span class="inp sm"><input data-imp-v="${d.id}|${i}" inputmode="decimal" value="${String(fl.v).replace(".",",")}"><span>${fl.unit}</span></span>`}</label>`).join("");
+    return `<div class="imp-doc">${head}${sel}${d.msg?`<div class="warn">${ic("alert")}<span>${d.msg}</span></div>`:""}${rows?`<div class="imp-rows">${rows}</div>`:""}</div>`}).join("");
+  const ready=IMP.filter(d=>d.status==="ok").reduce((s,d)=>s+d.fields.filter(f=>f.on).length,0),busy=IMP.some(d=>d.status==="wait"||d.status==="read");
+  $("impApply").innerHTML=IMP.length?`<div class="imp-apply"><span><b>${busy?"Lecture en cours...":ready+" information"+(ready>1?"s":"")+" prête"+(ready>1?"s":"")}</b><br><small>Vérifie les chiffres ci-dessus (tu peux les corriger ou décocher), puis valide.</small></span><button type="button" class="btn primary" id="impGo" ${busy||!ready?"disabled":""}>${ic("check")}Remplir ma situation</button></div>`:"";
+}
+function applyImport(){
+  let p=S.example?JSON.parse(JSON.stringify(DEFAULT)):JSON.parse(JSON.stringify(S.p));
+  p.placements=p.placements||[];p.credits=p.credits||[];p.biens=p.biens||[];
+  if(mode()!=="complet"&&!p.placements.length&&!p.biens.length){if(p.epargne>0)p.placements.push({id:nid(),type:"livretA",montant:p.epargne,taux:""});
+    if(p.loyersNu>0)p.biens.push({id:nid(),type:"nu",valeur:"",loyers:p.loyersNu,charges:p.chargesNu||""});if(p.proprio)p.biens.push({id:nid(),type:"rp",valeur:""})}
+  let n=0;S.docs=S.docs||{};
+  IMP.filter(d=>d.status==="ok").forEach(d=>{const c={};d.fields.forEach(fl=>{if(!fl.on)return;const v=fl.unit==="flag"?fl.v:num(fl.v);fl.apply(p,v,c);n++});if(d.finish)d.finish(p,c);const k=(DT[d.type]||[])[2];if(k)S.docs[k]=true});
+  S.p=Object.assign({},DEFAULT,p);S.example=false;S.settings.mode="complet";IMP=[];S.open=null;save();
+  toast(n+" information"+(n>1?"s":"")+" ajoutée"+(n>1?"s":"")+" à ta situation");location.hash="#plan";
+}
+$("impFiles").addEventListener("change",e=>{readFiles(e.target.files);e.target.value=""});
+const dz=$("impDrop");["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("over")}));
+["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("over")}));
+dz.addEventListener("drop",e=>{if(e.dataTransfer&&e.dataTransfer.files)readFiles(e.dataTransfer.files)});
+$("v-importer").addEventListener("change",e=>{const t=e.target;
+  if(t.dataset.impType){const d=IMP.find(x=>x.id===t.dataset.impType);d.type=t.value;d.target=null;extract(d);renderImport();return}
+  if(t.dataset.impTarget){const d=IMP.find(x=>x.id===t.dataset.impTarget);d.target=t.value;extract(d);renderImport();return}
+  if(t.dataset.impOn){const [id,i]=t.dataset.impOn.split("|");IMP.find(x=>x.id===id).fields[+i].on=t.checked;renderImport();return}});
+$("v-importer").addEventListener("input",e=>{const t=e.target;if(t.dataset.impV){const [id,i]=t.dataset.impV.split("|");IMP.find(x=>x.id===id).fields[+i].v=t.value.replace(/[^\d.,]/g,"")}});
+$("v-importer").addEventListener("click",e=>{const x=e.target.closest("[data-imp-del]");if(x){IMP=IMP.filter(d=>d.id!==x.dataset.impDel);renderImport();return}
+  if(e.target.closest("#impGo"))applyImport()});
+
 /* ===== Tuto d'installation ===== */
 const MI={lock:'<svg viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>',
  share:'<svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M7 10.5H5.5v10h13v-10H17"/></svg>',
