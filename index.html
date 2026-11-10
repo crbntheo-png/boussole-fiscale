@@ -415,6 +415,16 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .sim-k b{font-family:var(--f-display);font-size:18px}
 .sim p{margin:0}
 @media (max-width:480px){.sim-k{grid-template-columns:minmax(0,1fr)}}
+.gd-card{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.gd-h{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.gd-h b{display:block;font-family:var(--f-display);font-size:18px}
+.gd-logo{width:48px;height:48px;border-radius:14px;background:var(--sunk);display:grid;place-items:center;flex:none}
+.gd-grp{display:flex;flex-direction:column;gap:6px}
+.gd-grp h4{font-size:14px}
+.gd-f{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--sunk);cursor:pointer}
+.gd-f input{width:20px;height:20px;accent-color:var(--accent);flex:none}
+.gd-f b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gd-f small{color:var(--muted);font-size:12px}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -588,7 +598,8 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
         <input type="file" id="impFiles" accept="application/pdf,.pdf" multiple hidden>
       </label>
     </div>
-    <div class="note"><span data-ic="info"></span><span><b>Tes PDF sont sur Google Drive ?</b> Touche "Choisir mes PDF". Sur Android, ouvre le menu ☰ de la fenêtre puis "Drive". Sur iPhone, touche "Parcourir" puis "Google Drive". L'appli ne reçoit que les fichiers que tu choisis, pas l'accès à tout ton Drive.</span></div>
+    <div id="gdBox"></div>
+    <div class="note"><span data-ic="info"></span><span><b>Tu préfères choisir toi-même ?</b> Touche "Choisir mes PDF". Sur Android, ouvre le menu ☰ de la fenêtre puis "Drive". Sur iPhone, touche "Parcourir" puis "Google Drive". L'appli ne reçoit que les fichiers que tu choisis, pas l'accès à tout ton Drive.</span></div>
     <div id="impList" class="imp-list"></div>
     <div id="impApply"></div>
     <div class="box">
@@ -1045,7 +1056,7 @@ const currentView=()=>{const h=location.hash.replace("#","");return ALLV.include
 function renderNav(urgent){const v=currentView();
   const h=VIEWS.map(([id,l,i])=>`<a href="#${id}" ${v===id?'aria-current="page"':""}>${ic(i)}<span>${l}</span>${id==="plan"&&urgent?`<span class="dot">${urgent}</span>`:""}</a>`).join("");
   $("nav").innerHTML=h;$("bnav").innerHTML=h}
-function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();renderSci();window.scrollTo(0,0)}
+function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();renderGd();renderSci();window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 
 /* ===== Formulaire ===== */
@@ -1627,6 +1638,58 @@ $("v-importer").addEventListener("change",e=>{const t=e.target;
 $("v-importer").addEventListener("input",e=>{const t=e.target;if(t.dataset.impV){const [id,i]=t.dataset.impV.split("|");IMP.find(x=>x.id===id).fields[+i].v=t.value.replace(/[^\d.,]/g,"")}});
 $("v-importer").addEventListener("click",e=>{const x=e.target.closest("[data-imp-del]");if(x){IMP=IMP.filter(d=>d.id!==x.dataset.impDel);renderImport();return}
   if(e.target.closest("#impGo"))applyImport()});
+
+/* ===== Google Drive : recherche automatique des documents ===== */
+const GDRIVE_CLIENT_ID="";
+const GD={token:null,exp:0,client:null,state:"idle",found:[],msg:""};
+const GD_TYPES=[
+ ["avis","Avis d'impôt",1,"fullText contains 'revenu fiscal de référence' and fullText contains 'avis'"],
+ ["decl","Déclaration de revenus",1,"fullText contains 'déclaration des revenus' and fullText contains '1AJ'"],
+ ["paie","Fiches de paie",2,"(fullText contains 'net imposable' or fullText contains 'bulletin de salaire' or fullText contains 'bulletin de paie')"],
+ ["tf","Taxe foncière",2,"fullText contains 'taxe foncière'"],
+ ["pret","Prêts",3,"(fullText contains 'tableau d''amortissement' or fullText contains 'capital restant dû' or fullText contains 'offre de prêt')"],
+ ["ifu","Relevés fiscaux de banque",3,"(fullText contains 'imprimé fiscal unique' or fullText contains 'IFU')"],
+ ["plac","Placements",5,"(fullText contains 'valeur de rachat' or fullText contains 'plan d''épargne' or fullText contains 'assurance vie' or fullText contains 'relevé de situation')"]];
+function gdLoad(){return new Promise((res,rej)=>{if(window.google&&google.accounts&&google.accounts.oauth2)return res();const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.onload=()=>res();s.onerror=()=>rej(new Error("gsi"));document.head.appendChild(s)})}
+async function gdToken(){
+  if(GD.token&&Date.now()<GD.exp-60000)return GD.token;
+  await gdLoad();
+  return new Promise((res,rej)=>{GD.client=google.accounts.oauth2.initTokenClient({client_id:GDRIVE_CLIENT_ID,scope:"https://www.googleapis.com/auth/drive.readonly",
+    callback:r=>{if(r.error){rej(new Error(r.error));return}GD.token=r.access_token;GD.exp=Date.now()+(+r.expires_in||3600)*1000;res(GD.token)},
+    error_callback:e=>rej(new Error(e&&e.type||"popup"))});GD.client.requestAccessToken({prompt:""})})}
+async function gdApi(path){const t=await gdToken();const r=await fetch("https://www.googleapis.com/drive/v3/"+path,{headers:{Authorization:"Bearer "+t}});if(r.status===401){GD.token=null;throw new Error("auth")}if(!r.ok)throw new Error("http "+r.status);return r}
+async function gdSearch(){
+  GD.state="search";GD.msg="";GD.found=[];renderGd();
+  try{await gdToken();
+    const since=(YEAR-3)+"-01-01T00:00:00";const seen=new Set();
+    for(const [type,label,keep,q] of GD_TYPES){
+      const query=`mimeType='application/pdf' and trashed=false and modifiedTime > '${since}' and ${q}`;
+      const r=await gdApi("files?pageSize=30&orderBy=modifiedTime desc&fields=files(id,name,modifiedTime,size)&q="+encodeURIComponent(query));
+      const js=await r.json();(js.files||[]).forEach((f,i)=>{if(seen.has(f.id))return;seen.add(f.id);GD.found.push({id:f.id,name:f.name,date:f.modifiedTime,type,label,on:i<keep})})}
+    GD.state="list";if(!GD.found.length)GD.msg="Je n'ai trouvé aucun document fiscal en PDF dans ton Drive (3 dernières années).";
+  }catch(e){GD.state="idle";GD.msg=e.message==="gsi"?"Impossible de joindre Google. Vérifie ta connexion internet.":/popup|access_denied/.test(e.message)?"Connexion Google annulée.":"Erreur Google Drive : "+e.message}
+  renderGd()}
+async function gdRead(){
+  const sel=GD.found.filter(f=>f.on);if(!sel.length)return;GD.state="dl";renderGd();const files=[];
+  for(const f of sel){try{const r=await gdApi("files/"+f.id+"?alt=media");const b=await r.blob();files.push(new File([b],f.name,{type:"application/pdf"}))}catch(e){}}
+  GD.state="list";GD.found=[];renderGd();
+  if(files.length){await readFiles(files);toast(files.length+" document"+(files.length>1?"s":"")+" récupéré"+(files.length>1?"s":"")+" depuis Drive")}else toast("Aucun document n'a pu être téléchargé")}
+function renderGd(){const box=$("gdBox");if(!box)return;
+  if(!window.BOUSSOLE_PWA){box.innerHTML=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div><b>Chercher dans mon Google Drive</b><span class="muted">Disponible dans l'appli installée : <a href="https://crbntheo-png.github.io/boussole-fiscale/#importer" target="_blank" rel="noopener">l'ouvrir</a></span></div></div></div>`;return}
+  if(!GDRIVE_CLIENT_ID){box.innerHTML=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div><b>Chercher dans mon Google Drive</b><span class="muted">Bientôt disponible : la connexion Google est en cours d'activation.</span></div></div></div>`;return}
+  const busy=GD.state==="search"||GD.state==="dl";
+  let h=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div style="min-width:0;flex:1"><b>Chercher dans mon Google Drive</b><span class="muted">L'appli trouve toute seule tes avis d'impôt, paies, taxes foncières, prêts et relevés. Lecture seule.</span></div>
+    <button type="button" class="btn primary" id="gdGo" ${busy?"disabled":""}>${GD.state==="search"?"Recherche...":GD.state==="dl"?"Téléchargement...":GD.found.length?"Relancer":"Lancer la recherche"}</button></div>`;
+  if(busy)h+=`<div class="imp-bar"><i></i></div>`;
+  if(GD.msg)h+=`<div class="warn">${ic("alert")}<span>${esc(GD.msg)}</span></div>`;
+  if(GD.found.length){const n=GD.found.filter(f=>f.on).length;
+    h+=GD_TYPES.map(([t,label])=>{const fs=GD.found.filter(f=>f.type===t);if(!fs.length)return"";
+      return `<div class="gd-grp"><h4>${label} <span class="muted">(${fs.length})</span></h4>${fs.map(f=>`<label class="gd-f"><input type="checkbox" data-gd="${f.id}" ${f.on?"checked":""}><span style="min-width:0;flex:1"><b>${esc(f.name)}</b><small>${new Date(f.date).toLocaleDateString("fr-FR")}</small></span></label>`).join("")}</div>`}).join("");
+    h+=`<div class="row"><button type="button" class="btn primary" id="gdRead" ${n&&!busy?"":"disabled"}>${ic("check")}Lire ces ${n} document${n>1?"s":""}</button><span class="muted">Les plus récents sont déjà cochés.</span></div>`}
+  box.innerHTML=h+`</div>`}
+const GD_LOGO='<svg viewBox="0 0 87.3 78" width="28" height="25" aria-hidden="true"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>';
+$("gdBox").addEventListener("click",e=>{if(e.target.closest("#gdGo"))gdSearch();else if(e.target.closest("#gdRead"))gdRead()});
+$("gdBox").addEventListener("change",e=>{const id=e.target.dataset.gd;if(id){const f=GD.found.find(x=>x.id===id);f.on=e.target.checked;renderGd()}});
 
 /* ===== Tuto d'installation ===== */
 const MI={lock:'<svg viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>',
