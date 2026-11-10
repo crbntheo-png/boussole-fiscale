@@ -387,6 +387,21 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .imp-cta>span:last-child svg{color:var(--accent)}
 @media (max-width:760px){.imp-hero{grid-template-columns:minmax(0,1fr)}.imp-hero h2{font-size:24px}.imp-apply{bottom:calc(env(safe-area-inset-bottom,0px) + 80px)}.imp-row{grid-template-columns:auto minmax(0,1fr);}.imp-row .inp,.imp-row .imp-flag{grid-column:2}}
 @media (prefers-reduced-motion:reduce){.imp-bar i{animation:none;width:100%}}
+.sci-ill{display:flex;align-items:center;justify-content:center;gap:14px;color:var(--muted)}
+.sci-ill .tile,.sci-ill .logo{width:64px;height:64px;border-radius:18px}
+.sci-ill .tile svg.i,.sci-ill .logo svg.i{width:30px;height:30px}
+.sci-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.sci-h{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.sci-h b{display:block;font-family:var(--f-display);font-size:18px}
+.seg.sm button{padding:6px 10px;font-size:13px}
+.sci-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.sci-kpis div{background:var(--sunk);border-radius:12px;padding:10px 12px;min-width:0}
+.sci-kpis span{display:block;font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.sci-kpis b{font-family:var(--f-display);font-size:18px}
+.sci-kpis .me{background:var(--accent-soft)}
+.sci-kpis .me b{color:var(--accent)}
+.err{color:var(--rose);font-weight:600;margin:0}
+@media (max-width:760px){.sci-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.sci-kpis .me{grid-column:1/-1}.sci-ill{display:none}}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -532,6 +547,18 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
     <div class="sec-h"><h2>L'année fiscale en un coup d'œil</h2><p>En vert, tes actions. En rouge, les dates à ne pas rater.</p></div>
     <div class="months" id="months"></div>
     <div class="note"><span data-ic="bulb"></span><span><b>À tout moment :</b> mariage, Pacs, naissance, séparation, perte d'emploi, gros changement de revenus ? Signale-le dans les 60 jours sur impots.gouv.fr, rubrique "Gérer mon prélèvement à la source". Ton taux est recalculé tout de suite.</span></div>
+  </section>
+
+  <section class="view" id="v-sci" aria-label="Mes SCI" hidden>
+    <div class="imp-hero">
+      <div style="min-width:0;display:flex;flex-direction:column;gap:10px">
+        <span class="eyebrow"><span data-ic="lock"></span>Lecture seule · rien n'est modifié dans ton appli SCI</span>
+        <h2>Connecte ton appli de gestion SCI</h2>
+        <p>Boussole lit tes SCI en direct (loyers encaissés, dépenses, associés, régime IR ou IS) et calcule ta part à déclarer. À chaque ouverture, les chiffres se mettent à jour tout seuls.</p>
+      </div>
+      <div class="sci-ill"><span class="tile c-immo"><span data-ic="building"></span></span><span data-ic="arrow"></span><span class="logo" data-ic="logo"></span></div>
+    </div>
+    <div id="sciBox" style="display:flex;flex-direction:column;gap:14px"></div>
   </section>
 
   <section class="view" id="v-importer" aria-label="Importer mes documents" hidden>
@@ -727,7 +754,7 @@ const isCouple=p=>p.situation==="marie"||p.situation==="pacse";
 const hasPartner=p=>isCouple(p)||p.situation==="concubin";
 
 function derive(p,mode){
-  const d=Object.assign({},p);if(mode!=="complet")return d;
+  const d=Object.assign({},p);d.sciFonc=(p.sci||[]).filter(c=>c.regime==="IR"&&c.share!=null).reduce((t,c)=>t+c.res*c.share,0);if(mode!=="complet")return d;
   const P=p.placements||[],C=p.credits||[],B=p.biens||[];
   const sumP=t=>P.filter(x=>x.type===t).reduce((s,x)=>s+(+x.montant||0),0);
   d.epargne=sumP("courant")+sumP("livretA")+sumP("ldds")+sumP("lep");
@@ -756,7 +783,8 @@ function foyer(f){
   let vlTax=0;
   if(f.ca>0){const ab={vente:.71,services:.5,bnc:.34}[f.caType],rate={vente:.01,services:.017,bnc:.022}[f.caType];
     const pro=f.reelPro?Math.max(0,f.ca-f.fraisPro):f.ca*(1-ab);if(f.vl&&!f.reelPro)vlTax=f.ca*rate;else R+=pro}
-  let fonc=0;if(f.loyersNu>0){fonc=(f.reelNu||f.loyersNu>15000)?f.loyersNu-f.chargesNu:f.loyersNu*.7;R+=Math.max(-10700,fonc)}
+  let fonc=0;if(f.loyersNu>0)fonc=(f.reelNu||f.loyersNu>15000)?f.loyersNu-f.chargesNu:f.loyersNu*.7;
+  fonc+=f.sciFonc||0;if(f.loyersNu>0||f.sciFonc)R+=Math.max(-10700,fonc);
   let meub=0;if(f.loyersMeub>0){meub=f.reelMeub?f.loyersMeub*.15:f.loyersMeub*.5;R+=meub}
   let pfu=0;if(f.capitaux>0){if(f.optBareme)R+=f.capitaux*.6;else pfu=f.capitaux*.128}
   R-=f.per+f.pensionEnf+f.aideParent;R=Math.max(0,R);
@@ -774,10 +802,10 @@ function calc(p){
   const c={pension:p.pension,ca:p.ca,caType:p.caType,fraisPro:p.fraisPro,vl:p.vl,reelPro:!!p.reelPro,loyersNu:p.loyersNu,chargesNu:p.chargesNu,reelNu:!!p.reelNu,
     loyersMeub:p.loyersMeub,reelMeub:p.reelMeub,capitaux:p.capitaux,optBareme:!!p.optBareme,per:p.perDeja+(p.perPlus||0),
     pensionEnf:p.declPensionEnf?Math.min(p.pensionEnf,PENSION_ENF*p.enfMaj):0,aideParent:p.declAideParent?p.aideParent:0,
-    dons:p.dons,scol:!!p.scol,scolAmt:61*p.college+153*p.lycee+183*p.sup,domicile:p.domicile,garde:p.garde,syndicat:p.syndicat,kids:p.enfants,under6:p.under6};
+    sciFonc:p.sciFonc||0,dons:p.dons,scol:!!p.scol,scolAmt:61*p.college+153*p.lycee+183*p.sup,domicile:p.domicile,garde:p.garde,syndicat:p.syndicat,kids:p.enfants,under6:p.under6};
   if(p.situation==="concubin"){
     const a=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal1,km:p.km1,fr:!!p.fr1}],parts:partsOf(false,p.enfants,false,p.inval,false),caseT:false,salTotal:p.sal1}));
-    const b=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal2,km:p.km2,fr:!!p.fr2}],pension:0,ca:0,loyersNu:0,loyersMeub:0,capitaux:0,per:0,pensionEnf:0,aideParent:0,dons:0,scol:false,domicile:0,garde:0,syndicat:0,kids:0,under6:0,parts:1,caseT:false,salTotal:p.sal2}));
+    const b=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal2,km:p.km2,fr:!!p.fr2}],pension:0,ca:0,loyersNu:0,loyersMeub:0,capitaux:0,sciFonc:0,per:0,pensionEnf:0,aideParent:0,dons:0,scol:false,domicile:0,garde:0,syndicat:0,kids:0,under6:0,parts:1,caseT:false,salTotal:p.sal2}));
     return {R:a.R+b.R,ir:a.ir+b.ir,vlTax:a.vlTax,pfu:a.pfu,psFonc:a.psFonc,tmi:Math.max(a.tmi,b.tmi),parts:a.parts,total:a.total+b.total,sep:true,red:a.red+b.red,cred:a.cred+b.cred,brut:a.brut+b.brut};
   }
   const sals=[{s:p.sal1,km:p.km1,fr:!!p.fr1}];if(couple)sals.push({s:p.sal2,km:p.km2,fr:!!p.fr2});
@@ -958,6 +986,27 @@ function rules(p,base,mode,raw){
       what:"Les loyers de tes SCPI en direct sont taxés à "+Math.round(tmi*100)+" % plus les prélèvements sociaux. Dans une assurance vie, ils ne sont taxés que si tu retires.",why:"Avec ta tranche, près de la moitié des loyers part en impôts.",
       whenTxt:"Pour tes prochains achats (ne revends pas les anciennes, les frais d'entrée sont élevés).",how:["Vérifie quelles SCPI ton assurance vie propose.","Fais tes prochains achats via le contrat."],cases:[],link:SP("SCPI fiscalité")});
   }
+  (p.sci||[]).forEach(c=>{const mine=c.share!=null?c.res*c.share:null,pc=c.share!=null?Math.round(c.share*1000)/10+" %":"ta part";
+    if(c.regime==="IR")add({id:"sci-decl-"+c.id,k:"immo",ic:"building",title:"Déclarer ta part de la "+c.nom+(mine!=null?" : "+fmt(mine):""),gain:null,gainTxt:"Obligatoire",when:decl,tags:["immo","case"],
+      what:"La SCI dépose sa déclaration 2072 (vers mi-mai, en ligne). Toi, tu reportes ta part ("+pc+") du résultat sur ta déclaration 2044, puis case 4BA (ou 4BB / 4BC en cas de déficit).",
+      why:"Une SCI à l'impôt sur le revenu ne paie pas d'impôt elle-même : chaque associé est imposé sur sa part, comme s'il louait en direct. Résultat "+c.year+" de la SCI : "+fmt(c.res)+(c.prev!=null?" ("+fmt(c.prev)+" en "+(c.year-1)+")":"")+".",
+      whenTxt:"La 2072 de la SCI avant ta propre déclaration, au printemps "+DEC_SEASON+".",how:["Le gérant dépose la 2072 sur impots.gouv.fr, espace professionnel.","Chaque associé reçoit sa part du résultat.","Tu la reportes sur ta 2044 puis sur ta déclaration."],cases:["2072","2044","4BA"],
+      warn:"Calcul indicatif à partir de ton appli SCI (loyers encaissés moins dépenses). Le résultat fiscal exact de la 2072 peut différer.",link:SP("déclaration 2072 SCI")});
+    if(c.regime==="IR"&&c.res>0&&tmi>=.30&&c.share!=null)add({id:"sci-trav-"+c.id,k:"immo",ic:"building",title:"Programmer des travaux dans la "+c.nom+" avant le 31 décembre",gain:null,gainTxt:"jusqu'à "+fmt(Math.min(c.res*c.share,10700)*(tmi+PS)),when:yEnd,tags:["immo"],
+      what:"Si des travaux d'entretien ou de réparation sont prévus dans un bien de la SCI, fais-les payer par la SCI cette année.",why:"Ta part du résultat ("+fmt(c.res*c.share)+") est imposée à "+Math.round(tmi*100)+" % plus les prélèvements sociaux. Les travaux payés cette année la font baisser d'autant.",
+      whenTxt:"Facture payée avant le 31/12.",how:["Fais faire les devis maintenant.","Paie avec le compte de la SCI.","Enregistre la dépense dans ton appli SCI."],cases:["2072"],link:SP("travaux déductibles revenus fonciers")});
+    if(c.capital>0&&!c.interets)add({id:"sci-int-"+c.id,k:"immo",ic:"receipt",title:"Enregistrer les intérêts d'emprunt de la "+c.nom,gain:null,gainTxt:"Déductibles",when:yEnd,tags:["immo"],
+      what:"Ton appli SCI contient des remboursements de capital, mais aucun intérêt d'emprunt pour "+c.year+".",why:"Les intérêts (et l'assurance du prêt) se déduisent du résultat de la SCI. Sans eux, tu déclares trop.",whenTxt:"Avant la 2072.",how:["Prends le tableau d'amortissement du prêt.","Ajoute les intérêts de l'année dans ton appli SCI, catégorie \"Intérêts d'emprunt\"."],cases:[],link:[SCI_CFG.app,"Ton appli SCI"]});
+    if(c.nbBiens>0&&!c.tf&&c.year<YEAR)add({id:"sci-tf-"+c.id,k:"immo",ic:"home",title:"Ajouter la taxe foncière de la "+c.nom,gain:null,gainTxt:"Déductible",when:decl,tags:["immo"],
+      what:"Aucune taxe foncière n'est enregistrée pour "+c.year+" dans ton appli SCI.",why:"Elle se déduit du résultat de la SCI (sauf la part ordures ménagères refacturée aux locataires).",whenTxt:"Avant la 2072.",how:["Récupère l'avis sur l'espace professionnel impots.gouv.fr.","Ajoute-le dans ton appli SCI."],cases:[],link:[SCI_CFG.app,"Ton appli SCI"]});
+    if(c.regime==="IR"&&c.share!=null&&c.res*c.share>15000&&tmi>=.41)add({id:"sci-is-"+c.id,k:"immo",ic:"percent",title:"Faire étudier le passage de la "+c.nom+" à l'impôt sur les sociétés",gain:null,gainTxt:"À chiffrer",when:any("Avec un expert-comptable"),tags:["immo"],
+      what:"À l'IS, la SCI paie 15 % puis 25 % sur ses bénéfices et peut amortir les biens. Tu n'es imposé que sur ce que tu te verses.",why:"Ta part ("+fmt(c.res*c.share)+") est taxée à "+Math.round(tmi*100)+" % plus prélèvements sociaux : l'IS peut coûter beaucoup moins si tu laisses l'argent dans la SCI.",
+      whenTxt:"Décision lourde : à préparer avec un expert-comptable.",how:["Demande une simulation IR contre IS sur 10 ans.","Compare aussi la fiscalité en cas de revente."],cases:[],warn:"Le passage à l'IS est presque définitif et la plus-value à la revente est souvent bien plus lourde.",link:SP("SCI impôt sur les sociétés option")});
+    if(c.regime==="IS")skip.push(["Déclarer le résultat de la "+c.nom,"Elle est à l'IS : c'est la SCI qui paie l'impôt. Toi, seulement sur les dividendes versés."]);
+    if(kidsAll>0)add({id:"sci-don-"+c.id,k:"famille",ic:"gift",title:"Transmettre des parts de la "+c.nom+" à tes enfants",gain:null,gainTxt:"Droits réduits",when:any("Quand tu veux"),tags:["famille","immo"],
+      what:"Donner des parts de SCI plutôt que les biens eux-mêmes, petit à petit, en utilisant l'abattement de 100 000 € par parent et par enfant.",why:"La valeur des parts tient compte des crédits de la SCI : on donne moins cher. On peut aussi donner la nue-propriété et garder les loyers.",
+      whenTxt:"Pas de date limite. Le compteur de 15 ans démarre au don.",how:["Fais évaluer les parts.","Rendez-vous chez un notaire."],cases:["2735"],link:SP("donation parts SCI")});
+  });
   if(base.ir<=0&&base.brut<=0)skip.push(["Réductions d'impôt (dons, PER...)","Tu ne paies pas d'impôt : seuls les crédits d'impôt (aide à domicile, garde) te rapportent."]);
   out.forEach(o=>{o.free=o.tags.includes("case")});
   return {out,skip};
@@ -978,12 +1027,12 @@ applyTheme();
 
 /* ===== Navigation ===== */
 const VIEWS=[["plan","Mon plan","target"],["situation","Ma situation","list"],["calendrier","Calendrier","calendar"],["moi","Moi","user"]];
-const ALLV=[...VIEWS.map(v=>v[0]),"installer","importer"];
+const ALLV=[...VIEWS.map(v=>v[0]),"installer","importer","sci"];
 const currentView=()=>{const h=location.hash.replace("#","");return ALLV.includes(h)?h:"plan"};
 function renderNav(urgent){const v=currentView();
   const h=VIEWS.map(([id,l,i])=>`<a href="#${id}" ${v===id?'aria-current="page"':""}>${ic(i)}<span>${l}</span>${id==="plan"&&urgent?`<span class="dot">${urgent}</span>`:""}</a>`).join("");
   $("nav").innerHTML=h;$("bnav").innerHTML=h}
-function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();window.scrollTo(0,0)}
+function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();renderSci();window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 
 /* ===== Formulaire ===== */
@@ -1032,6 +1081,7 @@ const PROFIL=[
   {k:"gestion",t:"seg",l:"Comment veux-tu gérer ton épargne ?",opts:[["simple","Simple et pas cher","spark"],["pilote","Qu'on gère pour moi","users"],["actif","Je choisis mes actions","trend"]]},
   {k:"risque",t:"seg",l:"Face aux hauts et aux bas de la bourse, tu es plutôt",opts:[["prudent","Prudent","shield"],["equilibre","Équilibré","target"],["dynamique","Dynamique","trend"]]},
   {k:"banque",t:"seg",l:"Ta banque principale",opts:[["trad","Banque classique","bank"],["bourso","BoursoBank","card"],["fortuneo","Fortuneo","card"],["autre","Autre banque en ligne","phone"]]}];
+const sciLink=()=>`<a class="imp-cta" style="margin:0" href="#sci"><span class="tile c-immo">${ic("building")}</span><span style="min-width:0;flex:1"><b>${(S.p.sci||[]).length?"Mes SCI connectées ("+S.p.sci.length+")":"Tu as une SCI ?"}</b><span class="muted">${(S.p.sci||[]).length?"Voir ou actualiser les chiffres":"Connecte ton appli de gestion SCI : tout se remplit tout seul."}</span></span>${ic("arrow")}</a>`;
 const profilHTML=()=>`<div class="list-sec c-epargne"><h3><span class="tile">${ic("compass")}</span>Ton profil d'épargnant</h3><p>Pour te recommander les bons placements et les bonnes plateformes.</p>${PROFIL.map(fieldHTML).join("")}</div>`;
 const visible=(f,p)=>!f.show||f.show(p);
 function fieldHTML(f){
@@ -1059,8 +1109,8 @@ function listSec(list,title,icn,k,lead,defs){
    <div class="adder">${Object.entries(defs).map(([v,o])=>`<button type="button" data-add="${list}" data-type="${v}">${ic("plus")}${o.l}</button>`).join("")}</div></div>`;
 }
 function patrimoineHTML(){
-  if(mode()!=="complet")return profilHTML()+QUICK_ORDER.map(k=>fieldHTML(QP[k])).join("")+`<div class="box upgrade"><h3>${ic("spark")}Tu veux des conseils plus précis ?</h3><p>Le mode complet analyse chaque placement et chaque crédit : argent qui dort, crédit trop cher, assurance de prêt, livret plus rentable...</p><button type="button" class="btn" data-setmode="complet">${ic("arrow")}Passer en mode complet</button></div>`;
-  return profilHTML()+listSec("placements","Mes placements","piggy","c-epargne","Comptes, livrets, assurance vie, PEA... Le taux est pré-rempli en gris : corrige-le si tu connais le tien.",PLAC)
+  if(mode()!=="complet")return profilHTML()+sciLink()+QUICK_ORDER.map(k=>fieldHTML(QP[k])).join("")+`<div class="box upgrade"><h3>${ic("spark")}Tu veux des conseils plus précis ?</h3><p>Le mode complet analyse chaque placement et chaque crédit : argent qui dort, crédit trop cher, assurance de prêt, livret plus rentable...</p><button type="button" class="btn" data-setmode="complet">${ic("arrow")}Passer en mode complet</button></div>`;
+  return profilHTML()+sciLink()+listSec("placements","Mes placements","piggy","c-epargne","Comptes, livrets, assurance vie, PEA... Le taux est pré-rempli en gris : corrige-le si tu connais le tien.",PLAC)
    +listSec("credits","Mes crédits en cours","card","c-credit","Le reste à rembourser et le taux sont sur ton tableau d'amortissement ou ton appli bancaire.",CRED)
    +listSec("biens","Mes biens immobiliers","building","c-immo","Valeur estimée aujourd'hui. Pour une location : loyers et dépenses de l'année.",BIEN)
    +fieldHTML(QP.reelMeub)+fieldHTML(QP.perDeja)+fieldHTML(QP.perPlafond);
@@ -1225,6 +1275,7 @@ function update(){
   if(mode()!=="complet")side+=`<div class="box upgrade"><h3>${ic("spark")}Passe au mode complet</h3><p>Ajoute tes placements, crédits et biens un par un. On repère l'argent qui dort, les crédits trop chers, l'assurance de prêt à changer...</p><a class="btn" href="#situation" data-gomode="1">${ic("arrow")}Compléter</a></div>`;
   if(base.red+base.cred>10000)side+=`<div class="box"><h3>${ic("alert")}Plafond des niches</h3><p>Tes avantages fiscaux dépassent 10 000 €. Au-delà, ils sont plafonnés.</p></div>`;
   side+=`<div class="box"><h3>${ic("receipt")}Ton impôt en bref</h3><p>Revenu imposable : <b>${fmt(base.R)}</b><br>${base.sep?"2 déclarations séparées":String(base.parts).replace(".",",")+" part"+(base.parts>1?"s":"")}<br>Impôt sur le revenu : <b>${fmt(Math.max(0,base.ir))}</b>${base.ir<0?`<br>Remboursement attendu : <b>${fmt(-base.ir)}</b>`:""}${base.pfu>0?`<br>Impôt sur placements : <b>${fmt(base.pfu)}</b>`:""}${base.psFonc>0?`<br>Prélèv. sociaux sur loyers : <b>${fmt(base.psFonc)}</b>`:""}</p></div>`;
+  side+=`<div class="box"><h3>${ic("building")}Mes SCI</h3><p>${(S.p.sci||[]).length?S.p.sci.map(c=>`<b>${esc(c.nom)}</b> · ${c.regime} · ta part ${c.share!=null?fmt(c.res*c.share):"?"}`).join("<br>"):"Connecte ton appli de gestion SCI pour que tes sociétés soient prises en compte automatiquement."}</p><a class="btn" href="#sci">${ic("arrow")}${(S.p.sci||[]).length?"Voir le détail":"Connecter"}</a></div>`;
   {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn primary" href="#importer">${ic("upload")}Importer mes PDF</a></div>`}
   if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
   $("side").innerHTML=side;
@@ -1293,6 +1344,71 @@ function renderMe(){
     <a class="btn primary" href="#installer">${ic("phone")}Voir le tuto en images</a>
     <div class="link-row"><code id="appLink">${esc(appUrl())}</code><button class="btn" type="button" id="copyLink">${ic("copy")}Copier</button></div>`;
 }
+/* ===== Connexion à l'appli de gestion SCI (lecture seule, compte Supabase de l'appli SCI) ===== */
+const SCI_CFG={url:"https://bcfcrqmpeyaoovluvhhn.supabase.co",cle:"sb_publishable_23UtXl16W2EQ61M3In4R8A_wIEDNHDm",app:"https://github.com/crbntheo-png/logements-"};
+let SCI_SB=null,SCI_UI={etape:"email",email:"",busy:false,msg:""};
+function sciLib(){return new Promise((res,rej)=>{if(window.supabase&&window.supabase.createClient)return res();const s=document.createElement("script");s.src="lib/supabase.js";s.onload=()=>res();s.onerror=()=>rej(new Error("lib"));document.head.appendChild(s)})}
+async function sciClient(){if(SCI_SB)return SCI_SB;await sciLib();SCI_SB=window.supabase.createClient(SCI_CFG.url,SCI_CFG.cle,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"boussole-sci-auth"}});return SCI_SB}
+function sciCalc(docs,year,userEmail,pick){
+  const g=c=>docs.filter(d=>d.coll===c).map(d=>d.data||{});
+  const meta=(docs.find(d=>d.coll==="meta")||{}).data||{},sci=meta.sci||{},biens=g("biens"),baux=g("baux"),pay=g("paiements"),dep=g("depenses"),taxes=g("taxes");
+  const Y=String(year);let loyers=0,charges=0;
+  pay.filter(p=>(p.date||"").startsWith(Y)).forEach(p=>{const b=baux.find(x=>x.id===p.bailId)||{};const lo=+b.loyerHC||0,ch=+b.charges||0;const part=lo+ch>0?ch/(lo+ch):0;charges+=(+p.montant||0)*part;loyers+=(+p.montant||0)*(1-part)});
+  taxes.forEach(tx=>(tx.parts||[]).filter(x=>x.payeLe&&String(x.payeLe).startsWith(Y)).forEach(x=>charges+=+x.montant||0));
+  const dy=dep.filter(d=>(d.date||"").startsWith(Y)),cat=c=>dy.filter(d=>d.categorie===c).reduce((s,d)=>s+(+d.montant||0),0);
+  const depTot=dy.filter(d=>d.categorie!=="Remboursement capital emprunt").reduce((s,d)=>s+(+d.montant||0),0);
+  const ass=sci.associes||[],tot=ass.reduce((s,a)=>s+(+a.parts||0),0);
+  let me=pick!=null?ass[pick]:ass.find(a=>a.email&&userEmail&&a.email.toLowerCase()===userEmail.toLowerCase());
+  const share=me&&tot?(+me.parts||0)/tot:(ass.length?null:1);
+  const res=loyers+charges-depTot;
+  return {nom:sci.nom||"SCI",regime:sci.regime==="IS"?"IS":"IR",year,loyers:Math.round(loyers),charges:Math.round(charges),dep:Math.round(depTot),res:Math.round(res),
+    share,meNom:me?me.nom:null,associes:ass.map(a=>({nom:a.nom,parts:+a.parts||0})),nbBiens:biens.length,
+    interets:Math.round(cat("Intérêts d'emprunt")),capital:Math.round(cat("Remboursement capital emprunt")),tf:Math.round(cat("Taxe foncière")+taxes.reduce((s,tx)=>s+(tx.parts||[]).filter(x=>x.payeLe&&String(x.payeLe).startsWith(Y)).reduce((t,x)=>t+(+x.montant||0),0),0)),
+    travaux:Math.round(cat("Travaux d'entretien / réparation")+cat("Travaux d'amélioration"))};
+}
+async function sciSync(silent){
+  const sb=await sciClient();const ses=(await sb.auth.getSession()).data.session;if(!ses){if(!silent){SCI_UI.etape="email";renderSci()}return false}
+  const r=await sb.from("espaces").select("id, nom").order("cree_le");if(r.error)throw r.error;
+  const out=[],prev=S.p.sci||[];
+  for(const e of r.data||[]){const lignes=[];for(let de=0;;de+=1000){const q=await sb.from("docs").select("coll, doc_id, data").eq("espace_id",e.id).range(de,de+999);if(q.error)throw q.error;lignes.push(...q.data);if(q.data.length<1000)break}
+    const old=prev.find(x=>x.id===e.id)||{};const year=old.year||YEAR;
+    const c=sciCalc(lignes,year,ses.user.email,old.pick);c.id=e.id;c.pick=old.pick;c.nom=c.nom==="SCI"?e.nom:c.nom;c._docs=null;
+    c.prev=sciCalc(lignes,year-1,ses.user.email,old.pick).res;out.push(c);SCI_RAW[e.id]=lignes}
+  if(S.example){S.p=JSON.parse(JSON.stringify(DEFAULT));S.example=false}
+  S.p.sci=out;S.p.sciEmail=ses.user.email;S.p.sciSync=new Date().toISOString();S.example=false;S.docs=S.docs||{};save();update();renderSci();return true}
+const SCI_RAW={};
+function sciRecalc(id){const c=(S.p.sci||[]).find(x=>x.id===id);const raw=SCI_RAW[id];if(!c||!raw)return;const n=sciCalc(raw,c.year,S.p.sciEmail,c.pick);Object.assign(c,n,{id,pick:c.pick,nom:c.nom});c.prev=sciCalc(raw,c.year-1,S.p.sciEmail,c.pick).res;save();update();renderSci()}
+function renderSci(){
+  if(currentView()!=="sci")return;const box=$("sciBox");
+  if(!window.BOUSSOLE_PWA){box.innerHTML=`<div class="box"><h3>${ic("lock")}Disponible dans l'appli installée</h3><p>Pour des raisons de sécurité, la connexion à ton appli SCI ne fonctionne que dans la version installée de Boussole Fiscale.</p><a class="btn primary" href="https://crbntheo-png.github.io/boussole-fiscale/#sci" target="_blank" rel="noopener">${ic("arrow")}Ouvrir l'appli installée</a></div>`;return}
+  const list=S.p.sci||[],U=SCI_UI;
+  let h="";
+  if(list.length){h+=list.map(c=>{const mine=c.share!=null?c.res*c.share:null;
+    const pickSel=c.associes.length&&c.share==null?`<div class="field"><label>Quel associé es-tu ?</label><div class="inp"><select data-sci-pick="${c.id}"><option value="">Choisis...</option>${c.associes.map((a,i)=>`<option value="${i}">${esc(a.nom)} (${a.parts} parts)</option>`).join("")}</select></div></div>`:"";
+    return `<div class="sci-card"><div class="sci-h"><span class="tile c-immo">${ic("building")}</span><div style="min-width:0;flex:1"><b>${esc(c.nom)}</b><span class="muted">${c.nbBiens} bien${c.nbBiens>1?"s":""} · SCI à l'${c.regime}${c.meNom?" · tu es "+esc(c.meNom)+" ("+Math.round(c.share*1000)/10+" %)":""}</span></div>
+      <div class="seg sm">${[YEAR-1,YEAR].map(y=>`<button type="button" data-sci-year="${c.id}|${y}" aria-pressed="${c.year===y}">${y}${y===YEAR?" (en cours)":""}</button>`).join("")}</div></div>
+      <div class="sci-kpis"><div><span>Loyers</span><b>${fmt(c.loyers)}</b></div><div><span>Charges reçues</span><b>${fmt(c.charges)}</b></div><div><span>Dépenses</span><b>${fmt(c.dep)}</b></div><div><span>Résultat SCI</span><b>${fmt(c.res)}</b></div><div class="me"><span>${c.regime==="IR"?"Ta part à déclarer":"Ta part (non imposée)"}</span><b>${mine==null?"?":fmt(mine)}</b></div></div>${pickSel}</div>`}).join("");
+    h+=`<div class="row"><button class="btn primary" type="button" id="sciRefresh">${ic("upload")}Actualiser</button><button class="btn ghost" type="button" id="sciOut">Se déconnecter</button><span class="muted">Synchronisé le ${new Date(S.p.sciSync).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})} avec ${esc(S.p.sciEmail||"")}</span></div>`}
+  else if(U.etape==="code"){h+=`<form class="box" id="sciForm"><h3>${ic("lock")}Entre le code reçu par e-mail</h3><p>Envoyé à <b>${esc(U.email)}</b>. C'est le même type de code que pour ton appli SCI.</p><div class="inp"><input id="sciCode" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="10"></div><div class="row"><button class="btn primary" ${U.busy?"disabled":""}>${U.busy?"Vérification...":"Connecter"}</button><button type="button" class="btn ghost" id="sciBack">Changer d'adresse</button></div>${U.msg?`<p class="err">${esc(U.msg)}</p>`:""}</form>`}
+  else{h+=`<form class="box" id="sciForm"><h3>${ic("user")}Ton e-mail de l'appli SCI</h3><p>Celui avec lequel tu te connectes à ton appli de gestion locative. Tu vas recevoir un code.</p><div class="inp"><input id="sciEmail" type="email" autocomplete="email" placeholder="ton@email.fr" value="${esc(U.email)}"></div><button class="btn primary" ${U.busy?"disabled":""}>${U.busy?"Envoi...":"Recevoir mon code"}</button>${U.msg?`<p class="err">${esc(U.msg)}</p>`:""}</form>`}
+  box.innerHTML=h;
+}
+$("v-sci").addEventListener("submit",async e=>{e.preventDefault();const U=SCI_UI;U.msg="";U.busy=true;renderSci();
+  try{const sb=await sciClient();
+    if(U.etape!=="code"){U.email=($("sciEmail").value||"").trim().toLowerCase();const r=await sb.auth.signInWithOtp({email:U.email,options:{shouldCreateUser:false}});
+      if(r.error)U.msg=/signups not allowed|not found|user/i.test(r.error.message)?"Aucun compte de l'appli SCI avec cet e-mail.":/rate|seconds/i.test(r.error.message)?"Trop de demandes. Attends une minute et réessaie.":"Envoi impossible : "+r.error.message;else U.etape="code"}
+    else{const r=await sb.auth.verifyOtp({email:U.email,token:($("sciCode").value||"").trim(),type:"email"});
+      if(r.error)U.msg="Code incorrect ou expiré. Vérifie le dernier e-mail reçu.";else{U.etape="ok";U.busy=false;await sciSync();toast("Tes SCI sont connectées")}}}
+  catch(err){U.msg=err&&err.message==="lib"?"Impossible de charger la connexion. Vérifie ton internet.":"Erreur : "+(err&&err.message||err)}
+  U.busy=false;renderSci()});
+$("v-sci").addEventListener("click",async e=>{
+  if(e.target.closest("#sciBack")){SCI_UI={etape:"email",email:SCI_UI.email,busy:false,msg:""};renderSci();return}
+  if(e.target.closest("#sciRefresh")){try{await sciSync();toast("SCI actualisées")}catch(err){toast("Actualisation impossible")}return}
+  if(e.target.closest("#sciOut")){try{const sb=await sciClient();await sb.auth.signOut()}catch(_){}S.p.sci=[];save();update();SCI_UI={etape:"email",email:"",busy:false,msg:""};renderSci();return}
+  const y=e.target.closest("[data-sci-year]");if(y){const [id,yr]=y.dataset.sciYear.split("|");const c=S.p.sci.find(x=>x.id===id);c.year=+yr;if(SCI_RAW[id])sciRecalc(id);else{try{await sciSync()}catch(_){}}}});
+$("v-sci").addEventListener("change",e=>{const t=e.target;if(t.dataset.sciPick){const c=S.p.sci.find(x=>x.id===t.dataset.sciPick);c.pick=t.value===""?null:+t.value;if(SCI_RAW[c.id])sciRecalc(c.id);else sciSync().catch(()=>{})}});
+if(window.BOUSSOLE_PWA&&(S.p.sci||[]).length)setTimeout(()=>sciSync(true).catch(()=>{}),1500);
+
 /* ===== Import de documents PDF (lus sur l'appareil, rien n'est envoyé) ===== */
 const PDFJS_CDN="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
 let pdfReady=null;
