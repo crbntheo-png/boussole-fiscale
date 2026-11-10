@@ -402,6 +402,19 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .sci-kpis .me b{color:var(--accent)}
 .err{color:var(--rose);font-weight:600;margin:0}
 @media (max-width:760px){.sci-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.sci-kpis .me{grid-column:1/-1}.sci-ill{display:none}}
+.sim{border:1.5px solid var(--c,var(--accent));border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--cs,var(--accent-soft))}
+.sim-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sim-h b{display:flex;gap:6px;align-items:center;font-size:15px}
+.sim-h span{font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--c,var(--accent))}
+.sim input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+.sim-scale{position:relative;display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:-6px}
+.sim-scale .ideal{position:absolute;top:0;transform:translateX(-50%);color:var(--accent);font-weight:700}
+.sim-k{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sim-k div{background:var(--surface);border-radius:12px;padding:8px 10px;min-width:0}
+.sim-k span{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+.sim-k b{font-family:var(--f-display);font-size:18px}
+.sim p{margin:0}
+@media (max-width:480px){.sim-k{grid-template-columns:minmax(0,1fr)}}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -827,7 +840,7 @@ function rules(p,base,mode,raw){
     const reste=Math.max(0,Math.round((plafPER-p.perDeja)/100)*100);
     if(tmi>=.30&&reste>=500){
       const sugg=p.epargne>0?Math.min(reste,Math.max(1000,Math.round(p.epargne*.4/100)*100)):Math.min(reste,3000);
-      add({id:"per",k:"epargne",ic:"piggy",title:"Verser "+fmt(sugg)+" sur un plan d'épargne retraite",gain:gainOf(p,{perPlus:sugg}),when:yEnd,tags:["epargne"],
+      add({id:"per",k:"epargne",ic:"piggy",sim:{max:reste,val:sugg},title:"Verser "+fmt(sugg)+" sur un plan d'épargne retraite",gain:gainOf(p,{perPlus:sugg}),when:yEnd,tags:["epargne"],
         what:"Ouvre un PER (banque ou assureur en ligne) et verse "+fmt(sugg)+" avant le 31 décembre. Tu as le droit de verser jusqu'à "+fmt(reste)+" cette année.",
         why:"Chaque euro versé est retiré de tes revenus imposables. Avec ta tranche à "+Math.round(tmi*100)+" %, 1 000 € versés = "+fmt(1000*tmi)+" d'impôt en moins.",
         whenTxt:"Le versement doit arriver avant le 31 décembre.",how:["Choisis un PER sans frais d'entrée.","Fais le virement avant le 31/12.","Au printemps, vérifie le montant pré-rempli."],cases:["6NS","6NT"],
@@ -1217,6 +1230,30 @@ function docsHTML(){const have=S.docs||{},n=DOCS.filter(d=>have[d.id]).length;
   <p>Plus tu rassembles de documents, plus les conseils sont précis. Le plus simple : <b>importe-les directement</b>, l'appli lit les PDF et remplit ta situation toute seule.</p><a class="btn primary" href="#importer">${ic("upload")}Importer mes PDF</a>
   <ul class="docs">${DOCS.map(d=>`<li class="doc${have[d.id]?" ok":""}"><span class="tile c-case">${ic(d.ic)}</span><span style="min-width:0;flex:1"><b>${d.n}</b><span class="dd">${d.d}</span><span class="dw">${ic("compass")}${d.w}</span></span><button type="button" class="switch" role="switch" aria-checked="${!!have[d.id]}" aria-label="J'ai ce document" data-doc="${d.id}"></button></li>`).join("")}</ul>`}
 
+/* ===== Rappels Google Agenda ===== */
+const ymd=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+function gcal(title,date,details){const d=date<TODAY?new Date(TODAY.getTime()+864e5):date,e=new Date(d.getTime()+864e5);
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("Boussole Fiscale : "+title)+"&dates="+ymd(d)+"/"+ymd(e)+"&details="+encodeURIComponent((details||"")+"\n\nOuvrir l'appli : "+appUrl())}
+function remindUrl(o){const g=o.when.grp;let d;
+  if(g==="annee"){d=new Date(YEAR,11,10);if(d<=TODAY)d=new Date(TODAY.getTime()+864e5)}
+  else if(g==="decl")d=new Date(DEC_SEASON,3,15);
+  else d=new Date(TODAY.getTime()+7*864e5);
+  return gcal(o.title,d,String(o.what).replace(/<[^>]+>/g,""))}
+
+/* ===== Simulateur PER ===== */
+function simHTML(o){const m=o.sim.max,v=Math.min(m,S.simPer??o.sim.val),d=LAST.d;
+  const marg=x=>(gainOf(d,{perPlus:x+100})-gainOf(d,{perPlus:x}))/100,m0=marg(0);let ideal=m;
+  for(let x=0;x<m;x+=100){if(marg(x)<m0-.02){ideal=x;break}}
+  const tip=ideal<m?`Jusqu'à <b>${fmt(ideal)}</b>, chaque euro versé te fait économiser ${Math.round(m0*100)} %. Au-delà, ça tombe à ${Math.round(marg(Math.min(ideal+100,m-100))*100)} % : ton point idéal est donc autour de <b>${fmt(ideal)}</b>.`:`Sur tout ton plafond, chaque euro versé te fait économiser environ ${Math.round(m0*100)} %.`;
+  return `<div class="sim"><div class="sim-h"><b>${ic("target")}Choisis ton montant</b><span class="tnum" id="simV">${fmt(v)}</span></div>
+  <input type="range" id="simR" min="0" max="${m}" step="100" value="${v}" aria-label="Montant versé sur le PER">
+  <div class="sim-scale"><span>0 €</span>${ideal<m?`<span class="ideal" style="left:${ideal/m*100}%">idéal</span>`:""}<span>${fmt(m)}</span></div>
+  <div class="sim-k"><div><span>Impôt en moins</span><b class="tnum" id="simG"></b></div><div><span>Ce que ça te coûte vraiment</span><b class="tnum" id="simC"></b></div><div><span>Payé par l'État</span><b class="tnum" id="simP"></b></div></div>
+  <p class="muted">${tip}</p></div>`}
+function simUpdate(v){S.simPer=v;const g=gainOf(LAST.d,{perPlus:v});const set=(id,t)=>{const e=$(id);if(e)e.textContent=t};
+  set("simV",fmt(v));set("simG",fmt(g));set("simC",fmt(v-g));set("simP",v>0?Math.round(g/v*100)+" %":"0 %")}
+$("groups").addEventListener("input",e=>{if(e.target.id==="simR")simUpdate(+e.target.value)});
+
 /* ===== Plan ===== */
 const FILTERS=[["all","Tout","spark"],["case","Juste une case à cocher","check"],["epargne","Épargne","piggy"],["credit","Crédits","card"],["immo","Immobilier","building"],["famille","Famille","users"],["travail","Travail","briefcase"]];
 const GROUPS=[["annee","Avant le 31 décembre","clock","c-famille"],["libre","Dès maintenant, quand tu veux","spark","c-epargne"],["decl","Au moment de déclarer ("+DEC_SEASON+")","receipt","c-case"]];
@@ -1238,10 +1275,11 @@ function cardHTML(o){
       <div class="step"><span class="si">${ic("clock")}</span><div><h4>Quand</h4><p>${o.whenTxt}</p></div></div>
       <div class="step"><span class="si">${ic("list")}</span><div><h4>Comment</h4><ol>${o.how.map(h=>`<li>${h}</li>`).join("")}</ol></div></div>
     </div>
+    ${o.sim?simHTML(o):""}
     ${whereHTML(o)}
     ${o.warn?`<div class="warn">${ic("alert")}<span>${o.warn}</span></div>`:""}
     <div class="card-f"><span class="cases">${o.cases.length?"Sur la déclaration :"+o.cases.map(c=>`<span class="case">${c}</span>`).join(""):""}</span>
-      <span class="acts"><a href="${o.link[0]}" target="_blank" rel="noopener">${o.link[1]} ↗</a><button type="button" class="btn${done?"":" primary"}" data-done="${o.id}">${done?"Annuler":ic("check")+"C'est fait"}</button></span></div>
+      <span class="acts"><a class="btn ghost" href="${remindUrl(o)}" target="_blank" rel="noopener">${ic("calendar")}Me le rappeler</a><a href="${o.link[0]}" target="_blank" rel="noopener">${o.link[1]} ↗</a><button type="button" class="btn${done?"":" primary"}" data-done="${o.id}">${done?"Annuler":ic("check")+"C'est fait"}</button></span></div>
   </div></article>`;
 }
 const sorter=(a,b)=>{const g={annee:0,libre:1,decl:2};const ga=g[a.when.grp]??1,gb=g[b.when.grp]??1;if(ga!==gb)return ga-gb;return (typeof b.gain==="number"?b.gain:-1)-(typeof a.gain==="number"?a.gain:-1)};
@@ -1279,6 +1317,7 @@ function update(){
   {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn primary" href="#importer">${ic("upload")}Importer mes PDF</a></div>`}
   if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
   $("side").innerHTML=side;
+  if($("simR"))simUpdate(+$("simR").value);
   $("lGain").innerHTML=fmt(annual).replace(" €","<small>€</small>");
   $("lSub").textContent=`par an · ${todo.length} action${todo.length>1?"s":""} trouvée${todo.length>1?"s":""} · impôt estimé ${fmt(tax)}`;
   $("exampleBanner").hidden=!S.example||["importer","installer"].includes(currentView());
@@ -1308,7 +1347,7 @@ function renderCal(){
     {d:nextDate(4,28),t:"Date limite de déclaration (environ)",s:"Entre fin mai et début juin selon ton département."},
     {d:nextDate(9,15),t:"Taxe foncière",s:LAST.d&&LAST.d.proprio?"Tu es propriétaire : prévois-la dans ton budget.":"Pour les propriétaires."}
   ].filter(x=>x.d>=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate())).sort((a,b)=>a.d-b.d);
-  $("deadlines").innerHTML=dls.map(x=>{const days=Math.max(0,Math.ceil((x.d-TODAY)/864e5));return `<div class="dl${x.hot?" hot":""}"><div class="date"><b>${x.d.getDate()}</b><span>${MONTHS[x.d.getMonth()].slice(0,4)}</span></div><div style="min-width:0"><h3>${x.t}</h3><p>${x.s}</p><p><b>Dans ${days} jour${days>1?"s":""}</b></p></div></div>`}).join("");
+  $("deadlines").innerHTML=dls.map(x=>{const days=Math.max(0,Math.ceil((x.d-TODAY)/864e5));return `<div class="dl${x.hot?" hot":""}"><div class="date"><b>${x.d.getDate()}</b><span>${MONTHS[x.d.getMonth()].slice(0,4)}</span></div><div style="min-width:0"><h3>${x.t}</h3><p>${x.s}</p><p><b>Dans ${days} jour${days>1?"s":""}</b> · <a href="${gcal(x.t,new Date(x.d.getTime()-7*864e5),x.s)}" target="_blank" rel="noopener">${ic("calendar")} Me le rappeler</a></p></div></div>`}).join("");
   const mine={},put=(m,t)=>(mine[m]=mine[m]||[]).push(t);
   todo.forEach(o=>{if(o.when.grp==="annee")put(11,o.title);else if(o.when.grp==="decl")put(4,o.title);else if(o.id==="vl")put(8,o.title)});
   $("months").innerHTML=[...Array(12).keys()].map(i=>(MONTH+i)%12).map(m=>{
@@ -1674,5 +1713,8 @@ route();
 })();
 </script>
 
-<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
+<script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let shown=false;
+addEventListener("load",()=>navigator.serviceWorker.register("sw.js").then(r=>{setInterval(()=>r.update().catch(()=>{}),36e5)}).catch(()=>{}));
+navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!had||shown)return;shown=true;const b=document.createElement("div");b.className="toast";b.style.cssText="display:flex;gap:12px;align-items:center";
+b.innerHTML='<span>Nouvelle version de l\'appli disponible</span><button class="btn primary" type="button">Mettre à jour</button>';b.querySelector("button").onclick=()=>location.reload();document.body.appendChild(b)})}</script>
 </body></html>
