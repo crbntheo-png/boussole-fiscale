@@ -1,0 +1,1314 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A4D39"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Boussole">
+<script>window.BOUSSOLE_PWA=true;</script>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head><body>
+<title>Boussole Fiscale</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout : application à 4 vues (Plan, Situation, Calendrier, Moi). Navigation en haut sur ordinateur, en bas sur téléphone. */
+:root{
+  --bg:#F3F5F0; --surface:#FFFFFF; --sunk:#ECF0EA; --ink:#12201A; --muted:#5E6B64; --line:#DFE5DD;
+  --accent:#0D6B4E; --accent-ink:#FFFFFF; --accent-soft:#DCF1E6;
+  --hero-a:#0A4D39; --hero-b:#13805B; --hero-ink:#F2FBF6;
+  --blue:#2F62B8; --blue-soft:#E3ECFA; --amber:#A35A00; --amber-soft:#FCEBD2; --rose:#BE2A49; --rose-soft:#FBE1E7;
+  --violet:#6347B8; --violet-soft:#ECE6FA; --teal:#0E7882; --teal-soft:#DCF1F2;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-code:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --shadow:0 1px 2px rgba(18,32,26,.05),0 8px 28px rgba(18,32,26,.07);
+  --r:18px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1411; --surface:#151F1B; --sunk:#111A16; --ink:#E8F0EC; --muted:#93A39B; --line:#24312B;
+  --accent:#3FC493; --accent-ink:#04261A; --accent-soft:#12382B;
+  --hero-a:#0B3B2D; --hero-b:#11604A; --hero-ink:#EAFBF3;
+  --blue:#8DB1F0; --blue-soft:#17253D; --amber:#F2A848; --amber-soft:#36270F; --rose:#F27C93; --rose-soft:#3A1820;
+  --violet:#B5A2F5; --violet-soft:#251D3D; --teal:#6FD0D8; --teal-soft:#0F2E31;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.28); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1411; --surface:#151F1B; --sunk:#111A16; --ink:#E8F0EC; --muted:#93A39B; --line:#24312B;
+  --accent:#3FC493; --accent-ink:#04261A; --accent-soft:#12382B;
+  --hero-a:#0B3B2D; --hero-b:#11604A; --hero-ink:#EAFBF3;
+  --blue:#8DB1F0; --blue-soft:#17253D; --amber:#F2A848; --amber-soft:#36270F; --rose:#F27C93; --rose-soft:#3A1820;
+  --violet:#B5A2F5; --violet-soft:#251D3D; --teal:#6FD0D8; --teal-soft:#0F2E31;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.28); color-scheme:dark}
+:root[data-theme="light"]{color-scheme:light}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+h1,h2,h3,h4{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.015em}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px;border-radius:8px}
+a{color:var(--accent);font-weight:600}
+.tnum{font-variant-numeric:tabular-nums}
+svg.i{width:1.25em;height:1.25em;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.25em}
+.wrap{max-width:1180px;margin:0 auto}
+
+/* En-tête */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+  padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.top-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--hero-b),var(--hero-a));display:grid;place-items:center;color:#fff;flex:none;box-shadow:0 4px 12px rgba(13,107,78,.3)}
+.logo svg.i{width:22px;height:22px}
+.brand b{font-family:var(--f-display);font-size:20px;font-weight:800;letter-spacing:-.02em}
+.nav{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);padding:4px;border-radius:14px;box-shadow:var(--shadow)}
+.nav a{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600;font-size:14px;position:relative}
+.nav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.nav .dot{min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
+.view{display:flex;flex-direction:column;gap:20px;padding-top:12px}
+
+.banner{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--blue-soft);border-radius:16px;padding:12px 16px;font-size:14px;margin-top:12px}
+.banner .t{display:flex;gap:10px;align-items:center}
+.banner .t>svg,.banner .t>span>svg{color:var(--blue)}
+.banner .t .logo svg{color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:12px;font-weight:600;font-size:14px;text-decoration:none;color:var(--ink);white-space:nowrap}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--rose);border-color:var(--rose-soft);background:var(--rose-soft)}
+.btn:hover{filter:brightness(.97)}
+
+/* Héro */
+.hero{position:relative;overflow:hidden;border-radius:26px;padding:26px;color:var(--hero-ink);background:linear-gradient(140deg,var(--hero-a) 0%,var(--hero-b) 100%);box-shadow:0 18px 40px -18px rgba(10,77,57,.6);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px}
+.hero::after{content:"";position:absolute;right:-90px;top:-90px;width:320px;height:320px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);box-shadow:0 0 0 40px rgba(255,255,255,.04),0 0 0 80px rgba(255,255,255,.03);pointer-events:none}
+.hello{font-size:14.5px;opacity:.85;display:flex;align-items:center;gap:8px}
+.hero h1{font-size:15px;font-family:var(--f-body);font-weight:600;letter-spacing:0;opacity:.85;margin-top:14px}
+.money{white-space:nowrap;font-family:var(--f-display);font-weight:800;font-size:58px;line-height:1;margin-top:4px;letter-spacing:-.03em}
+.money small{font-size:22px;opacity:.75;font-weight:700;margin-left:6px}
+.hero .split{margin-top:10px;font-size:14px;opacity:.9;max-width:520px}
+.hero-stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.hs{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 14px;min-width:0;display:flex;flex-direction:column}
+.hs span{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;opacity:.75;font-weight:600}
+.hs b{font-family:var(--f-display);font-size:20px;font-weight:700}
+.ring-box{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:1}
+.ring{width:150px;height:150px;position:relative;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .lbl{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .lbl b{font-family:var(--f-display);font-size:34px;font-weight:800;line-height:1}
+.ring .lbl span{font-size:12px;opacity:.8}
+.ring-cap{font-size:13px;text-align:center;opacity:.85;max-width:240px}
+
+.next{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.next .eyebrow{color:var(--c,var(--accent))}
+.next h3{font-size:18px;margin-top:2px}
+.eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
+
+.tile{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:none;background:var(--cs,var(--sunk));color:var(--c,var(--ink))}
+.tile svg.i{width:22px;height:22px}
+.c-case{--c:var(--blue);--cs:var(--blue-soft)} .c-epargne{--c:var(--accent);--cs:var(--accent-soft)} .c-immo{--c:var(--amber);--cs:var(--amber-soft)}
+.c-famille{--c:var(--rose);--cs:var(--rose-soft)} .c-travail{--c:var(--teal);--cs:var(--teal-soft)} .c-credit{--c:var(--violet);--cs:var(--violet-soft)}
+
+/* Plan */
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;white-space:nowrap;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .n{font-size:12px;opacity:.7}
+.group{display:flex;flex-direction:column;gap:10px}
+.group-h{display:flex;align-items:center;gap:10px;margin-top:6px}
+.group-h h2{font-size:19px}
+.group-h .cnt{font-size:12.5px;color:var(--muted);font-weight:600}
+.group-h .tile{width:32px;height:32px;border-radius:10px}
+.group-h .tile svg.i{width:17px;height:17px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:color-mix(in srgb,var(--c,var(--accent)) 45%,var(--line))}
+.card[data-open="true"]{border-color:var(--c,var(--accent))}
+.card.done{opacity:.6}
+.card-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:16px;width:100%;text-align:left;border:0;background:transparent}
+.card-t h3{font-size:16.5px;font-weight:700;line-height:1.3}
+.card-t p{margin:3px 0 0;font-size:13.5px;color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill svg.i{width:13px;height:13px}
+.pill.urgent{background:var(--rose-soft);color:var(--rose)}
+.pill.soon{background:var(--amber-soft);color:var(--amber)}
+.pill.free{background:var(--blue-soft);color:var(--blue)}
+.pill.pro{background:var(--violet-soft);color:var(--violet)}
+.pill.ok{background:var(--accent-soft);color:var(--accent)}
+.gain-wrap{display:flex;align-items:center;gap:10px}
+.gain{text-align:right;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end}
+.gain b{font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--accent);line-height:1.1}
+.gain span{font-size:12px;color:var(--muted)}
+.gain.soft b{font-size:14px;color:var(--c,var(--muted));font-weight:700}
+.chev{transition:transform .2s;color:var(--muted);display:flex}
+.card[data-open="true"] .chev{transform:rotate(90deg)}
+.card-b{padding:0 16px 18px;display:flex;flex-direction:column;gap:14px}
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.step{background:var(--sunk);border-radius:14px;padding:12px 14px;display:flex;gap:10px;min-width:0}
+.step .si{width:30px;height:30px;border-radius:9px;background:var(--surface);display:grid;place-items:center;color:var(--c,var(--accent));flex:none}
+.step h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.step p{margin:2px 0 0;font-size:14px}
+.step ol{margin:4px 0 0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:3px}
+.warn{display:flex;gap:10px;background:var(--amber-soft);border-radius:14px;padding:12px 14px;font-size:14px}
+.warn svg{color:var(--amber);margin-top:2px}
+.card-f{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.cases{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.case{font-family:var(--f-code);font-size:12.5px;background:var(--ink);color:var(--bg);padding:2px 8px;border-radius:6px}
+.acts{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.side{display:flex;flex-direction:column;gap:14px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 80px)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;min-width:0}
+.box h3{font-size:16px;display:flex;align-items:center;gap:8px}
+.box p{margin:0;font-size:14px;color:var(--muted)}
+.box p b{color:var(--ink)}
+.upgrade{background:linear-gradient(160deg,var(--violet-soft),var(--surface));border-color:color-mix(in srgb,var(--violet) 30%,var(--line))}
+.upgrade h3{color:var(--violet)}
+.skip-list{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.skip-list li{font-size:13.5px;display:flex;gap:8px}
+.skip-list li>svg{color:var(--muted);margin-top:2px}
+.skip-list b{display:block}
+.skip-list span span{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:40px 20px;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty svg.i{width:40px;height:40px;color:var(--accent)}
+
+/* Situation */
+.sit-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.form{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.form-top{padding:18px 20px 0;display:flex;flex-direction:column;gap:14px}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--sunk);padding:5px;border-radius:14px}
+.mode button{border:0;background:transparent;border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--muted);font-weight:700}
+.mode button small{font-weight:500;font-size:12px;text-align:center}
+.mode button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.stepper{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stp{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 2px;color:var(--muted);font-size:12.5px;font-weight:600}
+.stp .tile{width:40px;height:40px;border-radius:13px;background:var(--sunk);color:var(--muted)}
+.stp[aria-selected="true"]{color:var(--ink)}
+.stp[aria-selected="true"] .tile{background:var(--accent);color:var(--accent-ink)}
+.stp.filled .tile{background:var(--accent-soft);color:var(--accent)}
+.prog{height:4px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.fields{padding:20px;display:flex;flex-direction:column;gap:18px}
+.fields>h2{font-size:22px}
+.fields .lead{margin:-12px 0 0;color:var(--muted);font-size:14px}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field>label,.field .lbl{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:8px}
+.field>label svg,.field .lbl svg{color:var(--accent)}
+.field .help{font-size:12.5px;color:var(--muted);margin-top:-3px}
+.sub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px;background:var(--sunk);border-radius:14px}
+.sub .field>label{font-size:13px;font-weight:500}
+.inp{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;transition:border-color .15s,box-shadow .15s;min-width:0}
+.inp:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.inp input,.inp select{border:0;outline:0;background:transparent;padding:11px 12px;width:100%;min-width:0;font-size:15.5px;font-variant-numeric:tabular-nums}
+.inp span{padding:0 12px 0 0;color:var(--muted);font-size:13px;white-space:nowrap}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:12px;font-size:14px;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);font-weight:600}
+.seg button[aria-pressed="true"] svg{color:var(--accent)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:14px}
+.switch{width:48px;height:28px;border-radius:99px;border:0;background:var(--line);position:relative;flex:none;transition:background .15s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"]::after{left:23px}
+.form-foot{display:flex;justify-content:space-between;gap:8px;padding:14px 20px;border-top:1px solid var(--line);background:var(--sunk)}
+.list-sec{display:flex;flex-direction:column;gap:10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.list-sec>h3{font-size:18px;display:flex;align-items:center;gap:10px}
+.list-sec>h3 .tile{width:34px;height:34px;border-radius:11px}
+.list-sec>h3 .tile svg.i{width:18px;height:18px}
+.list-sec>p{margin:-4px 0 0;font-size:13px;color:var(--muted)}
+.item{border:1.5px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--surface)}
+.item-h{display:flex;gap:10px;align-items:center}
+.item-h .tile{width:36px;height:36px;border-radius:11px}
+.item-h .tile svg.i{width:18px;height:18px}
+.item-h .inp{flex:1}
+.item-h .inp select{font-weight:600;font-size:14.5px;padding-block:8px}
+.icon-btn{border:0;background:transparent;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--muted);flex:none}
+.icon-btn:hover{background:var(--rose-soft);color:var(--rose)}
+.item-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.item-f .field>label{font-size:12.5px;font-weight:500;color:var(--muted)}
+.item-f .inp input{padding:9px 10px;font-size:14.5px}
+.adder{display:flex;flex-wrap:wrap;gap:6px}
+.adder button{display:inline-flex;align-items:center;gap:6px;border:1.5px dashed var(--line);background:transparent;border-radius:11px;padding:7px 11px;font-size:13px;font-weight:600;color:var(--muted)}
+.adder button:hover{border-color:var(--c,var(--accent));color:var(--c,var(--accent))}
+.adder button svg.i{width:15px;height:15px}
+.live{background:linear-gradient(150deg,var(--hero-a),var(--hero-b));color:var(--hero-ink);border:0}
+.live .eyebrow{color:var(--hero-ink);opacity:.8}
+.live .money{font-size:40px}
+.live p{color:var(--hero-ink);opacity:.85}
+.live .btn{background:rgba(255,255,255,.14);color:var(--hero-ink);border-color:rgba(255,255,255,.2);justify-content:center}
+
+/* Calendrier */
+.deadlines{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.dl{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;gap:14px;align-items:center;box-shadow:var(--shadow)}
+.dl .date{width:58px;flex:none;text-align:center;border-radius:14px;background:var(--sunk);padding:6px 0}
+.dl .date b{display:block;font-family:var(--f-display);font-size:24px;line-height:1.1}
+.dl .date span{font-size:11.5px;text-transform:uppercase;font-weight:700;color:var(--muted);letter-spacing:.05em}
+.dl.hot .date{background:var(--rose-soft);color:var(--rose)}
+.dl.hot .date span{color:var(--rose)}
+.dl h3{font-size:15.5px}
+.dl p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.months{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.month{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.month h4{font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.month h4 span{font-family:var(--f-body);font-size:11.5px;color:var(--muted);font-weight:600}
+.month.now{border:2px solid var(--accent);background:var(--accent-soft)}
+.month ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.month li{font-size:12.8px;line-height:1.4;display:flex;gap:7px}
+.month li i{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none;margin-top:6px;opacity:.6}
+.month li.hot i{background:var(--rose);opacity:1}
+.month li.mine{font-weight:600}
+.month li.mine i{background:var(--accent);opacity:1}
+.note{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;font-size:14px}
+.note>svg{color:var(--accent);margin-top:2px}
+.sec-h h2{font-size:24px}
+.sec-h p{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+/* Moi */
+.me-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.me-head{display:flex;align-items:center;gap:16px}
+.avatar{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,var(--hero-b),var(--hero-a));color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-size:28px;font-weight:800;flex:none}
+.me-head h2{font-size:26px}
+.me-head p{margin:0;color:var(--muted)}
+.howlist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;counter-reset:s}
+.howlist li{display:flex;gap:12px;align-items:flex-start;font-size:14.5px;counter-increment:s;line-height:1.7}
+.howlist li::before{content:counter(s);width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none;line-height:1}
+.k{display:inline-flex;align-items:center;gap:4px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:0 7px;font-weight:600;font-size:13.5px;white-space:nowrap}
+.link-row{display:flex;gap:8px;align-items:center;background:var(--sunk);border-radius:12px;padding:8px 8px 8px 12px}
+.link-row code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-code);font-size:12.5px;user-select:all}
+textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);padding:10px;font-family:var(--f-code);font-size:12px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 90px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;z-index:50;box-shadow:var(--shadow)}
+.foot{font-size:12.5px;color:var(--muted);margin-top:24px}
+.muted{color:var(--muted);font-size:13.5px}
+.banner.inst{background:var(--accent-soft)}
+.logo.sm{width:30px;height:30px;border-radius:9px;box-shadow:none}
+.logo.sm svg.i{width:18px;height:18px}
+.inst-hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+.inst-hero h2{font-size:30px;line-height:1.1}
+.inst-hero p{margin:0;color:var(--muted)}
+.share-card{display:flex;gap:16px;align-items:center;background:var(--sunk);border-radius:18px;padding:14px;min-width:0}
+.qr{width:128px;height:128px;flex:none;background:#fff;border-radius:12px;padding:6px;display:grid;place-items:center}
+.qr svg{width:100%;height:100%}
+.qr svg path,.qr svg rect{shape-rendering:crispEdges}
+.tuto{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.tuto.pc{grid-template-columns:minmax(0,1fr)}
+.tstep{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);position:relative}
+.tuto.pc .tstep{flex-direction:row;align-items:flex-start}
+.tno{width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;flex:none}
+.ttxt h3{font-size:17px}
+.ttxt p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.tmock{display:flex;justify-content:center;margin-top:auto}
+/* Maquettes de téléphone (illustrations, couleurs fixes) */
+.phone{width:176px;max-width:100%;aspect-ratio:9/19;border-radius:30px;background:#16181B;padding:6px;box-shadow:0 10px 30px -10px rgba(0,0,0,.45)}
+.scr{width:100%;height:100%;border-radius:25px;overflow:hidden;position:relative;background:#F2F2F7;color:#111;font-family:-apple-system,"Inter",system-ui,sans-serif;font-size:9px;display:flex;flex-direction:column}
+.phone svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.m-app{flex:1;padding:22px 9px 8px;display:flex;flex-direction:column;gap:6px;background:#F3F5F0}
+.m-hero{height:62px;border-radius:12px;background:linear-gradient(140deg,#0A4D39,#13805B);padding:8px;display:flex;flex-direction:column;gap:4px}
+.m-hero i{display:block;width:40%;height:5px;border-radius:3px;background:rgba(255,255,255,.5)}
+.m-hero b{display:block;width:60%;height:14px;border-radius:4px;background:#fff}
+.m-hero em{display:block;width:80%;height:5px;border-radius:3px;background:rgba(255,255,255,.35)}
+.m-ln{height:6px;border-radius:3px;background:#D5DCD7;width:85%}
+.m-ln.s{width:55%}
+.m-card{height:30px;border-radius:8px;background:#fff;border:1px solid #E1E6E2}
+.m-bar{display:flex;align-items:center;gap:5px;padding:6px 7px 14px;background:rgba(249,249,249,.96);border-top:1px solid #DDD}
+.m-abar{display:flex;align-items:center;gap:5px;padding:20px 7px 6px;background:#fff;border-bottom:1px solid #E3E3E3}
+.m-url{flex:1;display:flex;align-items:center;justify-content:center;gap:3px;background:#E4E4E9;border-radius:9px;padding:5px;font-size:9px;color:#333}
+.m-url svg{width:9px;height:9px}
+.m-b{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;color:#0A7AFF;font-size:13px;font-weight:700;flex:none}
+.phone.and .m-b{color:#333}
+.m-dim{position:absolute;inset:0;background:rgba(0,0,0,.28)}
+.m-sheet{position:absolute;left:0;right:0;bottom:0;background:#F2F2F7;border-radius:14px 14px 0 0;padding:8px 7px 14px;display:flex;flex-direction:column;gap:7px}
+.m-sh-h{display:flex;gap:6px;align-items:center;background:#fff;border-radius:9px;padding:6px}
+.m-sh-h b{display:block;font-size:9.5px}
+.m-sh-h small,.m-form small,.m-dlg small{color:#888;font-size:8px}
+.m-grp{background:#fff;border-radius:9px;overflow:hidden}
+.m-row{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:7px 8px;border-bottom:1px solid #EEE;font-size:9px}
+.m-row:last-child{border-bottom:0}
+.m-ico{width:22px;height:22px;border-radius:6px;background:linear-gradient(140deg,#13805B,#0A4D39);display:grid;place-items:center;flex:none}
+.m-ico svg{width:15px;height:15px;stroke:none}
+.m-ico.big{width:38px;height:38px;border-radius:9px}
+.m-ico.big svg{width:26px;height:26px}
+.m-top{display:flex;justify-content:space-between;align-items:center;padding:22px 8px 8px;font-size:9px}
+.m-link{color:#0A7AFF;font-weight:600;padding:2px 4px}
+.phone.and .m-link{color:#0B57D0}
+.m-form{display:flex;gap:8px;align-items:center;padding:8px;margin:0 7px 8px}
+.m-field{border-bottom:1px solid #DDD;padding-bottom:2px;font-size:10px}
+.scr>.m-grp{margin:0 7px}
+.m-sw{width:22px;height:13px;border-radius:99px;background:#34C759;position:relative;flex:none}
+.m-sw::after{content:"";position:absolute;right:1.5px;top:1.5px;width:10px;height:10px;border-radius:50%;background:#fff}
+.m-kb{margin-top:auto;height:38%;background:#D1D3D9}
+.m-home{flex:1;background:linear-gradient(160deg,#3A6EA5,#7B5EA7 60%,#E07A5F);display:grid;grid-template-columns:repeat(4,1fr);gap:9px 5px;padding:30px 9px;align-content:start}
+.m-hi{display:flex;flex-direction:column;align-items:center;gap:3px}
+.m-hi small{font-size:7px;color:#fff;min-height:8px}
+.m-g{width:26px;height:26px;border-radius:7px;background:hsl(var(--h) 45% 72% / .85)}
+.m-hi .m-ico{width:26px;height:26px;border-radius:7px}
+.m-gen{width:26px;height:26px;border-radius:50%;background:#E4E6E8;border:2px solid #fff;display:block}
+.m-menu{position:absolute;right:5px;top:40px;width:72%;background:#fff;border-radius:9px;box-shadow:0 6px 20px rgba(0,0,0,.25);overflow:hidden}
+.m-menu .m-row{justify-content:flex-start}
+.m-dlg{position:absolute;left:10px;right:10px;top:34%;background:#fff;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;font-size:9.5px}
+.m-dlg .m-form{margin:0;padding:4px 0}
+.m-acts{display:flex;justify-content:flex-end;gap:6px}
+.hl{outline:2.5px solid #FF2D55;outline-offset:1px;border-radius:7px;animation:hlp 1.6s ease-in-out infinite;position:relative;z-index:1}
+@keyframes hlp{0%,100%{box-shadow:0 0 0 0 rgba(255,45,85,.45)}50%{box-shadow:0 0 0 6px rgba(255,45,85,0)}}
+@media (prefers-reduced-motion:reduce){.hl{animation:none}}
+@media (max-width:760px){.inst-hero{grid-template-columns:minmax(0,1fr)}.inst-hero h2{font-size:24px}.tuto{grid-template-columns:minmax(0,1fr)}.tstep{flex-direction:row;align-items:flex-start;flex-wrap:wrap}.tstep .ttxt{flex:1;min-width:0}.tmock{width:100%}}
+@media (max-width:420px){.share-card{flex-direction:column;align-items:stretch}.qr{margin:0 auto}}
+.where{display:flex;flex-direction:column;gap:10px}
+.where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
+.picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.pick{border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.pick.top{border-color:var(--c,var(--accent));background:var(--cs,var(--accent-soft))}
+.pick .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c,var(--accent))}
+.pick b{font-family:var(--f-display);font-size:16.5px}
+.pick p{margin:0;font-size:13.5px;color:var(--muted)}
+.pick.top p{color:var(--ink)}
+.pick a{font-size:13.5px;margin-top:2px}
+.inside{display:flex;gap:10px;background:var(--sunk);border-radius:14px;padding:11px 14px;font-size:14px}
+.inside>svg{color:var(--c,var(--accent));margin-top:2px}
+.docs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.doc{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px}
+.doc.ok{border-color:var(--accent);background:var(--accent-soft)}
+.doc .tile{width:36px;height:36px;border-radius:11px}
+.doc .tile svg.i{width:18px;height:18px}
+.doc b{display:block;font-size:14px}
+.doc .dd{display:block;font-size:13px;color:var(--muted)}
+.doc .dw{display:flex;gap:5px;align-items:center;font-size:12px;color:var(--accent);font-weight:600;margin-top:2px}
+.doc .dw svg.i{width:13px;height:13px}
+
+.bnav{display:none}
+@media (max-width:900px){
+  .plan-grid,.sit-grid{grid-template-columns:minmax(0,1fr)}
+  .side{position:static}
+  .months{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .me-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:760px){
+  .nav{display:none}
+  .bnav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
+    padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+  .bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:var(--muted);text-decoration:none;font-size:11.5px;font-weight:600;position:relative}
+  .bnav a svg.i{width:24px;height:24px}
+  .bnav a[aria-current="page"]{color:var(--accent)}
+  .bnav .dot{position:absolute;top:0;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--rose);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
+  body{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+  .hero{grid-template-columns:minmax(0,1fr);padding:22px}
+  .ring-box{flex-direction:row;justify-content:flex-start}
+  .ring{width:96px;height:96px}
+  .ring .lbl b{font-size:24px}
+  .ring-cap{text-align:left}
+  .money{font-size:46px}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .next{grid-template-columns:auto minmax(0,1fr)}
+  .next .btn{grid-column:1/-1;justify-content:center}
+}
+@media (max-width:480px){
+  .card-h{grid-template-columns:auto minmax(0,1fr);gap:12px}
+  .card-h .gain-wrap{grid-column:2}
+  .card-h .gain{flex-direction:row;align-items:baseline;gap:6px}
+  .card-h .chev{display:none}
+  .sub{grid-template-columns:minmax(0,1fr)}
+  .months{grid-template-columns:minmax(0,1fr)}
+  .stp{font-size:11px}
+  .brand b{font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#plan"><span class="logo" data-ic="logo"></span><b>Boussole Fiscale</b></a>
+    <nav class="nav" id="nav" aria-label="Navigation"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner inst" id="installBanner" hidden>
+    <span class="t"><span class="logo sm" data-ic="logo"></span><span><b>Installe Boussole Fiscale sur ton téléphone.</b> Une icône sur ton écran d'accueil, comme une vraie appli.</span></span>
+    <span class="row"><a class="btn primary" href="#installer"><span data-ic="install"></span>Voir le tuto</a><button class="icon-btn" type="button" id="instClose" aria-label="Masquer"><span data-ic="x"></span></button></span>
+  </div>
+  <div class="banner" id="exampleBanner" hidden>
+    <span class="t"><span data-ic="info"></span><span><b>Ceci est un exemple.</b> Une famille avec 2 enfants, un appartement en location, des crédits et des placements.</span></span>
+    <button class="btn primary" id="clearBtn" type="button"><span data-ic="arrow"></span>Saisir ma situation</button>
+  </div>
+
+  <section class="view" id="v-plan" aria-label="Mon plan">
+    <div class="hero">
+      <div style="position:relative;z-index:1;min-width:0">
+        <div class="hello" id="hello"></div>
+        <h1>Ce que tu peux gagner chaque année</h1>
+        <div class="money tnum" id="hGain">0 €</div>
+        <div class="split" id="hSplit"></div>
+        <div class="hero-stats">
+          <div class="hs"><span>Impôt estimé</span><b class="tnum" id="hTax">0 €</b></div>
+          <div class="hs"><span>Ta tranche</span><b class="tnum" id="hTmi">0 %</b></div>
+          <div class="hs"><span>Avant le 31 déc.</span><b class="tnum" id="hDays">0 jours</b></div>
+        </div>
+      </div>
+      <div class="ring-box">
+        <div class="ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="12"/><circle id="ringArc" cx="60" cy="60" r="50" fill="none" stroke="#7CF0C2" stroke-width="12" stroke-linecap="round" stroke-dasharray="314.16" stroke-dashoffset="314.16" style="transition:stroke-dashoffset .6s"/></svg>
+          <div class="lbl"><b class="tnum" id="ringPct">0 %</b><span>optimisé</span></div>
+        </div>
+        <div class="ring-cap" id="ringCap"></div>
+      </div>
+    </div>
+    <div class="next" id="nextBox" hidden></div>
+    <div class="plan-grid">
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="filters" id="chips" role="group" aria-label="Filtrer"></div>
+        <div id="groups" style="display:flex;flex-direction:column;gap:18px"></div>
+      </div>
+      <aside class="side" id="side"></aside>
+    </div>
+  </section>
+
+  <section class="view" id="v-situation" aria-label="Ma situation" hidden>
+    <div class="sit-grid">
+      <div class="form">
+        <div class="form-top">
+          <div class="mode" role="group" aria-label="Niveau de détail" id="modeSw">
+            <button type="button" data-mode="rapide"><span>Rapide</span><small>2 minutes, ordres de grandeur</small></button>
+            <button type="button" data-mode="complet"><span>Complet</span><small>Placements, crédits et biens un par un</small></button>
+          </div>
+          <div class="stepper" role="tablist" id="stepper"></div>
+          <div class="prog"><i id="progBar"></i></div>
+        </div>
+        <div class="fields" id="fields"></div>
+        <div class="form-foot">
+          <button class="btn ghost" type="button" id="prevBtn"><span data-ic="back"></span>Précédent</button>
+          <button class="btn primary" type="button" id="nextBtn">Suivant</button>
+        </div>
+      </div>
+      <aside class="side">
+        <div class="box live">
+          <span class="eyebrow">En direct</span>
+          <div class="money tnum" id="lGain">0 €</div>
+          <p id="lSub">par an, en suivant ton plan</p>
+          <a class="btn" href="#plan"><span data-ic="target"></span>Voir mon plan</a>
+        </div>
+        <div class="box"><h3><span data-ic="lock"></span>Confidentiel</h3><p>Tes chiffres restent sur cet appareil. Rien n'est envoyé, nulle part.</p></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="view" id="v-calendrier" aria-label="Calendrier" hidden>
+    <div class="sec-h"><h2>Mes prochaines échéances</h2><p>Les dates qui comptent pour toi, de la plus proche à la plus lointaine.</p></div>
+    <div class="deadlines" id="deadlines"></div>
+    <div class="sec-h"><h2>L'année fiscale en un coup d'œil</h2><p>En vert, tes actions. En rouge, les dates à ne pas rater.</p></div>
+    <div class="months" id="months"></div>
+    <div class="note"><span data-ic="bulb"></span><span><b>À tout moment :</b> mariage, Pacs, naissance, séparation, perte d'emploi, gros changement de revenus ? Signale-le dans les 60 jours sur impots.gouv.fr, rubrique "Gérer mon prélèvement à la source". Ton taux est recalculé tout de suite.</span></div>
+  </section>
+
+  <section class="view" id="v-installer" aria-label="Installer l'application" hidden>
+    <div class="inst-hero">
+      <div style="min-width:0;display:flex;flex-direction:column;gap:12px">
+        <span class="eyebrow"><span data-ic="install"></span>Gratuit · 1 minute · rien à télécharger sur un store</span>
+        <h2>Installe Boussole Fiscale sur ton écran d'accueil</h2>
+        <p>Choisis ton appareil, puis suis les images étape par étape.</p>
+        <div class="seg" id="instTabs"></div>
+      </div>
+      <div class="share-card">
+        <div class="qr" id="qrBox" aria-label="QR code du lien"></div>
+        <div style="min-width:0;display:flex;flex-direction:column;gap:8px">
+          <b id="shareT">Sur un ordinateur ?</b>
+          <span class="muted" id="shareD">Scanne ce code avec l'appareil photo de ton téléphone, ou envoie-toi le lien.</span>
+          <div class="link-row"><code id="instLink"></code><button class="btn" type="button" id="instCopy"><span data-ic="copy"></span>Copier</button></div>
+        </div>
+      </div>
+    </div>
+    <div id="instNow"></div>
+    <ol class="tuto" id="tuto"></ol>
+    <div class="note" id="instNote"></div>
+  </section>
+
+  <section class="view" id="v-moi" aria-label="Mon espace" hidden>
+    <div class="me-head"><div class="avatar" id="avatar">?</div><div><h2 id="meTitle">Mon espace</h2><p id="meSub"></p></div></div>
+    <div class="me-grid">
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0"><div class="box" id="docsBox"></div><div class="box" id="installBox"></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="box">
+          <h3><span data-ic="user"></span>Mon profil</h3>
+          <div class="field"><label for="s-prenom">Ton prénom</label><div class="inp"><input id="s-prenom" autocomplete="given-name" placeholder="Pour te dire bonjour"></div></div>
+          <div class="field"><span class="lbl">Niveau de détail</span><div class="seg" id="s-mode"></div></div>
+          <div class="field"><span class="lbl">Apparence</span><div class="seg" id="s-theme"></div></div>
+        </div>
+        <div class="box">
+          <h3><span data-ic="shield"></span>Mes données</h3>
+          <p id="dataSum"></p>
+          <div class="row">
+            <button class="btn" type="button" id="exportBtn"><span data-ic="copy"></span>Copier ma sauvegarde</button>
+            <button class="btn" type="button" id="importToggle"><span data-ic="upload"></span>Restaurer</button>
+          </div>
+          <div id="importBox" hidden>
+            <label for="importTxt" style="font-size:13.5px;color:var(--muted);display:block;margin-bottom:6px">Ton code de sauvegarde (colle-le sur l'autre appareil) :</label>
+            <textarea id="importTxt"></textarea>
+            <div class="row" style="margin-top:8px"><button class="btn primary" type="button" id="importBtn">Restaurer ce code</button><span id="importMsg" style="font-size:13.5px"></span></div>
+          </div>
+          <div class="row" style="border-top:1px solid var(--line);padding-top:10px">
+            <button class="btn danger" type="button" id="wipeBtn"><span data-ic="trash"></span>Tout effacer</button>
+            <span id="wipeConfirm" hidden class="row"><span style="font-size:13.5px">Sûr ? Tout sera perdu.</span><button class="btn danger" type="button" id="wipeYes">Oui, effacer</button><button class="btn ghost" type="button" id="wipeNo">Annuler</button></span>
+          </div>
+        </div>
+        <div class="box">
+          <h3><span data-ic="info"></span>À propos</h3>
+          <p>Estimation indicative, pas un conseil fiscal personnalisé. Barème 2026 (revenus 2025, revalorisé de 0,9 %) : 0 % jusqu'à 11 600 €, 11 % jusqu'à 29 579 €, 30 % jusqu'à 84 577 €, 41 % jusqu'à 181 917 €, 45 % au-delà. Taux des livrets et crédits : ceux que tu saisis. Pour vérifier : <a href="https://www.impots.gouv.fr" target="_blank" rel="noopener">impots.gouv.fr</a> et <a href="https://www.service-public.fr" target="_blank" rel="noopener">service-public.fr</a>. Donation, montage immobilier, renégociation : fais valider par un notaire, un expert-comptable ou ta banque.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <p class="foot">Boussole Fiscale · estimation indicative · barème 2026 sur revenus 2025.</p>
+</main>
+
+<nav class="bnav" id="bnav" aria-label="Navigation"></nav>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function(){
+"use strict";
+const IC={
+ logo:'<path d="M5 10v9.5M10.5 13.5v6M16 17v2.5" stroke-width="3.6"/><path d="M4.5 4.5l7 2.4 7.5 4.2M15.6 8.9l3.4 2.2-3.7 1.4" stroke-width="2"/>',
+ compass:'<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z" fill="currentColor"/>',
+ home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.6c2.7.2 4.5 2 4.5 5"/>',
+ calendar:'<rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+ list:'<rect x="5" y="3.5" width="14" height="18" rx="2"/><path d="M9 3.5V2h6v1.5M9 9.5h6M9 13.5h6M9 17.5h3"/>',
+ piggy:'<path d="M19 9.5h1.5v4H19c-.5 1.4-1.4 2.5-2.5 3.3V20h-3v-2h-3v2h-3v-3.2A6.5 6.5 0 0 1 9 5.5h4.5c1 0 2 .3 2.8.8L19 4.5z"/><path d="M15.5 10h.01"/>',
+ building:'<path d="M4 21V5.5L12 2.5v18.5M12 8l8 3v10M2 21h20"/><path d="M7 8h2M7 12h2M7 16h2M15 14h2M15 17.5h2"/>',
+ briefcase:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4.5h6V7M3 12.5h18"/>',
+ check:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="m8 12 3 3 5-6"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ euro:'<path d="M17.5 5.5a7.5 7.5 0 1 0 0 13"/><path d="M4 10h9M4 14h9"/>',
+ car:'<path d="M5 11.5 7 6.5h10l2 5"/><rect x="3" y="11.5" width="18" height="6" rx="2"/><path d="M6 20v-2.5M18 20v-2.5"/><circle cx="7.5" cy="14.5" r=".6" fill="currentColor"/><circle cx="16.5" cy="14.5" r=".6" fill="currentColor"/>',
+ heart:'<path d="M12 20s-7.5-4.5-7.5-10A4.3 4.3 0 0 1 12 7.5 4.3 4.3 0 0 1 19.5 10c0 5.5-7.5 10-7.5 10z"/>',
+ gift:'<rect x="3.5" y="8.5" width="17" height="4.5" rx="1"/><path d="M5 13v8h14v-8M12 8.5V21M12 8.5C10 4 6.5 4.5 6.5 6.5s5.5 2 5.5 2zM12 8.5c2-4.5 5.5-4 5.5-2s-5.5 2-5.5 2z"/>',
+ grad:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.2 9 2.2 12 0v-5M22 9v6"/>',
+ baby:'<circle cx="12" cy="12.5" r="8.5"/><path d="M9.2 11h.01M14.8 11h.01M9.5 15a3.5 3.5 0 0 0 5 0M12 4c-1.5 0-2 1.5-1 2.2"/>',
+ trend:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+ bank:'<path d="M3 10 12 4l9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>',
+ card:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6 15h4"/>',
+ percent:'<path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
+ receipt:'<path d="M5 3h14v18l-2.5-1.5L14 21l-2-1.5L10 21l-2.5-1.5L5 21z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+ wallet:'<path d="M19 7V5.5A1.5 1.5 0 0 0 17.5 4h-12A2.5 2.5 0 0 0 3 6.5v11A2.5 2.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15"/><path d="M3 6.5A2.5 2.5 0 0 0 5.5 9H20v6h-4a3 3 0 0 1 0-6"/>',
+ coins:'<ellipse cx="9" cy="7" rx="6" ry="3"/><path d="M3 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7"/><path d="M9 14v3c0 1.7 2.7 3 6 3s6-1.3 6-3v-4c0-1.7-2.7-3-6-3"/>',
+ bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+ target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
+ info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
+ alert:'<path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5M12 17.2h.01"/>',
+ arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+ back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+ chev:'<path d="m9 6 6 6-6 6"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ x:'<path d="M6 6l12 12M18 6 6 18"/>',
+ trash:'<path d="M4 7h16M9.5 7V4h5v3M6 7l1 13.5h10L18 7"/>',
+ lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>',
+ copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+ upload:'<path d="M12 20V9M7 14l5-5 5 5M4 4h16"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+ moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/>',
+ auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
+ phone:'<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+ monitor:'<rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+ share:'<path d="M12 3v12M8 7l4-4 4 4"/><path d="M7 10.5H5.5v10h13v-10H17"/>',
+ dots:'<circle cx="12" cy="5" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="19" r="1.4" fill="currentColor"/>',
+ plusbox:'<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/>',
+ install:'<path d="M12 3v10M8 9l4 4 4-4"/><rect x="3" y="15" width="18" height="6" rx="2"/>',
+ spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.7 1.8 1.8.7-1.8.7L19 22l-.7-1.8-1.8-.7 1.8-.7z"/>',
+ key:'<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14.5 8.5l2 2"/>',
+ leaf:'<path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19l8-8"/>',
+ hand:'<path d="M3 13h3l4 2h4a1.5 1.5 0 0 1 0 3h-4"/><path d="M14 18l5-2.5a1.5 1.5 0 0 1 1.5 2.5L14 21H3"/><circle cx="15" cy="7" r="3"/>'
+};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||IC.info}</svg>`;
+const hydrate=root=>root.querySelectorAll("[data-ic]").forEach(e=>{if(e.dataset.done!=="1"){e.insertAdjacentHTML("afterbegin",ic(e.dataset.ic));e.dataset.done="1"}});
+const $=id=>document.getElementById(id);
+
+/* ===== Constantes fiscales ===== */
+const BAREME=[[11600,0],[29579,.11],[84577,.30],[181917,.41],[Infinity,.45]];
+const QF_HALF=1807,QF_T=4262,DEC={solo:[1982,897],duo:[3277,1483]},ABAT_SAL=[509,14555],ABAT_PEN=[454,4439];
+const PASS=47100,PS=.172,PENSION_ENF=6794;
+const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
+const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
+const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
+const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
+const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
+const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ===== Types du mode complet ===== */
+const PLAC={courant:{l:"Compte courant",ic:"wallet",r:0},livretA:{l:"Livret A",ic:"piggy",r:1.7},ldds:{l:"LDDS",ic:"leaf",r:1.7},lep:{l:"LEP",ic:"piggy",r:2.5},
+ pel:{l:"PEL / CEL",ic:"home",r:2,year:true},cat:{l:"Compte à terme",ic:"clock",r:2.5},av:{l:"Assurance vie",ic:"shield",r:2.6,year:true},pea:{l:"PEA",ic:"trend",r:6,year:true},
+ cto:{l:"Compte-titres",ic:"trend",r:2},per:{l:"PER (retraite)",ic:"coins",r:5,year:true},pee:{l:"Épargne salariale",ic:"briefcase",r:5},scpi:{l:"SCPI (pierre-papier)",ic:"building",r:4.5},crypto:{l:"Crypto",ic:"key",r:0}};
+const CRED={rp:{l:"Prêt résidence principale",ic:"home",immo:true},nu:{l:"Prêt location vide",ic:"building",immo:true},meuble:{l:"Prêt location meublée",ic:"building",immo:true},
+ secondaire:{l:"Prêt résidence secondaire",ic:"home",immo:true},conso:{l:"Crédit conso / auto",ic:"car"},travaux:{l:"Prêt travaux",ic:"leaf"},etudiant:{l:"Prêt étudiant",ic:"grad"}};
+const BIEN={rp:{l:"Résidence principale",ic:"home"},nu:{l:"Location vide",ic:"building",rent:true},meuble:{l:"Location meublée",ic:"building",rent:true},secondaire:{l:"Résidence secondaire",ic:"home"},terrain:{l:"Terrain / autre",ic:"leaf"}};
+const txOf=x=>(x.taux===""||x.taux==null)?(PLAC[x.type]?PLAC[x.type].r:0):+x.taux;
+
+const DEFAULT={situation:"celib",age1:35,age2:35,enfants:0,under6:0,college:0,lycee:0,sup:0,seul:false,enfMaj:0,inval:false,
+  sal1:0,km1:0,sal2:0,km2:0,pension:0,ca:0,caType:"services",fraisPro:0,vl:false,capitaux:0,pv:0,prime:0,
+  proprio:false,loyersNu:0,chargesNu:0,loyersMeub:0,reelMeub:false,immoNet:0,epargne:0,hasPEA:false,hasAV:false,perDeja:0,
+  dons:0,domicile:0,garde:0,pensionEnf:0,aideParent:0,syndicat:0,placements:[],credits:[],biens:[],
+  gestion:"simple",risque:"equilibre",banque:"trad",perPlafond:0};
+let uid=1;const nid=()=>"i"+Date.now().toString(36)+(uid++);
+const EXAMPLE=Object.assign({},DEFAULT,{situation:"pacse",age1:41,age2:39,enfants:2,under6:1,college:1,sal1:58000,km1:28,sal2:34000,km2:6,garde:2400,
+  epargne:18000,hasAV:true,loyersNu:9600,chargesNu:4100,immoNet:380000,proprio:true,
+  placements:[{id:"e1",type:"courant",montant:14500,taux:0},{id:"e2",type:"livretA",montant:9000,taux:1.7},{id:"e3",type:"av",montant:24000,taux:2.6,annee:2016},{id:"e4",type:"cto",montant:12000,taux:2}],
+  credits:[{id:"e5",type:"rp",capital:186000,taux:4.1,assurance:.34,fin:2045},{id:"e6",type:"conso",capital:9500,taux:6.4,assurance:"",fin:2029},{id:"e7",type:"nu",capital:92000,taux:2.1,assurance:.2,fin:2039}],
+  biens:[{id:"e8",type:"rp",valeur:345000},{id:"e9",type:"nu",valeur:165000,loyers:9600,charges:1650}]});
+const isCouple=p=>p.situation==="marie"||p.situation==="pacse";
+const hasPartner=p=>isCouple(p)||p.situation==="concubin";
+
+function derive(p,mode){
+  const d=Object.assign({},p);if(mode!=="complet")return d;
+  const P=p.placements||[],C=p.credits||[],B=p.biens||[];
+  const sumP=t=>P.filter(x=>x.type===t).reduce((s,x)=>s+(+x.montant||0),0);
+  d.epargne=sumP("courant")+sumP("livretA")+sumP("ldds")+sumP("lep");
+  d.hasPEA=P.some(x=>x.type==="pea");d.hasAV=P.some(x=>x.type==="av");
+  let cap=0;P.forEach(x=>{if(x.type==="cto"||x.type==="cat"||(x.type==="pel"&&(+x.annee||0)>=2018))cap+=txOf(x)/100*(+x.montant||0)});
+  d.capitaux=Math.round(cap);
+  const scpiRev=P.filter(x=>x.type==="scpi").reduce((s,x)=>s+txOf(x)/100*(+x.montant||0),0);
+  const interets=t=>C.filter(c=>c.type===t).reduce((s,c)=>s+(+c.capital||0)*((+c.taux||0)+(+c.assurance||0))/100,0);
+  d.loyersNu=Math.round(B.filter(b=>b.type==="nu").reduce((s,b)=>s+(+b.loyers||0),0)+scpiRev);
+  d.chargesNu=Math.round(B.filter(b=>b.type==="nu").reduce((s,b)=>s+(+b.charges||0),0)+interets("nu"));
+  d.loyersMeub=B.filter(b=>b.type==="meuble").reduce((s,b)=>s+(+b.loyers||0),0);
+  const debt=C.filter(c=>CRED[c.type]&&CRED[c.type].immo).reduce((s,c)=>s+(+c.capital||0),0);
+  d.immoNet=Math.max(0,B.reduce((s,b)=>s+(+b.valeur||0),0)+sumP("scpi")-debt);
+  d.proprio=B.some(b=>b.type==="rp");
+  return d;
+}
+
+/* ===== Moteur d'impôt ===== */
+function bareme(R,parts){const q=Math.max(0,R)/parts;let t=0,prev=0;for(const [lim,r] of BAREME){if(q>prev)t+=(Math.min(q,lim)-prev)*r;prev=lim}return t*parts}
+function tmiOf(R,parts){const q=Math.max(0,R)/parts;for(const [lim,r] of BAREME){if(q<=lim)return r}return .45}
+function kmFrais(km){if(!km)return 0;const d=Math.min(km,40)*2*215;return d<=5000?d*.636:d<=20000?d*.357+1395:d*.427}
+function salNet(s,km,fr){if(s<=0)return 0;return s-(fr?kmFrais(km):Math.min(s,clamp(s*.1,ABAT_SAL[0],ABAT_SAL[1])))}
+function foyer(f){
+  let R=0;f.sals.forEach(x=>R+=salNet(x.s,x.km,x.fr));
+  if(f.pension>0)R+=f.pension-Math.min(f.pension,clamp(f.pension*.1,ABAT_PEN[0],ABAT_PEN[1]));
+  let vlTax=0;
+  if(f.ca>0){const ab={vente:.71,services:.5,bnc:.34}[f.caType],rate={vente:.01,services:.017,bnc:.022}[f.caType];
+    const pro=f.reelPro?Math.max(0,f.ca-f.fraisPro):f.ca*(1-ab);if(f.vl&&!f.reelPro)vlTax=f.ca*rate;else R+=pro}
+  let fonc=0;if(f.loyersNu>0){fonc=(f.reelNu||f.loyersNu>15000)?f.loyersNu-f.chargesNu:f.loyersNu*.7;R+=Math.max(-10700,fonc)}
+  let meub=0;if(f.loyersMeub>0){meub=f.reelMeub?f.loyersMeub*.15:f.loyersMeub*.5;R+=meub}
+  let pfu=0;if(f.capitaux>0){if(f.optBareme)R+=f.capitaux*.6;else pfu=f.capitaux*.128}
+  R-=f.per+f.pensionEnf+f.aideParent;R=Math.max(0,R);
+  const base=f.couple?2:1;let brut=bareme(R,f.parts);
+  if(f.parts>base){const t0=bareme(R,base),h=Math.round((f.parts-base)*2);brut=Math.max(brut,t0-(f.caseT?QF_T+(h-1)*QF_HALF:h*QF_HALF))}
+  const [seuil,dec]=f.couple?DEC.duo:DEC.solo;if(brut<seuil)brut=Math.max(0,brut-(dec-brut*.4525));
+  const red=Math.min(f.dons,R*.2)*.66+(f.scol?f.scolAmt:0);
+  const cred=Math.min(f.domicile,Math.min(15000,12000+1500*f.kids))*.5+Math.min(f.garde,3500*f.under6)*.5+Math.min(f.syndicat,f.salTotal*.01)*.66;
+  const ir=Math.max(0,brut-red)-cred,psFonc=(Math.max(0,fonc)+meub)*PS;
+  return {R,ir,vlTax,pfu,tmi:tmiOf(R,f.parts),parts:f.parts,brut,red,cred,psFonc,total:ir+vlTax+pfu+psFonc};
+}
+function partsOf(couple,kids,caseT,inval,veuf){let p=(couple||(veuf&&kids>0))?2:1;p+=kids<=2?kids*.5:1+(kids-2);if(caseT)p+=.5;if(inval)p+=.5;return p}
+function calc(p){
+  const couple=isCouple(p),caseT=p.situation==="celib"&&p.enfants>0&&p.seul;
+  const c={pension:p.pension,ca:p.ca,caType:p.caType,fraisPro:p.fraisPro,vl:p.vl,reelPro:!!p.reelPro,loyersNu:p.loyersNu,chargesNu:p.chargesNu,reelNu:!!p.reelNu,
+    loyersMeub:p.loyersMeub,reelMeub:p.reelMeub,capitaux:p.capitaux,optBareme:!!p.optBareme,per:p.perDeja+(p.perPlus||0),
+    pensionEnf:p.declPensionEnf?Math.min(p.pensionEnf,PENSION_ENF*p.enfMaj):0,aideParent:p.declAideParent?p.aideParent:0,
+    dons:p.dons,scol:!!p.scol,scolAmt:61*p.college+153*p.lycee+183*p.sup,domicile:p.domicile,garde:p.garde,syndicat:p.syndicat,kids:p.enfants,under6:p.under6};
+  if(p.situation==="concubin"){
+    const a=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal1,km:p.km1,fr:!!p.fr1}],parts:partsOf(false,p.enfants,false,p.inval,false),caseT:false,salTotal:p.sal1}));
+    const b=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal2,km:p.km2,fr:!!p.fr2}],pension:0,ca:0,loyersNu:0,loyersMeub:0,capitaux:0,per:0,pensionEnf:0,aideParent:0,dons:0,scol:false,domicile:0,garde:0,syndicat:0,kids:0,under6:0,parts:1,caseT:false,salTotal:p.sal2}));
+    return {R:a.R+b.R,ir:a.ir+b.ir,vlTax:a.vlTax,pfu:a.pfu,psFonc:a.psFonc,tmi:Math.max(a.tmi,b.tmi),parts:a.parts,total:a.total+b.total,sep:true,red:a.red+b.red,cred:a.cred+b.cred,brut:a.brut+b.brut};
+  }
+  const sals=[{s:p.sal1,km:p.km1,fr:!!p.fr1}];if(couple)sals.push({s:p.sal2,km:p.km2,fr:!!p.fr2});
+  return foyer(Object.assign({},c,{couple,sals,parts:partsOf(couple,p.enfants,caseT,p.inval,p.situation==="veuf"),caseT,salTotal:p.sal1+(couple?p.sal2:0)}));
+}
+const gainOf=(p,mod)=>Math.max(0,calc(p).total-calc(Object.assign({},p,mod)).total);
+
+/* ===== Règles ===== */
+const SP=q=>["https://www.service-public.fr/particuliers/recherche?keyword="+encodeURIComponent(q),"En savoir plus (service-public.fr)"];
+function rules(p,base,mode,raw){
+  const out=[],skip=[],add=o=>out.push(o);
+  const tmi=base.tmi,taxable=base.ir>0||base.brut>0;
+  const yEnd={label:"Avant le 31 déc.",lvl:DAYS_LEFT<=60?"urgent":"soon",grp:"annee"};
+  const decl={label:"Déclaration "+DEC_SEASON,lvl:"",grp:"decl"};
+  const any=l=>({label:l,lvl:"",grp:"libre"});
+  const revPro=(p.sal1+(hasPartner(p)?p.sal2:0))*.9+(p.ca>0?p.ca*.5:0);
+  if(revPro>0){
+    const plafPER=p.perPlafond>0?p.perPlafond:Math.max(PASS*.1,Math.min(revPro*.1,PASS*.8));
+    const reste=Math.max(0,Math.round((plafPER-p.perDeja)/100)*100);
+    if(tmi>=.30&&reste>=500){
+      const sugg=p.epargne>0?Math.min(reste,Math.max(1000,Math.round(p.epargne*.4/100)*100)):Math.min(reste,3000);
+      add({id:"per",k:"epargne",ic:"piggy",title:"Verser "+fmt(sugg)+" sur un plan d'épargne retraite",gain:gainOf(p,{perPlus:sugg}),when:yEnd,tags:["epargne"],
+        what:"Ouvre un PER (banque ou assureur en ligne) et verse "+fmt(sugg)+" avant le 31 décembre. Tu as le droit de verser jusqu'à "+fmt(reste)+" cette année.",
+        why:"Chaque euro versé est retiré de tes revenus imposables. Avec ta tranche à "+Math.round(tmi*100)+" %, 1 000 € versés = "+fmt(1000*tmi)+" d'impôt en moins.",
+        whenTxt:"Le versement doit arriver avant le 31 décembre.",how:["Choisis un PER sans frais d'entrée.","Fais le virement avant le 31/12.","Au printemps, vérifie le montant pré-rempli."],cases:["6NS","6NT"],
+        warn:"L'argent est bloqué jusqu'à la retraite (sauf achat de ta résidence principale). Ne verse que ce dont tu n'auras pas besoin.",link:SP("plan d'épargne retraite")});
+    } else if(tmi<.30)skip.push(["Plan d'épargne retraite","Avec une tranche à "+Math.round(tmi*100)+" %, l'avantage est trop faible pour bloquer ton argent."]);
+  }
+  [[1,p.sal1,p.km1],[2,hasPartner(p)?p.sal2:0,p.km2]].forEach(([i,s,km])=>{
+    if(s>0&&km>=10){const g=gainOf(p,{["fr"+i]:true});
+      if(g>=50)add({id:"fr"+i,k:"travail",ic:"car",title:"Déclarer "+(i===1?"tes":"ses")+" frais de trajet réels"+(i===2?" (conjoint)":""),gain:g,when:decl,tags:["case","travail"],
+        what:"Remplace l'abattement automatique de 10 % par les vrais frais de trajet ("+km+" km aller).",why:"Le barème kilométrique officiel donne environ "+fmt(kmFrais(km))+" par an, plus que les 10 % automatiques ("+fmt(clamp(s*.1,509,14555))+").",
+        whenTxt:"À la déclaration. Garde dès maintenant tes justificatifs.",how:["Compte les jours travaillés sur place (sans télétravail ni congés).","Indique le total dans la case frais réels.","Garde la carte grise et une capture de l'itinéraire."],cases:[i===1?"1AK":"1BK"],
+        warn:"Au-delà de 40 km aller, il faut justifier pourquoi tu habites loin. Calcul plafonné à 40 km, voiture de 5 CV.",link:SP("frais réels barème kilométrique")});
+      else skip.push(["Frais réels"+(i===2?" (conjoint)":""),"Les 10 % automatiques sont plus avantageux."]);}});
+  if(p.situation==="concubin"&&(p.sal1+p.sal2)>0){const g=gainOf(p,{situation:"pacse"});
+    if(g>=300)add({id:"pacs",k:"famille",ic:"heart",title:"Vous pacser pour déclarer ensemble",gain:g,when:yEnd,tags:["famille"],
+      what:"Signer un Pacs (mairie ou notaire) pour faire une seule déclaration à deux.",why:"Vos revenus sont différents : à deux, le plus gros revenu est réparti sur 2 parts et vous payez moins.",
+      whenTxt:"Un Pacs signé avant le 31 décembre compte pour toute l'année.",how:["Rendez-vous en mairie (gratuit) ou chez un notaire.","Signalez-le sur impots.gouv.fr sous 60 jours."],cases:[],
+      warn:"Le Pacs a aussi des effets juridiques (dettes du ménage, logement). Ce n'est pas qu'une décision fiscale.",link:SP("pacs")});}
+  if(p.situation==="celib"&&p.enfants>0&&p.seul){const g=gainOf(p,{seul:false});
+    if(g>0)add({id:"caseT",k:"case",ic:"users",title:"Cocher la case T (parent seul)",gain:g,when:decl,tags:["case","famille"],what:"Coche la case T : tu élèves seul(e) tes enfants.",why:"Elle ajoute une demi-part, donc moins d'impôt. Elle est souvent oubliée.",whenTxt:"Pendant la déclaration.",how:["Étape \"situation du foyer\".","Coche la case T."],cases:["T"],link:SP("parent isolé case T")});}
+  if(p.inval){const g=gainOf(p,{inval:false});
+    if(g>0)add({id:"inval",k:"case",ic:"shield",title:"Cocher la case invalidité",gain:g,when:decl,tags:["case","famille"],what:"Coche la case P (toi) ou F (ton conjoint).",why:"La carte d'invalidité donne une demi-part en plus.",whenTxt:"Pendant la déclaration.",how:["Étape \"situation du foyer\".","Coche P ou F."],cases:["P","F"],link:SP("demi-part invalidité")});}
+  if(61*p.college+153*p.lycee+183*p.sup>0){const g=gainOf(p,{scol:true});
+    if(g>0)add({id:"scol",k:"case",ic:"grad",title:"Déclarer la scolarité de tes enfants",gain:g,when:decl,tags:["case","famille"],what:"Indique combien d'enfants sont au collège, au lycée et en études supérieures.",why:"61 € par collégien, 153 € par lycéen, 183 € par étudiant. Rien à justifier, mais ce n'est pas automatique.",
+      whenTxt:"Pendant la déclaration (situation au 31 décembre).",how:["Rubrique \"réductions et crédits d'impôt\".","Indique le nombre d'enfants par niveau."],cases:["7EA","7EC","7EF"],link:SP("réduction impôt frais de scolarité")});}
+  if(p.enfMaj>0){
+    const gP=p.pensionEnf>0?gainOf(p,{declPensionEnf:true}):gainOf(Object.assign({},p,{pensionEnf:PENSION_ENF*p.enfMaj}),{declPensionEnf:true});
+    const gR=gainOf(p,{enfants:p.enfants+p.enfMaj,enfMaj:0}),ratt=gR>gP;
+    add({id:"enfmaj",k:"famille",ic:"users",title:ratt?"Rattacher ton enfant majeur à ta déclaration":"Déduire l'argent donné à ton enfant majeur",gain:Math.max(gP,gR),when:decl,tags:["famille","case"],
+      what:ratt?"Ton enfant (moins de 21 ans, ou moins de 25 ans s'il étudie) demande à être rattaché à ton foyer.":"Déclare l'aide versée comme pension alimentaire, jusqu'à "+fmt(PENSION_ENF)+" par enfant et par an.",
+      why:"C'est le choix le plus avantageux pour toi : rattachement ≈ "+fmt(gR)+", pension ≈ "+fmt(gP)+". C'est l'un ou l'autre.",whenTxt:"Chaque année à la déclaration. Tu peux changer d'option.",
+      how:ratt?["Ton enfant signe une demande de rattachement (papier libre).","Ajoute-le dans ta déclaration.","Ses revenus s'ajoutent aux tiens."]:["Garde les preuves des versements.","Déclare le total en pension alimentaire.","Ton enfant déclare cette somme (souvent sans impôt pour lui)."],
+      cases:ratt?["Rattachement"]:["6EL","6EM"],link:SP("pension alimentaire enfant majeur")});}
+  if(p.aideParent>0){const g=gainOf(p,{declAideParent:true});
+    if(g>0)add({id:"parent",k:"famille",ic:"hand",title:"Déduire l'aide versée à ton parent",gain:g,when:decl,tags:["famille","case"],what:"Déclare les "+fmt(p.aideParent)+" versés comme pension alimentaire à un parent.",why:"Aider un parent aux revenus modestes (maison de retraite, loyer) se déduit de tes revenus. Oubli très fréquent.",
+      whenTxt:"À la déclaration. Garde factures et virements.",how:["Rassemble les preuves.","Déclare le total en pension alimentaire.","Ton parent déclare la même somme."],cases:["6GU"],warn:"Ton parent doit être dans le besoin et la somme raisonnable par rapport à tes revenus.",link:SP("pension alimentaire ascendant")});}
+  if(p.capitaux>0&&tmi<=.11){const g=gainOf(p,{optBareme:true});
+    if(g>=20)add({id:"bareme",k:"case",ic:"percent",title:"Cocher l'option barème pour tes revenus de placement",gain:g,when:decl,tags:["case","epargne"],what:"Coche la case 2OP : tes intérêts et dividendes seront taxés à "+Math.round(tmi*100)+" % au lieu de 12,8 %.",why:"Ta tranche est basse, et les dividendes ont en plus un abattement de 40 % avec cette option.",
+      whenTxt:"Pendant la déclaration.",how:["Rubrique revenus de capitaux mobiliers.","Coche 2OP."],cases:["2OP"],warn:"Calcul fait comme si c'étaient des dividendes. Pour des intérêts seuls, le gain est plus petit.",link:SP("option barème 2OP")});}
+  if(p.pv>0)add({id:"mv",k:"epargne",ic:"trend",title:"Vendre tes actions en perte pour effacer tes gains",gain:null,gainTxt:"jusqu'à "+fmt(p.pv*.128),when:yEnd,tags:["epargne"],what:"Si des actions sont en perte sur ton compte-titres, vends-les avant le 31 décembre. Tu peux les racheter après.",why:"Tes pertes sont soustraites de tes "+fmt(p.pv)+" de gains. Moins de gains, moins d'impôt.",
+      whenTxt:"Avant le 31 décembre.",how:["Repère les lignes en rouge.","Vends avant fin décembre.","Ta banque calcule tout sur le relevé fiscal."],cases:["3VG","3VH"],link:SP("moins-values actions")});
+  if(p.dons===0&&base.ir>200)add({id:"dons",k:"famille",ic:"gift",title:"Faire tes dons avant le 31 décembre",gain:null,gainTxt:"66 % remboursés",when:yEnd,tags:["famille"],what:"Si tu comptes donner à une association, fais-le avant la fin de l'année.",why:"Un don de 100 € ne te coûte que 34 €. Pour l'aide aux personnes en difficulté (Restos du cœur...), 75 % jusqu'à environ 1 000 €.",
+      whenTxt:"Avant le 31 décembre.",how:["Choisis une association reconnue d'intérêt général.","Garde le reçu fiscal."],cases:["7UF","7UD"],link:SP("réduction impôt dons")});
+  if(!taxable&&p.dons>0)skip.push(["Réduction pour tes dons","Tu ne paies pas d'impôt : elle ne te rapporte rien."]);
+  if(p.domicile===0&&(p.enfants>0||p.age1>=60||p.proprio))add({id:"dom",k:"famille",ic:"home",title:"Ménage, jardin, cours : l'État paie la moitié",gain:null,gainTxt:"50 % remboursés",when:any("Toute l'année"),tags:["famille"],what:"Ménage, jardinage, soutien scolaire, petit bricolage : tu récupères 50 % de ce que tu paies.",why:"C'est un crédit d'impôt, remboursé même sans impôt. 1 000 € de ménage = 500 € récupérés.",
+      whenTxt:"Toute l'année. Avec l'avance immédiate, tu ne paies que la moitié tout de suite.",how:["Passe par une entreprise agréée ou le CESU.","Active l'avance immédiate.","Plafond : 12 000 € par an (+1 500 € par enfant)."],cases:["7DB"],link:SP("crédit d'impôt emploi à domicile")});
+  if(p.domicile>0)add({id:"avance",k:"travail",ic:"clock",title:"Activer l'avance immédiate pour l'aide à domicile",gain:null,gainTxt:"Trésorerie",when:any("Dès maintenant"),tags:[],what:"Ne paie que 50 % de la facture le jour même, au lieu d'attendre le remboursement l'année suivante.",why:"Tu récupères déjà "+fmt(Math.min(p.domicile,15000)*.5)+" par an. Autant ne pas les avancer.",
+      whenTxt:"Dès maintenant.",how:["Demande à ton prestataire.","Ou active-la sur ton compte CESU."],cases:["7DB"],link:SP("avance immédiate crédit d'impôt")});
+  if(p.under6>0&&p.garde===0)add({id:"garde",k:"famille",ic:"baby",title:"Déclarer les frais de garde (moins de 6 ans)",gain:null,gainTxt:"jusqu'à "+fmt(1750*p.under6),when:decl,tags:["case","famille"],what:"Crèche, assistante maternelle, garderie : déclare ce qu'il te reste à payer après la CAF.",why:"Tu récupères 50 %, jusqu'à 3 500 € de dépenses par enfant. Remboursé même sans impôt.",
+      whenTxt:"À la déclaration.",how:["Récupère l'attestation annuelle.","Rubrique frais de garde."],cases:["7GA","7GB"],link:SP("crédit d'impôt frais de garde")});
+  if(p.prime>0&&tmi>0)add({id:"pee",k:"travail",ic:"briefcase",title:"Placer ta prime d'intéressement au lieu de la toucher",gain:p.prime*tmi,when:any("À la prochaine prime"),tags:["epargne","travail"],what:"Quand ton entreprise te propose de toucher ou placer ta prime, choisis \"placer\" sur le plan d'épargne entreprise.",why:"Placée, la prime n'est pas imposée. Touchée, elle te coûterait environ "+fmt(p.prime*tmi)+" d'impôt.",
+      whenTxt:"Tu as souvent 15 jours pour choisir, au printemps.",how:["Surveille le mail de ton gestionnaire d'épargne salariale.","Choisis \"placer\"."],cases:[],warn:"Bloqué 5 ans, sauf cas de déblocage (mariage, naissance, achat de résidence principale...).",link:SP("plan d'épargne entreprise")});
+  if(p.loyersNu>0){
+    if(p.loyersNu<=15000){const g=gainOf(p,{reelNu:true});
+      if(g>=100)add({id:"reel",k:"immo",ic:"receipt",title:"Passer ta location vide au régime réel",gain:g,when:decl,tags:["immo"],
+        what:"Au lieu de 30 % de déduction automatique, déclare tes vraies dépenses : "+fmt(p.chargesNu)+" par an"+(mode==="complet"?" (intérêts et assurance du prêt compris)":"")+".",
+        why:"Tes dépenses font "+Math.round(p.chargesNu/p.loyersNu*100)+" % de tes loyers, plus que les 30 % automatiques. Moins d'impôt et de prélèvements sociaux.",
+        whenTxt:"À la déclaration, formulaire 2044. Engagement de 3 ans minimum.",how:["Rassemble intérêts d'emprunt, taxe foncière, assurance, travaux.","Remplis la 2044 en ligne (guidée).","Reporte le résultat."],cases:["4BA","2044"],link:SP("régime réel revenus fonciers")});
+      else skip.push(["Régime réel (location vide)","Tes dépenses sont sous les 30 % automatiques."]);}
+    if(tmi>=.30)add({id:"deficit",k:"immo",ic:"building",title:"Faire les travaux de ta location avant le 31 décembre",gain:null,gainTxt:"jusqu'à "+fmt(10700*(tmi+PS)),when:yEnd,tags:["immo"],
+      what:"Si des travaux d'entretien ou de rénovation sont prévus dans ta location vide, paie-les cette année.",why:"Au réel, les travaux qui dépassent tes loyers créent un déficit : jusqu'à 10 700 € retirés de ton revenu total.",whenTxt:"C'est la date de paiement qui compte : avant le 31/12.",
+      how:["Fais faire les devis maintenant.","Paie avant le 31/12.","Déclare au réel (2044)."],cases:["4BC"],warn:"Agrandissement et construction exclus. Tu dois continuer à louer 3 ans.",link:SP("déficit foncier")});
+  }
+  if(p.loyersMeub>0&&!p.reelMeub){const g=gainOf(p,{reelMeub:true});
+    if(g>=300)add({id:"lmnp",k:"immo",ic:"building",title:"Passer ton meublé au régime réel",gain:g,approx:true,when:{label:"Avant le 1er janvier",lvl:"soon",grp:"annee"},tags:["immo"],
+      what:"Avec un comptable, tu déduis toutes les charges et une partie de la valeur du bien chaque année (amortissement).",why:"Le revenu imposable du meublé tombe souvent presque à zéro pendant des années. Au micro, tu n'as que 50 % de déduction.",
+      whenTxt:"Le choix vaut pour l'année entière : décide avant le 1er janvier.",how:["Prends un comptable spécialisé (300 à 600 € par an).","Il fait la déclaration 2031."],cases:["2031"],warn:"Depuis 2025, les amortissements sont repris dans la plus-value à la revente. À valider si tu comptes vendre.",link:SP("location meublée régime réel")});}
+  if(p.ca>0){const ab={vente:.71,services:.5,bnc:.34}[p.caType];
+    if(p.fraisPro>p.ca*ab*1.15){const g=gainOf(p,{reelPro:true});
+      if(g>=200)add({id:"reelpro",k:"travail",ic:"receipt",title:"Étudier le régime réel pour ton entreprise",gain:g,approx:true,when:{label:"Avant le 1er janvier",lvl:"soon",grp:"annee"},tags:["travail"],
+        what:"Tes vraies dépenses ("+fmt(p.fraisPro)+") dépassent la déduction automatique du micro ("+Math.round(ab*100)+" %).",why:"Au réel, tu es taxé sur ton vrai bénéfice, plus bas ici.",whenTxt:"L'option se fait avant le début de l'année.",how:["Demande un devis à un expert-comptable.","Compare aussi tes cotisations sociales."],cases:[],warn:"Le réel demande une vraie comptabilité.",link:SP("micro-entreprise régime réel")});}
+    if(!p.vl){const g=gainOf(p,{vl:true});
+      if(g>=100&&base.R/base.parts<=29315)add({id:"vl",k:"travail",ic:"percent",title:"Choisir le versement libératoire",gain:g,when:any("Avant le 30 sept."),tags:["travail"],
+        what:"Tu paies ton impôt directement sur ton chiffre d'affaires ("+({vente:"1 %",services:"1,7 %",bnc:"2,2 %"}[p.caType])+") avec tes cotisations URSSAF.",why:"Pour toi, c'est moins que l'impôt normal sur ton bénéfice.",whenTxt:"Avant le 30 septembre pour l'année suivante.",
+        how:["Connecte-toi sur autoentrepreneur.urssaf.fr.","Demande l'option."],cases:[],warn:"Réservé si ton revenu fiscal d'il y a 2 ans ne dépasse pas environ 29 000 € par part.",link:SP("versement libératoire")});}
+  }
+  const ctoAmt=(raw.placements||[]).filter(x=>x.type==="cto").reduce((s,x)=>s+(+x.montant||0),0);
+  if(!p.hasPEA&&p.epargne>=1000&&!(mode==="complet"&&ctoAmt>=5000))add({id:"pea",k:"epargne",ic:"trend",title:"Ouvrir un PEA maintenant, même avec 10 €",gain:null,gainTxt:"Gain futur",when:any("Dès maintenant"),tags:["epargne"],
+      what:"Ouvre un plan d'épargne en actions dans une banque en ligne et verse une petite somme.",why:"Après 5 ans, plus d'impôt sur le revenu sur les gains. Le compteur démarre à l'ouverture.",whenTxt:"Maintenant, même avec très peu.",how:["Banque en ligne sans frais de tenue.","Verse 10 à 50 €.","Plus tard, investis régulièrement (fonds indiciels)."],cases:[],link:SP("plan d'épargne en actions")});
+  if(!p.hasAV&&p.epargne>=2000)add({id:"av",k:"epargne",ic:"shield",title:"Ouvrir une assurance vie pour lancer le compteur des 8 ans",gain:null,gainTxt:"Gain futur",when:any("Dès maintenant"),tags:["epargne"],
+      what:"Ouvre une assurance vie sans frais sur versements, avec un petit montant.",why:"Après 8 ans, 4 600 € de gains par an sans impôt (9 200 € en couple). Et 152 500 € transmis par bénéficiaire sans droits.",whenTxt:"Maintenant : les 8 ans démarrent au premier versement.",how:["Contrat en ligne sans frais d'entrée.","Premier versement.","Désigne tes bénéficiaires."],cases:[],link:SP("assurance vie fiscalité")});
+  const lepPlaf=23028+(base.parts-1)*2*6150;
+  if(mode!=="complet"&&base.R>0&&base.R<=lepPlaf&&p.epargne>0)add({id:"lep",k:"epargne",ic:"piggy",title:"Ouvrir un Livret d'épargne populaire (LEP)",gain:null,gainTxt:"Meilleur livret",when:any("Dès maintenant"),tags:["epargne"],
+      what:"Le LEP rapporte plus que le Livret A, sans impôt, jusqu'à 10 000 €.",why:"Tes revenus semblent sous le plafond (environ "+fmt(lepPlaf)+" de revenu fiscal de référence).",whenTxt:"Dès maintenant.",how:["Prends ton dernier avis d'impôt.","Demande un LEP à ta banque."],cases:[],link:SP("livret d'épargne populaire")});
+  const kidsAll=p.enfants+p.enfMaj;
+  if(kidsAll>0&&p.epargne>=30000&&YEAR<=2026)add({id:"don26",k:"famille",ic:"gift",title:"Donner jusqu'à 100 000 € sans droits pour un logement neuf",gain:null,gainTxt:"Fin le 31/12/2026",when:yEnd,tags:["famille"],
+      what:"Si un enfant achète un logement neuf (résidence principale) ou fait des travaux de rénovation énergétique, tu peux lui donner jusqu'à 100 000 € sans droits.",why:"Mesure temporaire, en plus de l'abattement habituel de 100 000 €. Elle s'arrête le 31 décembre 2026.",whenTxt:"Don avant le 31/12/2026, argent utilisé dans les 6 mois.",
+      how:["Vérifie le projet de ton enfant.","Fais le virement et déclare le don (formulaire 2735).","Passe chez le notaire si la somme est importante."],cases:["2735"],warn:"Conditions précises à valider avec un notaire avant de donner.",link:SP("don familial logement neuf exonération")});
+  if(kidsAll>0&&(p.epargne>=50000||p.immoNet>=400000))add({id:"donation",k:"famille",ic:"gift",title:"Donner de ton vivant, tous les 15 ans",gain:null,gainTxt:"Succession allégée",when:any("Quand tu veux"),tags:["famille"],
+      what:"Chaque parent peut donner 100 000 € à chaque enfant tous les 15 ans sans droits. Plus 31 865 € en argent si tu as moins de 80 ans.",why:"Plus tu commences tôt, plus tu peux réutiliser ces abattements. Ce qui est donné échappe aux droits de succession (20 % à 45 %).",whenTxt:"Pas de date limite. Le compteur de 15 ans démarre au don.",
+      how:["Fais le point avec un notaire.","Pour de l'argent, une déclaration de don manuel suffit."],cases:["2735"],link:SP("abattement donation enfant")});
+  if(p.immoNet>1300000)add({id:"ifi",k:"immo",ic:"bank",title:"Tu es concerné par l'impôt sur la fortune immobilière",gain:null,gainTxt:"À optimiser",when:decl,tags:["immo"],what:"Au-dessus de 1,3 million € d'immobilier net, tu déclares l'IFI avec tes revenus.",why:"Ta résidence principale a 30 % de réduction. Les crédits restants se déduisent.",
+      whenTxt:"Valeur au 1er janvier, déclaration au printemps.",how:["Fais estimer tes biens.","Liste tous les crédits restants.","Un conseiller patrimonial peut aider."],cases:["IFI"],link:SP("impôt sur la fortune immobilière")});
+  if(isCouple(p)&&p.sal1>0&&p.sal2>0&&Math.max(p.sal1,p.sal2)/Math.min(p.sal1,p.sal2)>=1.5)add({id:"pas",k:"travail",ic:"percent",title:"Individualiser votre taux de prélèvement",gain:null,gainTxt:"Plus juste",when:any("Quand tu veux"),tags:["travail"],
+      what:"Chacun a un taux selon ses propres revenus, au lieu d'un taux commun.",why:"Le total ne change pas, mais celui qui gagne moins est moins prélevé chaque mois.",whenTxt:"À tout moment, effet en 2 mois environ.",how:["impots.gouv.fr → Gérer mon prélèvement à la source.","Choisis \"taux individualisé\"."],cases:[],link:["https://www.impots.gouv.fr","Ouvrir impots.gouv.fr"]});
+
+  /* ===== Mode complet ===== */
+  if(mode==="complet"){
+    const P=raw.placements||[],C=raw.credits||[];
+    const sumP=t=>P.filter(x=>x.type===t).reduce((s,x)=>s+(+x.montant||0),0);
+    const rateOf=t=>{const x=P.find(y=>y.type===t);return x?txOf(x):PLAC[t].r};
+    const cc=sumP("courant"),la=sumP("livretA"),ld=sumP("ldds"),lep=sumP("lep");
+    const SAFE=3000,rA=rateOf("livretA"),roomA=Math.max(0,22950-la),roomD=Math.max(0,12000-ld);
+    let available=Math.max(0,cc-SAFE);
+    if(available>=1000&&roomA+roomD>0){const mv=Math.min(available,roomA+roomD);
+      const dest=roomA>=mv?"ton Livret A":roomA>0?"ton Livret A puis ton LDDS":"ton LDDS";
+      add({id:"cash",k:"epargne",ic:"wallet",pro:true,money:true,title:"Faire travailler les "+fmt(mv)+" qui dorment sur ton compte courant",gain:mv*rA/100,when:any("Dès maintenant"),tags:["epargne"],
+        what:"Garde environ "+fmt(SAFE)+" sur ton compte courant et mets "+fmt(mv)+" sur "+dest+".",why:"Sur le compte courant, cet argent ne rapporte rien. Sur un livret, il rapporte "+pct(rA)+" par an, sans impôt et disponible à tout moment.",
+        whenTxt:"Tout de suite : les intérêts sont calculés par quinzaine.",how:["Fais un virement depuis ton appli bancaire.","Programme un virement automatique chaque mois."],cases:[],link:SP("livret A")});
+      available-=mv;}
+    if(available>=5000&&roomA+roomD===0)add({id:"surplus",k:"epargne",ic:"coins",pro:true,title:"Placer ton surplus d'épargne à plus long terme",gain:null,gainTxt:"Gain futur",when:any("Dès maintenant"),tags:["epargne"],
+      what:"Tes livrets sont pleins et "+fmt(available)+" restent sur ton compte courant. Place ce que tu n'utiliseras pas avant 5 ans.",why:"Assurance vie ou PEA rapportent plus sur la durée, avec des avantages fiscaux.",whenTxt:"Dès maintenant, de préférence en plusieurs fois.",
+      how:["Garde 3 à 6 mois de dépenses sur les livrets.","Le reste : assurance vie ou PEA."],cases:[],link:SP("assurance vie")});
+    if(base.R>0&&base.R<=lepPlaf&&lep<10000){const amt=Math.min(10000-lep,la+ld+Math.max(0,cc-SAFE)),rL=rateOf("lep");
+      if(amt>=500)add({id:"lep2",k:"epargne",ic:"piggy",pro:true,money:true,title:"Déplacer "+fmt(amt)+" vers un LEP",gain:amt*(rL-rA)/100,when:any("Dès maintenant"),tags:["epargne"],
+        what:"Ouvre un Livret d'épargne populaire et transfère-y "+fmt(amt)+" depuis tes autres livrets.",why:"Le LEP rapporte "+pct(rL)+" contre "+pct(rA)+" pour le Livret A, toujours sans impôt. Tes revenus semblent sous le plafond (environ "+fmt(lepPlaf)+").",
+        whenTxt:"Dès maintenant.",how:["Prends ton dernier avis d'impôt.","Demande un LEP à ta banque : elle vérifie ton droit."],cases:[],link:SP("livret d'épargne populaire")});}
+    let cash=Math.max(0,la+ld+cc-8000);
+    C.slice().sort((a,b)=>(+b.taux||0)-(+a.taux||0)).forEach(c=>{
+      const t=+c.taux||0,cap=+c.capital||0,def=CRED[c.type]||CRED.conso;
+      if(c.type==="nu"||c.type==="meuble")return;
+      if(t>=3&&cap>0&&cash>=1000&&t-rA>=1.5){const amt=Math.min(cap,cash);cash-=amt;
+        add({id:"remb-"+c.id,k:"credit",ic:"card",pro:true,money:true,title:"Rembourser en avance "+fmt(amt)+" de ton "+def.l.toLowerCase(),gain:amt*(t-rA)/100,when:any("Dès maintenant"),tags:["credit"],
+          what:"Utilise "+fmt(amt)+" de ton épargne pour rembourser une partie de ce crédit à "+pct(t)+".",why:"Ce crédit te coûte "+pct(t)+" par an alors que ton épargne rapporte "+pct(rA)+". Rembourser, c'est un placement garanti à "+pct(t)+".",
+          whenTxt:"Dès que possible. Demande à réduire la durée plutôt que la mensualité.",how:["Garde 3 à 6 mois de dépenses de côté (on a gardé 8 000 € dans le calcul).","Demande un remboursement anticipé partiel à ta banque.","Choisis \"réduire la durée\" : c'est ce qui économise le plus."],cases:[],
+          warn:def.immo?"Pour un prêt immobilier, la banque peut facturer des frais (au plus 6 mois d'intérêts ou 3 % du montant remboursé). Vérifie ton contrat.":"Pour un crédit conso, les frais sont au plus 1 % du montant remboursé, souvent 0.",link:SP("remboursement anticipé crédit")});}
+    });
+    C.filter(c=>c.type==="nu"&&(+c.capital||0)>0).forEach(c=>{if(tmi>=.30)skip.push(["Rembourser en avance ton prêt locatif","Ses intérêts se déduisent de tes loyers : il ne te coûte vraiment qu'environ "+pct((+c.taux||0)*(1-tmi-PS))+" par an."])});
+    C.forEach(c=>{const def=CRED[c.type];if(!def||!def.immo)return;const a=+c.assurance||0,cap=+c.capital||0,fin=+c.fin||0;
+      if(a>=.25&&cap>=40000&&(!fin||fin-YEAR>=4))add({id:"assur-"+c.id,k:"credit",ic:"shield",pro:true,money:true,approx:true,title:"Changer l'assurance de ton "+def.l.toLowerCase(),gain:cap*(a-.12)/100,when:any("Quand tu veux"),tags:["credit"],
+        what:"Ton assurance emprunteur coûte "+pct(a)+" du capital par an. Des assureurs en ligne proposent souvent 0,10 à 0,15 % pour un profil sans souci de santé.",
+        why:"Depuis la loi Lemoine, tu peux changer d'assurance à tout moment, sans frais. La banque ne peut pas refuser si les garanties sont équivalentes.",whenTxt:"À tout moment. Plus tôt tu changes, plus tu économises.",
+        how:["Fais 2 ou 3 devis en ligne avec ton offre de prêt sous la main.","Envoie le nouveau contrat à ta banque (10 jours pour répondre).","Résilie l'ancienne une fois l'accord reçu."],cases:[],warn:"Estimation sur le capital restant. Le gain réel dépend de ton âge, ta santé et si tu fumes.",link:SP("changer assurance emprunteur loi Lemoine")});});
+    C.forEach(c=>{const def=CRED[c.type];if(!def||!def.immo)return;const t=+c.taux||0,cap=+c.capital||0,fin=+c.fin||0;
+      if(t>=4.2&&cap>=70000&&fin-YEAR>=8)add({id:"reneg-"+c.id,k:"credit",ic:"percent",pro:true,money:true,title:"Faire chiffrer une renégociation de ton "+def.l.toLowerCase(),gain:null,gainTxt:"jusqu'à "+fmt(cap*(t-3.4)/100)+"/an",when:any("Quand tu veux"),tags:["credit"],
+        what:"Ton taux est de "+pct(t)+". Si les taux actuels sont au moins 0,7 point plus bas, renégocier ou faire racheter ton prêt peut valoir le coup.",why:"Il te reste "+fmt(cap)+" à rembourser jusqu'en "+fin+". Chaque point de taux en moins économise environ "+fmt(cap/100)+" d'intérêts la première année.",
+        whenTxt:"Dès maintenant : demande d'abord à ta banque, puis à un courtier.",how:["Demande une renégociation à ta banque.","Fais une simulation chez un courtier.","Compare en comptant tous les frais."],cases:[],warn:"Montant indicatif. Les frais peuvent effacer le gain si l'écart de taux est faible.",link:SP("renégocier prêt immobilier")});});
+    const pea=sumP("pea");
+    if(ctoAmt>=5000&&pea<150000){const amt=Math.min(ctoAmt,150000-pea);
+      add({id:"cto",k:"epargne",ic:"trend",pro:true,title:"Basculer peu à peu ton compte-titres vers un PEA",gain:null,gainTxt:"≈ "+fmt(amt*.05*.128)+"/an à terme",when:any("Dès maintenant"),tags:["epargne"],
+        what:(pea>0?"Ton PEA a encore de la place. ":"Ouvre un PEA. ")+"Vends progressivement tes "+fmt(amt)+" en compte-titres et réinvestis-les dans le PEA.",
+        why:"Sur le compte-titres, gains et dividendes sont taxés à 12,8 % d'impôt. Dans un PEA de plus de 5 ans, cet impôt disparaît (il reste les prélèvements sociaux).",whenTxt:"Commence par les lignes en perte ou à faible gain, sur plusieurs années.",
+        how:["Ouvre un PEA si tu n'en as pas (le compteur des 5 ans démarre).","Vends d'abord les lignes en perte.","Réinvestis dans le PEA en fonds indiciels éligibles."],cases:[],warn:"Vendre une ligne en gain déclenche l'impôt cette année. Étale sur plusieurs années.",link:SP("plan d'épargne en actions")});}
+    const avOld=P.filter(x=>x.type==="av"&&x.annee&&YEAR-(+x.annee)>=8).reduce((s,x)=>s+(+x.montant||0),0);
+    if(avOld>=15000){const ab=isCouple(p)?9200:4600;
+      add({id:"avpurge",k:"epargne",ic:"coins",pro:true,title:"Sortir "+fmt(ab)+" de gains de ton assurance vie sans impôt",gain:null,gainTxt:"≈ "+fmt(ab*.075)+"/an évités",when:yEnd,tags:["epargne"],
+        what:"Ton assurance vie a plus de 8 ans. Fais un retrait partiel calculé pour que les gains retirés restent sous "+fmt(ab)+", puis reverse la somme si tu veux.",
+        why:"Chaque année, "+fmt(ab)+" de gains peuvent sortir sans impôt sur le revenu. Si tu ne les utilises pas, l'abattement de l'année est perdu.",whenTxt:"Une fois par an, avant le 31 décembre.",
+        how:["Demande à ton assureur combien de gains contient ton contrat.","Fais un rachat partiel calculé pour rester sous l'abattement.","Reverse la somme sur le contrat si tu n'en as pas besoin."],cases:["2CH"],warn:"Les prélèvements sociaux restent dus sur les gains. Vérifie les frais de versement avant de reverser.",link:SP("rachat assurance vie abattement")});}
+    const totalFin=P.reduce((s,x)=>s+(+x.montant||0),0);
+    if(p.age1>=55&&p.age1<70&&kidsAll>0&&totalFin>=50000)add({id:"av70",k:"famille",ic:"gift",pro:true,title:"Verser sur une assurance vie avant tes 70 ans",gain:null,gainTxt:"Transmission",when:any("Avant 70 ans"),tags:["famille","epargne"],
+      what:"Les sommes versées avant 70 ans peuvent être transmises jusqu'à 152 500 € par bénéficiaire, sans droits de succession.",why:"Tu as "+p.age1+" ans : il te reste "+(70-p.age1)+" an(s). Après 70 ans, l'abattement tombe à 30 500 € pour tous les bénéficiaires réunis.",
+      whenTxt:"Avant ton 70e anniversaire.",how:["Vérifie la clause bénéficiaire de tes contrats.","Verse avant 70 ans ce que tu veux transmettre."],cases:[],link:SP("assurance vie transmission")});
+    const scpi=sumP("scpi");
+    if(scpi>=10000&&tmi>=.30)add({id:"scpi",k:"immo",ic:"building",pro:true,approx:true,title:"Acheter tes prochaines SCPI dans une assurance vie",gain:null,gainTxt:"≈ "+fmt(scpi*.045*(tmi+PS)*.5)+"/an",when:any("Prochain achat"),tags:["immo","epargne"],
+      what:"Les loyers de tes SCPI en direct sont taxés à "+Math.round(tmi*100)+" % plus les prélèvements sociaux. Dans une assurance vie, ils ne sont taxés que si tu retires.",why:"Avec ta tranche, près de la moitié des loyers part en impôts.",
+      whenTxt:"Pour tes prochains achats (ne revends pas les anciennes, les frais d'entrée sont élevés).",how:["Vérifie quelles SCPI ton assurance vie propose.","Fais tes prochains achats via le contrat."],cases:[],link:SP("SCPI fiscalité")});
+  }
+  if(base.ir<=0&&base.brut<=0)skip.push(["Réductions d'impôt (dons, PER...)","Tu ne paies pas d'impôt : seuls les crédits d'impôt (aide à domicile, garde) te rapportent."]);
+  out.forEach(o=>{o.free=o.tags.includes("case")});
+  return {out,skip};
+}
+
+/* ===== État ===== */
+const KEY="boussole-v2";
+let S={p:JSON.parse(JSON.stringify(EXAMPLE)),example:true,step:0,filter:"all",open:null,done:{},settings:{prenom:"",mode:"complet",theme:"auto"},installOS:null};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");
+  if(s&&s.p){S.p=Object.assign({},DEFAULT,s.p);S.example=!!s.example;S.done=s.done||{};S.step=s.step||0;S.settings=Object.assign(S.settings,s.settings||{})}
+  else{const o=JSON.parse(localStorage.getItem("boussole-v1")||"null");if(o&&o.p&&!o.example){S.p=Object.assign({},DEFAULT,o.p);S.example=false;S.done=o.done||{};S.settings.mode="rapide"}}
+}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.docs)S.docs=s.docs;if(s&&s.instHidden)S.instHidden=true}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({p:S.p,example:S.example,done:S.done,step:S.step,settings:S.settings,docs:S.docs||{},instHidden:!!S.instHidden}))}catch(e){}};
+const mode=()=>S.settings.mode;
+function applyTheme(){const t=S.settings.theme;if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
+applyTheme();
+
+/* ===== Navigation ===== */
+const VIEWS=[["plan","Mon plan","target"],["situation","Ma situation","list"],["calendrier","Calendrier","calendar"],["moi","Moi","user"]];
+const ALLV=[...VIEWS.map(v=>v[0]),"installer"];
+const currentView=()=>{const h=location.hash.replace("#","");return ALLV.includes(h)?h:"plan"};
+function renderNav(urgent){const v=currentView();
+  const h=VIEWS.map(([id,l,i])=>`<a href="#${id}" ${v===id?'aria-current="page"':""}>${ic(i)}<span>${l}</span>${id==="plan"&&urgent?`<span class="dot">${urgent}</span>`:""}</a>`).join("");
+  $("nav").innerHTML=h;$("bnav").innerHTML=h}
+function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();window.scrollTo(0,0)}
+window.addEventListener("hashchange",route);
+
+/* ===== Formulaire ===== */
+const STEPS=[
+ {label:"Foyer",ic:"users",title:"Ton foyer",lead:"Qui vit avec toi ? C'est la base du calcul.",fields:[
+  {k:"situation",t:"seg",l:"Ta situation",opts:[["celib","Seul(e)","user"],["marie","Marié(e)","heart"],["pacse","Pacsé(e)","heart"],["concubin","En couple sans Pacs","users"],["veuf","Veuf / veuve","user"]]},
+  {k:"age1",t:"num",l:"Ton âge",u:"ans"},{k:"age2",t:"num",l:"Âge de ton conjoint",u:"ans",show:hasPartner},
+  {k:"enfants",t:"num",l:"Enfants à ta charge",u:"enfants",ic:"baby",h:"Ceux qui vivent avec toi, ou les étudiants de moins de 25 ans rattachés à ta déclaration."},
+  {group:true,show:p=>p.enfants>0,l:"Dont :",fields:[{k:"under6",t:"num",l:"Moins de 6 ans"},{k:"college",t:"num",l:"Au collège"},{k:"lycee",t:"num",l:"Au lycée"},{k:"sup",t:"num",l:"Études supérieures"}]},
+  {k:"seul",t:"bool",l:"Tu élèves seul(e) tes enfants",h:"Tu vis sans conjoint ni concubin.",show:p=>p.situation==="celib"&&p.enfants>0},
+  {k:"enfMaj",t:"num",l:"Enfants majeurs avec leur propre déclaration",u:"enfants",h:"Par exemple un étudiant qui déclare seul."},
+  {k:"inval",t:"bool",l:"Carte d'invalidité (au moins 80 %)",h:"Pour toi ou ton conjoint."}]},
+ {label:"Revenus",ic:"euro",title:"Tes revenus",lead:"Ce que tu gagnes sur une année.",fields:[
+  {k:"sal1",t:"num",l:"Ton salaire net imposable sur l'année",u:"€/an",ic:"briefcase",h:"Le \"net imposable\" cumulé en bas de ta fiche de paie de décembre."},
+  {k:"km1",t:"num",l:"Distance maison → travail (aller)",u:"km",ic:"car",show:p=>p.sal1>0},
+  {k:"sal2",t:"num",l:"Salaire net imposable de ton conjoint",u:"€/an",ic:"briefcase",show:hasPartner},
+  {k:"km2",t:"num",l:"Sa distance maison → travail (aller)",u:"km",ic:"car",show:p=>hasPartner(p)&&p.sal2>0},
+  {k:"pension",t:"num",l:"Retraites et pensions du foyer",u:"€/an"},
+  {k:"ca",t:"num",l:"Chiffre d'affaires de ta micro-entreprise",u:"€/an",h:"Laisse 0 si tu n'es pas auto-entrepreneur."},
+  {k:"caType",t:"seg",l:"Type d'activité",show:p=>p.ca>0,opts:[["vente","Vente"],["services","Services, artisanat"],["bnc","Libéral, conseil"]]},
+  {k:"fraisPro",t:"num",l:"Tes vraies dépenses pour l'activité",u:"€/an",show:p=>p.ca>0},
+  {k:"vl",t:"bool",l:"Tu as déjà le versement libératoire",show:p=>p.ca>0},
+  {k:"capitaux",t:"num",l:"Dividendes et intérêts reçus",u:"€/an",h:"Hors livrets, PEA et assurance vie.",show:()=>mode()!=="complet"},
+  {k:"pv",t:"num",l:"Gains en vendant des actions cette année",u:"€",h:"Sur un compte-titres (pas un PEA)."},
+  {k:"prime",t:"num",l:"Prime d'intéressement ou participation",u:"€/an",show:p=>p.sal1>0||p.sal2>0}]},
+ {label:"Patrimoine",ic:"coins",title:"Ton patrimoine",lead:"",fields:[]},
+ {label:"Dépenses",ic:"receipt",title:"Tes dépenses",lead:"Certaines dépenses font baisser ton impôt.",fields:[
+  {k:"dons",t:"num",l:"Dons aux associations",u:"€/an",ic:"gift"},
+  {k:"domicile",t:"num",l:"Aide à domicile : ménage, jardin, cours...",u:"€/an",ic:"home"},
+  {k:"garde",t:"num",l:"Crèche, nounou, garderie",u:"€/an",ic:"baby",show:p=>p.under6>0,h:"Après déduction des aides de la CAF."},
+  {k:"pensionEnf",t:"num",l:"Argent donné à tes enfants majeurs",u:"€/an",ic:"users",show:p=>p.enfMaj>0},
+  {k:"aideParent",t:"num",l:"Argent versé pour aider un parent",u:"€/an",ic:"hand",h:"Maison de retraite, loyer, factures d'un parent aux revenus modestes."},
+  {k:"syndicat",t:"num",l:"Cotisations syndicales",u:"€/an",show:p=>p.sal1>0||p.sal2>0}]}
+];
+const QP={proprio:{k:"proprio",t:"bool",l:"Propriétaire de ton logement"},loyersNu:{k:"loyersNu",t:"num",l:"Loyers de locations vides",u:"€/an",ic:"building"},
+  chargesNu:{k:"chargesNu",t:"num",l:"Dépenses sur ces locations",u:"€/an",show:p=>p.loyersNu>0,h:"Intérêts d'emprunt, taxe foncière, assurance, travaux."},
+  loyersMeub:{k:"loyersMeub",t:"num",l:"Loyers de locations meublées",u:"€/an",ic:"building"},
+  reelMeub:{k:"reelMeub",t:"bool",l:"Tu as déjà un comptable pour ton meublé",show:p=>mode()==="complet"?(p.biens||[]).some(b=>b.type==="meuble"):p.loyersMeub>0},
+  immoNet:{k:"immoNet",t:"num",l:"Valeur de tes biens immobiliers, moins les crédits restants",u:"€"},
+  epargne:{k:"epargne",t:"num",l:"Épargne disponible",u:"€",ic:"piggy",h:"Livrets, compte courant."},
+  hasPEA:{k:"hasPEA",t:"bool",l:"Tu as un PEA"},hasAV:{k:"hasAV",t:"bool",l:"Tu as une assurance vie"},
+  perDeja:{k:"perDeja",t:"num",l:"Déjà versé sur un PER cette année",u:"€",ic:"coins"},
+  perPlafond:{k:"perPlafond",t:"num",l:"Ton plafond épargne retraite disponible",u:"€",ic:"receipt",h:"Facultatif. Sur ton dernier avis d'impôt, rubrique \"plafond épargne retraite\" (total des 4 années). Sinon on l'estime."}};
+const QUICK_ORDER=["proprio","loyersNu","chargesNu","loyersMeub","reelMeub","immoNet","epargne","hasPEA","hasAV","perDeja","perPlafond"];
+const PROFIL=[
+  {k:"gestion",t:"seg",l:"Comment veux-tu gérer ton épargne ?",opts:[["simple","Simple et pas cher","spark"],["pilote","Qu'on gère pour moi","users"],["actif","Je choisis mes actions","trend"]]},
+  {k:"risque",t:"seg",l:"Face aux hauts et aux bas de la bourse, tu es plutôt",opts:[["prudent","Prudent","shield"],["equilibre","Équilibré","target"],["dynamique","Dynamique","trend"]]},
+  {k:"banque",t:"seg",l:"Ta banque principale",opts:[["trad","Banque classique","bank"],["bourso","BoursoBank","card"],["fortuneo","Fortuneo","card"],["autre","Autre banque en ligne","phone"]]}];
+const profilHTML=()=>`<div class="list-sec c-epargne"><h3><span class="tile">${ic("compass")}</span>Ton profil d'épargnant</h3><p>Pour te recommander les bons placements et les bonnes plateformes.</p>${PROFIL.map(fieldHTML).join("")}</div>`;
+const visible=(f,p)=>!f.show||f.show(p);
+function fieldHTML(f){
+  const p=S.p;if(!visible(f,p))return"";
+  if(f.group)return `<div class="field"><span class="lbl">${f.l}</span><div class="sub">${f.fields.map(fieldHTML).join("")}</div></div>`;
+  const id="f-"+f.k,help=f.h?`<span class="help">${f.h}</span>`:"",lic=f.ic?ic(f.ic):"";
+  if(f.t==="num")return `<div class="field"><label for="${id}">${lic}${f.l}</label>${help}<div class="inp"><input id="${id}" data-k="${f.k}" inputmode="numeric" value="${p[f.k]||""}" placeholder="0" autocomplete="off"><span>${f.u||""}</span></div></div>`;
+  if(f.t==="seg")return `<div class="field"><span class="lbl">${lic}${f.l}</span>${help}<div class="seg" role="group">${f.opts.map(([v,t,i])=>`<button type="button" data-k="${f.k}" data-v="${v}" aria-pressed="${p[f.k]===v}">${i?ic(i):""}${t}</button>`).join("")}</div></div>`;
+  return `<div class="field"><div class="toggle"><span class="lbl" id="${id}-l">${lic}${f.l}</span><button type="button" class="switch" role="switch" id="${id}" aria-labelledby="${id}-l" data-k="${f.k}" aria-checked="${!!p[f.k]}"></button></div>${help}</div>`;
+}
+function itemHTML(list,x,i){
+  const defs=list==="placements"?PLAC:list==="credits"?CRED:BIEN,d=defs[x.type]||Object.values(defs)[0];
+  const k=list==="placements"?"c-epargne":list==="credits"?"c-credit":"c-immo";
+  const v=f=>x[f]===""||x[f]==null?"":String(x[f]).replace(".",",");
+  const inp=(f,l,u,dec,ph)=>`<div class="field"><label for="${list}-${x.id}-${f}">${l}</label><div class="inp"><input id="${list}-${x.id}-${f}" data-list="${list}" data-i="${i}" data-f="${f}" inputmode="${dec?"decimal":"numeric"}" value="${v(f)}" placeholder="${ph||"0"}" autocomplete="off"><span>${u}</span></div></div>`;
+  let f="";
+  if(list==="placements")f=inp("montant","Montant","€")+inp("taux","Rapporte","%/an",1,String(d.r).replace(".",","))+(d.year?inp("annee","Ouvert en","",0,"2020"):"");
+  else if(list==="credits")f=inp("capital","Reste à rembourser","€")+inp("taux","Taux","%",1,"3,5")+(d.immo?inp("assurance","Assurance","%/an",1,"0,3"):"")+inp("fin","Fin du prêt","",0,String(YEAR+10));
+  else f=inp("valeur","Valeur aujourd'hui","€")+(d.rent?inp("loyers","Loyers","€/an")+inp("charges","Taxe foncière, copro, assurance, travaux","€/an"):"");
+  return `<div class="item ${k}"><div class="item-h"><span class="tile">${ic(d.ic)}</span><div class="inp"><select aria-label="Type" data-list="${list}" data-i="${i}" data-f="type">${Object.entries(defs).map(([val,o])=>`<option value="${val}" ${val===x.type?"selected":""}>${o.l}</option>`).join("")}</select></div><button type="button" class="icon-btn" data-del="${list}" data-i="${i}" aria-label="Supprimer">${ic("trash")}</button></div><div class="item-f">${f}</div></div>`;
+}
+function listSec(list,title,icn,k,lead,defs){
+  const items=S.p[list]||[];
+  return `<div class="list-sec ${k}"><h3><span class="tile">${ic(icn)}</span>${title}${items.length?` <span class="pill">${items.length}</span>`:""}</h3><p>${lead}</p>${items.map((x,i)=>itemHTML(list,x,i)).join("")}
+   <div class="adder">${Object.entries(defs).map(([v,o])=>`<button type="button" data-add="${list}" data-type="${v}">${ic("plus")}${o.l}</button>`).join("")}</div></div>`;
+}
+function patrimoineHTML(){
+  if(mode()!=="complet")return profilHTML()+QUICK_ORDER.map(k=>fieldHTML(QP[k])).join("")+`<div class="box upgrade"><h3>${ic("spark")}Tu veux des conseils plus précis ?</h3><p>Le mode complet analyse chaque placement et chaque crédit : argent qui dort, crédit trop cher, assurance de prêt, livret plus rentable...</p><button type="button" class="btn" data-setmode="complet">${ic("arrow")}Passer en mode complet</button></div>`;
+  return profilHTML()+listSec("placements","Mes placements","piggy","c-epargne","Comptes, livrets, assurance vie, PEA... Le taux est pré-rempli en gris : corrige-le si tu connais le tien.",PLAC)
+   +listSec("credits","Mes crédits en cours","card","c-credit","Le reste à rembourser et le taux sont sur ton tableau d'amortissement ou ton appli bancaire.",CRED)
+   +listSec("biens","Mes biens immobiliers","building","c-immo","Valeur estimée aujourd'hui. Pour une location : loyers et dépenses de l'année.",BIEN)
+   +fieldHTML(QP.reelMeub)+fieldHTML(QP.perDeja)+fieldHTML(QP.perPlafond);
+}
+function renderStepper(){
+  $("stepper").innerHTML=STEPS.map((s,i)=>`<button class="stp ${i<S.step?"filled":""}" role="tab" type="button" aria-selected="${i===S.step}" data-step="${i}"><span class="tile">${ic(s.ic)}</span>${s.label}</button>`).join("");
+  $("progBar").style.width=((S.step+1)/STEPS.length*100)+"%";
+  $("prevBtn").style.visibility=S.step===0?"hidden":"visible";
+  $("nextBtn").innerHTML=(S.step===STEPS.length-1?"Voir mon plan":"Suivant")+ic("arrow");
+  $("modeSw").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===mode()));
+}
+function sig(){const st=STEPS[S.step];if(st.label==="Patrimoine")return mode()+"|"+QUICK_ORDER.filter(k=>visible(QP[k],S.p)).join();
+  return st.fields.flatMap(f=>f.group?[f,...f.fields]:[f]).filter(f=>visible(f,S.p)).map(f=>f.k||f.l).join()}
+let lastSig="";
+function renderFields(){
+  const st=STEPS[S.step];
+  const lead=st.label==="Patrimoine"?(mode()==="complet"?"Ajoute chaque placement, crédit et bien. Plus c'est précis, plus les conseils sont justes.":"Une idée globale suffit."):st.lead;
+  $("fields").innerHTML=`<h2>${st.title}</h2><p class="lead">${lead}</p>`+(st.label==="Patrimoine"?patrimoineHTML():st.fields.map(fieldHTML).join(""));
+  lastSig=sig();
+}
+function leaveExample(){if(S.example){S.example=false;$("exampleBanner").hidden=true}}
+const num=v=>{const n=parseFloat(String(v).replace(/\s/g,"").replace(",","."));return isNaN(n)?0:n};
+$("fields").addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.list&&t.dataset.f!=="type"){const it=S.p[t.dataset.list][+t.dataset.i];const raw=t.value.replace(/[^\d.,]/g,"");if(raw!==t.value)t.value=raw;it[t.dataset.f]=raw===""?"":num(raw);leaveExample();update();return}
+  const k=t.dataset.k;if(!k)return;
+  const clean=t.value.replace(/[^\d]/g,"");if(clean!==t.value)t.value=clean;
+  S.p[k]=clean===""?0:parseInt(clean,10);leaveExample();
+  if(sig()!==lastSig){const id=t.id;renderFields();const el=$(id);if(el){el.focus();const n=el.value.length;try{el.setSelectionRange(n,n)}catch(_){}}}
+  update();
+});
+$("fields").addEventListener("change",e=>{const t=e.target;if(t.tagName==="SELECT"&&t.dataset.list){const it=S.p[t.dataset.list][+t.dataset.i];it.type=t.value;if(t.dataset.list==="placements")it.taux="";leaveExample();renderFields();update()}});
+$("fields").addEventListener("click",e=>{
+  const sm=e.target.closest("[data-setmode]");if(sm){S.settings.mode=sm.dataset.setmode;renderStepper();renderFields();update();return}
+  const ad=e.target.closest("[data-add]");if(ad){const l=ad.dataset.add,o={id:nid(),type:ad.dataset.type};
+    if(l==="placements")Object.assign(o,{montant:"",taux:""});else if(l==="credits")Object.assign(o,{capital:"",taux:"",assurance:"",fin:""});else Object.assign(o,{valeur:"",loyers:"",charges:""});
+    (S.p[l]=S.p[l]||[]).push(o);leaveExample();renderFields();update();
+    const el=$(`${l}-${o.id}-${l==="placements"?"montant":l==="credits"?"capital":"valeur"}`);if(el)el.focus();return}
+  const del=e.target.closest("[data-del]");if(del){S.p[del.dataset.del].splice(+del.dataset.i,1);leaveExample();renderFields();update();return}
+  const b=e.target.closest("button[data-k]");if(!b)return;const k=b.dataset.k;
+  if(b.dataset.v!==undefined)S.p[k]=b.dataset.v;else S.p[k]=!S.p[k];leaveExample();renderFields();update();
+});
+$("stepper").addEventListener("click",e=>{const b=e.target.closest("[data-step]");if(!b)return;S.step=+b.dataset.step;renderStepper();renderFields();save()});
+$("modeSw").addEventListener("click",e=>{const b=e.target.closest("[data-mode]");if(!b)return;S.settings.mode=b.dataset.mode;renderStepper();renderFields();update()});
+$("prevBtn").onclick=()=>{if(S.step>0){S.step--;renderStepper();renderFields();save();document.querySelector(".form").scrollIntoView({block:"start"})}};
+$("nextBtn").onclick=()=>{if(S.step<STEPS.length-1){S.step++;renderStepper();renderFields();save();document.querySelector(".form").scrollIntoView({block:"start"})}else location.hash="#plan"};
+$("clearBtn").onclick=()=>{S.p=JSON.parse(JSON.stringify(DEFAULT));S.example=false;S.done={};S.step=0;S.open=null;S.settings.mode="rapide";save();if(location.hash==="#situation")route();else location.hash="#situation"};
+
+/* ===== Où le faire : plateformes recommandées selon le profil ===== */
+const U={linxea:"https://www.linxea.com",yomoni:"https://www.yomoni.fr",tr:"https://traderepublic.com/fr-fr",fortuneo:"https://www.fortuneo.fr",bourso:"https://www.boursobank.com",
+  bd:"https://www.boursedirect.fr",magnolia:"https://www.magnolia.fr",reassurez:"https://www.reassurez-moi.fr",mt:"https://www.meilleurtaux.com",cesu:"https://www.cesu.urssaf.fr",impots:"https://www.impots.gouv.fr"};
+function insideTxt(kind,p){const r=p.risque||"equilibre",old=(+p.age1||0)>=55;
+  if(kind==="per")return old?"Choisis la gestion \"à horizon retraite\" : elle sécurise ton argent automatiquement à l'approche de la retraite.":r==="dynamique"?"100 % dans un ETF monde (MSCI World ou ACWI) : un seul fonds, frais minimes, des milliers d'entreprises.":r==="prudent"?"70 % fonds euros (pas de perte possible), 30 % ETF monde.":"70 % ETF monde, 30 % fonds euros. Ou la gestion \"à horizon retraite\" si tu ne veux rien choisir.";
+  if(kind==="pea")return r==="prudent"?"Commence petit (20 à 50 € par mois) dans un ETF monde éligible PEA. Le but est surtout de lancer le compteur des 5 ans.":"Un ETF monde éligible PEA (MSCI World), avec un versement automatique chaque mois. Puis ne touche à rien pendant au moins 5 ans.";
+  return r==="dynamique"?"Fonds euros pour l'argent dont tu pourrais avoir besoin, le reste en ETF monde.":r==="prudent"?"Surtout le fonds euros (capital garanti), un peu d'ETF monde si tu acceptes des hauts et des bas.":"Moitié fonds euros, moitié ETF monde."}
+function picksPEA(p){const g=p.gestion||"simple",b=p.banque||"trad",tr={n:"Trade Republic PEA",w:"Le plus simple : versement automatique chaque mois dans un ETF, frais très bas. N°1 de plusieurs comparatifs 2026.",u:U.tr};
+  if(g==="pilote")return [{n:"Yomoni PEA",w:"Gestion pilotée : tu choisis ton niveau de risque, ils gèrent tout en ETF.",u:U.yomoni},Object.assign({},tr,{w:"Moins cher : un ETF monde en versement automatique, c'est presque aussi simple."})];
+  if(b==="bourso")return [{n:"BoursoBank PEA",w:"Tu es déjà client : tout au même endroit, ouverture en quelques minutes.",u:U.bourso},tr];
+  if(b==="fortuneo")return [{n:"Fortuneo PEA",w:"Tu es déjà client. 1 ordre gratuit par mois jusqu'à 500 €.",u:U.fortuneo},tr];
+  if(g==="actif")return [{n:"Bourse Direct",w:"Parmi les frais de courtage les plus bas pour acheter des actions toi-même.",u:U.bd},{n:"Fortuneo PEA",w:"Banque française complète, 1 ordre gratuit par mois jusqu'à 500 €.",u:U.fortuneo}];
+  return [tr,{n:"Fortuneo PEA",w:"Si tu préfères une banque française classique : 1 ordre gratuit par mois jusqu'à 500 €.",u:U.fortuneo}]}
+function picksAV(p){if((p.gestion||"simple")==="pilote")return [{n:"Yomoni Vie",w:"Gestion pilotée en ETF : tu choisis ton profil, ils s'occupent de tout.",u:U.yomoni},{n:"Linxea Spirit 2 (gestion pilotée)",w:"Même idée, avec un des meilleurs fonds euros du marché.",u:U.linxea}];
+  return [{n:"Linxea Spirit 2",w:"0 % de frais sur les versements, 0,5 %/an sur les ETF, fonds euros parmi les meilleurs en 2025 (autour de 3 %).",u:U.linxea},{n:"Lucya Cardif",w:"Aussi via Linxea : 0 % de frais sur versements, plus de 1 600 supports.",u:U.linxea}]}
+function picksPER(p){if((p.gestion||"simple")==="pilote")return [{n:"Yomoni PER",w:"Gestion pilotée en ETF, avec sécurisation progressive avant la retraite.",u:U.yomoni},{n:"Linxea Spirit PER",w:"Moins cher si tu acceptes de choisir 1 ou 2 fonds toi-même.",u:U.linxea}];
+  return [{n:"Linxea Spirit PER",w:"Le plus cité des comparatifs 2026 : 0 % de frais sur les versements, 0,5 %/an, plus de 400 ETF.",u:U.linxea},{n:"Yomoni PER",w:"Si tu préfères qu'on gère pour toi (frais un peu plus élevés).",u:U.yomoni}]}
+function RECO(o){const p=S.p,id=o.id.split("-")[0];
+  switch(id){
+    case"per":return {picks:picksPER(p),inside:insideTxt("per",p),need:"ton dernier avis d'impôt, pour connaître le montant exact que tu peux verser (avec les plafonds non utilisés des 3 dernières années)."};
+    case"pea":case"cto":return {picks:picksPEA(p),inside:insideTxt("pea",p),need:id==="cto"?"le relevé de ton compte-titres avec les plus et moins-values de chaque ligne.":null};
+    case"av":case"surplus":return {picks:picksAV(p),inside:insideTxt("av",p)};
+    case"lep":case"lep2":return {picks:[{n:"Une banque en agence",w:"La Banque Postale, Caisse d'Épargne, Crédit Agricole... proposent toutes le LEP. Elles vérifient ton droit avec ton avis d'impôt."},{n:"Ta banque en ligne",w:"Vérifie d'abord : beaucoup de banques en ligne ne proposent pas le LEP."}],need:"ton dernier avis d'impôt (revenu fiscal de référence)."};
+    case"cash":return {picks:[{n:"Ta banque actuelle",w:"Livret A et LDDS ont le même taux partout (1,7 % depuis le 1er août 2026). Pas besoin de changer de banque."}]};
+    case"assur":return {picks:[{n:"Magnolia",w:"Courtier en assurance de prêt : il compare et gère la démarche avec ta banque, gratuitement.",u:U.magnolia},{n:"Réassurez-moi",w:"Autre courtier spécialisé, même principe. Fais faire 2 devis pour comparer.",u:U.reassurez}],need:"ton offre de prêt et ton certificat d'assurance (garanties et taux exacts)."};
+    case"reneg":return {picks:[{n:"Ta banque d'abord",w:"Un simple rendez-vous : elle peut baisser ton taux pour te garder, sans frais de rachat."},{n:"Meilleurtaux",w:"Si ta banque refuse : un courtier fait jouer la concurrence pour un rachat de prêt.",u:U.mt}],need:"ton tableau d'amortissement et ton offre de prêt (frais de remboursement anticipé)."};
+    case"remb":return {picks:[{n:"Ton espace client bancaire",w:"Demande un \"remboursement anticipé partiel\" par message ou en rendez-vous, avec le décompte exact avant de valider."}],need:"ton tableau d'amortissement."};
+    case"dom":case"avance":return {picks:[{n:"cesu.urssaf.fr",w:"Pour déclarer toi-même la personne qui t'aide et activer l'avance immédiate.",u:U.cesu},{n:"Une entreprise agréée",w:"Ménage, jardin, cours : elle s'occupe de tout et propose souvent l'avance immédiate."}]};
+    case"avpurge":case"av70":return {picks:[{n:"Ton assureur actuel",w:"Écris à ton conseiller : demande le montant des gains de ton contrat et un \"rachat partiel\"."}],need:"le dernier relevé annuel de ton assurance vie."};
+    case"don26":case"donation":return {picks:[{n:"Un notaire",w:"Un premier rendez-vous de conseil est souvent peu cher. Il sécurise le don et la déclaration."}]};
+    case"lmnp":return {picks:[{n:"Un comptable en ligne spécialisé LMNP",w:"Compte 300 à 600 € par an. Demande 2 ou 3 devis."}],need:"ton acte d'achat, le prix des meubles et les factures de l'année."};
+    case"reelpro":return {picks:[{n:"Un expert-comptable",w:"Demande une simulation micro contre réel, cotisations comprises, avant de changer."}]};
+    case"reel":case"deficit":return {picks:[{n:"impots.gouv.fr",w:"La déclaration 2044 se remplit en ligne, elle est guidée pas à pas.",u:U.impots}],need:"tes avis de taxe foncière, l'attestation d'intérêts de ton prêt et les factures de travaux."};
+    case"fr1":case"fr2":return {picks:[{n:"impots.gouv.fr",w:"Case frais réels, au moment de la déclaration.",u:U.impots}],need:"ta carte grise et le nombre de jours travaillés sur place."};
+  }
+  return null}
+function whereHTML(o){const r=RECO(o);if(!r)return"";
+  return `<div class="where"><h4>${ic("compass")}Où le faire</h4><div class="picks">${r.picks.map((x,i)=>`<div class="pick${i===0?" top":""}"><span class="tag">${i===0?"Mon choix pour toi":"Autre option"}</span><b>${x.n}</b><p>${x.w}</p>${x.u?`<a href="${x.u}" target="_blank" rel="noopener">Voir le site ↗</a>`:""}</div>`).join("")}</div>
+  ${r.inside?`<div class="inside">${ic("bulb")}<span><b>Quoi mettre dedans :</b> ${r.inside}</span></div>`:""}
+  ${r.need?`<div class="inside">${ic("receipt")}<span><b>Pour un conseil au centime près, il me faut :</b> ${r.need}</span></div>`:""}</div>`}
+
+/* ===== Documents ===== */
+const DOCS=[
+ {id:"avis",n:"Dernier avis d'impôt",ic:"receipt",d:"Ta vraie tranche, ton revenu fiscal (droit au LEP), ton plafond PER exact.",w:"impots.gouv.fr → Espace particulier → Documents"},
+ {id:"decl",n:"Ta dernière déclaration de revenus",ic:"list",d:"Les cases déjà cochées et celles oubliées (frais réels, enfants, pensions).",w:"impots.gouv.fr → Espace particulier → Documents"},
+ {id:"paie",n:"Fiche de paie de décembre (ou la dernière)",ic:"briefcase",d:"Ton net imposable réel, tes primes, ton épargne salariale.",w:"Ton employeur ou ton coffre-fort numérique"},
+ {id:"ifu",n:"Relevés fiscaux annuels de tes banques (IFU)",ic:"bank",d:"Dividendes, intérêts et plus-values à déclarer.",w:"Espace client de chaque banque, en mars-avril"},
+ {id:"plac",n:"Relevés de tes placements (assurance vie, PEA, PER)",ic:"coins",d:"Montants, date d'ouverture, frais, gains : pour savoir s'il faut changer de contrat.",w:"Espace client de ta banque ou de ton assureur"},
+ {id:"amort",n:"Tableau d'amortissement de chaque crédit",ic:"card",d:"Reste à payer, taux exact, intérêts de l'année : remboursement ou renégociation.",w:"Espace client de ta banque, rubrique crédits"},
+ {id:"pret",n:"Offre de prêt et certificat d'assurance emprunteur",ic:"shield",d:"Le coût réel de ton assurance de prêt et les frais de remboursement anticipé.",w:"Le dossier signé à l'achat, ou ta banque"},
+ {id:"tf",n:"Avis de taxe foncière",ic:"home",d:"Les charges de tes locations, la valeur locative de tes biens.",w:"impots.gouv.fr → Espace particulier → Documents"},
+ {id:"loc",n:"Baux, loyers reçus et charges de copropriété",ic:"building",d:"Choisir entre micro-foncier et réel, prévoir des travaux.",w:"Ton agence ou tes relevés de compte"},
+ {id:"att",n:"Attestations : crèche, aide à domicile, dons",ic:"gift",d:"Vérifier que tous tes crédits d'impôt sont bien comptés.",w:"Pajemploi, CESU, la crèche, les associations"}];
+function docsHTML(){const have=S.docs||{},n=DOCS.filter(d=>have[d.id]).length;
+  return `<h3>${ic("receipt")}Mes documents <span class="pill ${n===DOCS.length?"ok":""}">${n} / ${DOCS.length}</span></h3>
+  <p>Plus tu rassembles de documents, plus les conseils sont précis. Le plus simple : <b>envoie-les à Claude dans la conversation où tu as créé l'appli</b>. Il remplit ta situation et te donne un code à coller dans "Mes données" → "Restaurer".</p>
+  <ul class="docs">${DOCS.map(d=>`<li class="doc${have[d.id]?" ok":""}"><span class="tile c-case">${ic(d.ic)}</span><span style="min-width:0;flex:1"><b>${d.n}</b><span class="dd">${d.d}</span><span class="dw">${ic("compass")}${d.w}</span></span><button type="button" class="switch" role="switch" aria-checked="${!!have[d.id]}" aria-label="J'ai ce document" data-doc="${d.id}"></button></li>`).join("")}</ul>`}
+
+/* ===== Plan ===== */
+const FILTERS=[["all","Tout","spark"],["case","Juste une case à cocher","check"],["epargne","Épargne","piggy"],["credit","Crédits","card"],["immo","Immobilier","building"],["famille","Famille","users"],["travail","Travail","briefcase"]];
+const GROUPS=[["annee","Avant le 31 décembre","clock","c-famille"],["libre","Dès maintenant, quand tu veux","spark","c-epargne"],["decl","Au moment de déclarer ("+DEC_SEASON+")","receipt","c-case"]];
+let LAST={out:[],skip:[],base:null,d:null};
+function pillWhen(w){const cls=w.lvl==="urgent"?"urgent":w.lvl==="soon"?"soon":"";return `<span class="pill ${cls}">${ic("clock")}${w.label}${w.grp==="annee"?" · J-"+DAYS_LEFT:""}</span>`}
+const firstSentence=s=>{const m=String(s).match(/^.*?[.!?](\s|$)/);return m?m[0]:s};
+function cardHTML(o){
+  const open=S.open===o.id,done=!!S.done[o.id];
+  const gain=typeof o.gain==="number"?`<div class="gain"><b class="tnum">${o.approx?"≈ ":""}${fmt(o.gain)}</b><span>par an${o.money?" · budget":""}</span></div>`:`<div class="gain soft"><b>${o.gainTxt||""}</b></div>`;
+  const pills=pillWhen(o.when)+(o.free?`<span class="pill free">${ic("check")}Gratuit</span>`:"")+(o.pro?`<span class="pill pro">${ic("spark")}Analyse détaillée</span>`:"")+(done?`<span class="pill ok">${ic("check")}Fait</span>`:"");
+  return `<article class="card c-${o.k}${done?" done":""}" data-open="${open}">
+  <button type="button" class="card-h" data-id="${o.id}" aria-expanded="${open}"><span class="tile">${ic(o.ic)}</span>
+    <span class="card-t" style="min-width:0"><h3>${o.title}</h3><p>${firstSentence(o.why)}</p><span class="meta">${pills}</span></span>
+    <span class="gain-wrap">${gain}<span class="chev">${ic("chev")}</span></span></button>
+  <div class="card-b" ${open?"":"hidden"}>
+    <div class="steps">
+      <div class="step"><span class="si">${ic("target")}</span><div><h4>Quoi faire</h4><p>${o.what}</p></div></div>
+      <div class="step"><span class="si">${ic("bulb")}</span><div><h4>Pourquoi</h4><p>${o.why}</p></div></div>
+      <div class="step"><span class="si">${ic("clock")}</span><div><h4>Quand</h4><p>${o.whenTxt}</p></div></div>
+      <div class="step"><span class="si">${ic("list")}</span><div><h4>Comment</h4><ol>${o.how.map(h=>`<li>${h}</li>`).join("")}</ol></div></div>
+    </div>
+    ${whereHTML(o)}
+    ${o.warn?`<div class="warn">${ic("alert")}<span>${o.warn}</span></div>`:""}
+    <div class="card-f"><span class="cases">${o.cases.length?"Sur la déclaration :"+o.cases.map(c=>`<span class="case">${c}</span>`).join(""):""}</span>
+      <span class="acts"><a href="${o.link[0]}" target="_blank" rel="noopener">${o.link[1]} ↗</a><button type="button" class="btn${done?"":" primary"}" data-done="${o.id}">${done?"Annuler":ic("check")+"C'est fait"}</button></span></div>
+  </div></article>`;
+}
+const sorter=(a,b)=>{const g={annee:0,libre:1,decl:2};const ga=g[a.when.grp]??1,gb=g[b.when.grp]??1;if(ga!==gb)return ga-gb;return (typeof b.gain==="number"?b.gain:-1)-(typeof a.gain==="number"?a.gain:-1)};
+function update(){
+  const d=derive(S.p,mode()),base=calc(d),r=rules(d,base,mode(),S.p),out=r.out,skip=r.skip;LAST={out,skip,base,d};
+  const todo=out.filter(o=>!S.done[o.id]),isNum=o=>typeof o.gain==="number";
+  const annual=todo.filter(isNum).reduce((s,o)=>s+o.gain,0),taxPart=todo.filter(o=>isNum(o)&&!o.money).reduce((s,o)=>s+o.gain,0);
+  const doneGain=out.filter(o=>isNum(o)&&S.done[o.id]).reduce((s,o)=>s+o.gain,0);
+  const score=(annual+doneGain)>0?Math.round(doneGain/(annual+doneGain)*100):100;
+  const tax=Math.max(0,base.ir+base.vlTax+base.pfu),name=(S.settings.prenom||"").trim();
+  $("hello").innerHTML=`${ic(TODAY.getHours()>=18||TODAY.getHours()<6?"moon":"sun")}<span>Bonjour${name?" "+esc(name):""} · ${TODAY.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}</span>`;
+  $("hGain").innerHTML=fmt(annual).replace(" €","<small>€/an</small>");
+  const parts=[];if(taxPart>0)parts.push(fmt(taxPart)+" d'impôts en moins");if(annual-taxPart>0)parts.push(fmt(annual-taxPart)+" d'économies sur ton budget (crédits, épargne)");
+  $("hSplit").textContent=parts.length?"Dont "+parts.join(" et ")+".":"Remplis ta situation pour voir ce que tu peux gagner.";
+  $("hTax").textContent=fmt(tax);$("hTmi").textContent=Math.round(base.tmi*100)+" %";$("hDays").textContent=DAYS_LEFT+" jours";
+  $("ringArc").style.strokeDashoffset=String(314.16*(1-score/100));$("ringPct").textContent=score+" %";
+  $("ringCap").textContent=doneGain>0?`Tu as déjà sécurisé ${fmt(doneGain)} par an. Continue !`:"Coche \"C'est fait\" sur une action pour faire monter ton score.";
+  const next=todo.slice().sort(sorter)[0];
+  if(next){$("nextBox").hidden=false;$("nextBox").className="next c-"+next.k;
+    $("nextBox").innerHTML=`<span class="tile">${ic(next.ic)}</span><div style="min-width:0"><span class="eyebrow">${ic("target")}Ta prochaine action</span><h3>${next.title}</h3></div><button type="button" class="btn primary" data-goto="${next.id}">Voir comment${ic("arrow")}</button>`}
+  else $("nextBox").hidden=true;
+  const counts={};FILTERS.forEach(([f])=>counts[f]=f==="all"?out.length:out.filter(o=>o.tags.includes(f)).length);
+  if(S.filter!=="all"&&!counts[S.filter])S.filter="all";
+  $("chips").innerHTML=FILTERS.filter(([f])=>f==="all"||counts[f]>0).map(([f,t,i])=>`<button type="button" class="chip" data-f="${f}" aria-pressed="${S.filter===f}">${ic(i)}${t}<span class="n">${counts[f]}</span></button>`).join("");
+  const list=out.filter(o=>S.filter==="all"||o.tags.includes(S.filter)).sort(sorter);
+  $("groups").innerHTML=list.length?GROUPS.map(([g,t,i,c])=>{const items=list.filter(o=>o.when.grp===g);if(!items.length)return"";
+    return `<div class="group"><div class="group-h ${c}"><span class="tile">${ic(i)}</span><h2>${t}</h2><span class="cnt">${items.length} action${items.length>1?"s":""}</span></div>${items.map(cardHTML).join("")}</div>`}).join("")
+    :`<div class="empty">${ic("compass")}<p><b>Ton plan est vide pour l'instant.</b><br>Remplis ta situation : les actions apparaissent au fur et à mesure.</p><a class="btn primary" href="#situation">Remplir ma situation</a></div>`;
+  let side="";
+  if(base.ir<=0&&base.brut<=0&&(d.sal1+d.sal2+d.pension+d.ca)>0)side+=`<div class="box"><h3>${ic("spark")}Bonne nouvelle</h3><p>Tu ne paies pas d'impôt sur le revenu. Concentre-toi sur les crédits d'impôt (remboursés) et ton épargne.</p></div>`;
+  if(mode()!=="complet")side+=`<div class="box upgrade"><h3>${ic("spark")}Passe au mode complet</h3><p>Ajoute tes placements, crédits et biens un par un. On repère l'argent qui dort, les crédits trop chers, l'assurance de prêt à changer...</p><a class="btn" href="#situation" data-gomode="1">${ic("arrow")}Compléter</a></div>`;
+  if(base.red+base.cred>10000)side+=`<div class="box"><h3>${ic("alert")}Plafond des niches</h3><p>Tes avantages fiscaux dépassent 10 000 €. Au-delà, ils sont plafonnés.</p></div>`;
+  side+=`<div class="box"><h3>${ic("receipt")}Ton impôt en bref</h3><p>Revenu imposable : <b>${fmt(base.R)}</b><br>${base.sep?"2 déclarations séparées":String(base.parts).replace(".",",")+" part"+(base.parts>1?"s":"")}<br>Impôt sur le revenu : <b>${fmt(Math.max(0,base.ir))}</b>${base.ir<0?`<br>Remboursement attendu : <b>${fmt(-base.ir)}</b>`:""}${base.pfu>0?`<br>Impôt sur placements : <b>${fmt(base.pfu)}</b>`:""}${base.psFonc>0?`<br>Prélèv. sociaux sur loyers : <b>${fmt(base.psFonc)}</b>`:""}</p></div>`;
+  {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn" href="#moi">${ic("arrow")}Voir la liste</a></div>`}
+  if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
+  $("side").innerHTML=side;
+  $("lGain").innerHTML=fmt(annual).replace(" €","<small>€</small>");
+  $("lSub").textContent=`par an · ${todo.length} action${todo.length>1?"s":""} trouvée${todo.length>1?"s":""} · impôt estimé ${fmt(tax)}`;
+  $("exampleBanner").hidden=!S.example;
+  renderNav(todo.filter(o=>o.when.grp==="annee").length);
+  renderCal();renderMe();save();
+}
+$("groups").addEventListener("click",e=>{const dn=e.target.closest("[data-done]");if(dn){const id=dn.dataset.done;S.done[id]=!S.done[id];if(S.done[id]){S.open=null;toast("Bravo, une action de moins !")}update();return}
+  const h=e.target.closest(".card-h");if(h){S.open=S.open===h.dataset.id?null:h.dataset.id;update()}});
+$("chips").addEventListener("click",e=>{const c=e.target.closest("[data-f]");if(c){S.filter=c.dataset.f;update()}});
+$("nextBox").addEventListener("click",e=>{const b=e.target.closest("[data-goto]");if(!b)return;S.filter="all";S.open=b.dataset.goto;update();const el=document.querySelector(`.card-h[data-id="${b.dataset.goto}"]`);el&&el.scrollIntoView({behavior:"smooth",block:"center"})});
+$("side").addEventListener("click",e=>{if(e.target.closest("[data-gomode]")){S.settings.mode="complet";S.step=2;save()}});
+
+/* ===== Calendrier ===== */
+const MONTHS=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const BASE_EV={0:[["Mi-janvier : 60 % de tes crédits d'impôt de l'an dernier versés sur ton compte"]],1:[["Ouvre ou alimente PER, PEA, assurance vie tôt dans l'année"]],
+ 3:[["Mi-avril : ouverture de la déclaration en ligne",1]],4:[["Fin mai : date limite de déclaration (selon ton département)",1]],5:[["Début juin : dernières dates limites",1]],
+ 6:[["Fin juillet : avis d'impôt. Vérifie-le"]],7:[["Remboursement éventuel versé"]],8:[["Septembre à décembre : prélèvement du solde si tu dois de l'argent"],["30 sept : versement libératoire (micro-entreprise)"]],
+ 9:[["15 octobre : taxe foncière (20 oct en ligne)",1]],10:[["Le bon moment pour faire le point"]],11:[["15 déc : taxe d'habitation résidence secondaire"],["31 déc : dernier jour pour PER, dons, travaux, ventes en perte",1]]};
+const nextDate=(m,d)=>{let dt=new Date(YEAR,m,d);if(dt<TODAY)dt=new Date(YEAR+1,m,d);return dt};
+function renderCal(){
+  if(currentView()!=="calendrier")return;
+  const todo=LAST.out.filter(o=>!S.done[o.id]),nY=todo.filter(o=>o.when.grp==="annee"),nD=todo.filter(o=>o.when.grp==="decl");
+  const dls=[
+    {d:new Date(YEAR,11,31),t:"Dernier jour pour agir sur l'impôt "+YEAR,s:nY.length?`${nY.length} action${nY.length>1?"s":""} de ton plan à faire avant.`:"Rien d'urgent pour toi.",hot:nY.length>0},
+    {d:nextDate(0,15),t:"Avance de crédits d'impôt",s:"60 % de tes crédits d'impôt (aide à domicile, garde, dons) arrivent sur ton compte."},
+    {d:nextDate(3,10),t:"Ouverture de la déclaration",s:nD.length?`${nD.length} case${nD.length>1?"s":""} ou option${nD.length>1?"s":""} de ton plan à ne pas oublier.`:"Vérifie les montants pré-remplis.",hot:nD.length>0},
+    {d:nextDate(4,28),t:"Date limite de déclaration (environ)",s:"Entre fin mai et début juin selon ton département."},
+    {d:nextDate(9,15),t:"Taxe foncière",s:LAST.d&&LAST.d.proprio?"Tu es propriétaire : prévois-la dans ton budget.":"Pour les propriétaires."}
+  ].filter(x=>x.d>=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate())).sort((a,b)=>a.d-b.d);
+  $("deadlines").innerHTML=dls.map(x=>{const days=Math.max(0,Math.ceil((x.d-TODAY)/864e5));return `<div class="dl${x.hot?" hot":""}"><div class="date"><b>${x.d.getDate()}</b><span>${MONTHS[x.d.getMonth()].slice(0,4)}</span></div><div style="min-width:0"><h3>${x.t}</h3><p>${x.s}</p><p><b>Dans ${days} jour${days>1?"s":""}</b></p></div></div>`}).join("");
+  const mine={},put=(m,t)=>(mine[m]=mine[m]||[]).push(t);
+  todo.forEach(o=>{if(o.when.grp==="annee")put(11,o.title);else if(o.when.grp==="decl")put(4,o.title);else if(o.id==="vl")put(8,o.title)});
+  $("months").innerHTML=[...Array(12).keys()].map(i=>(MONTH+i)%12).map(m=>{
+    const ev=(BASE_EV[m]||[]).map(([t,hot])=>`<li class="${hot?"hot":""}"><i></i><span>${t}</span></li>`).join("");
+    const my=(mine[m]||[]).slice(0,4).map(t=>`<li class="mine"><i></i><span>${t}</span></li>`).join("")+((mine[m]||[]).length>4?`<li class="mine"><i></i><span>+ ${mine[m].length-4} autre(s)</span></li>`:"");
+    return `<div class="month${m===MONTH?" now":""}"><h4>${MONTHS[m]}<span>${m<MONTH?YEAR+1:YEAR}${m===MONTH?" · maintenant":""}</span></h4><ul>${my}${ev}</ul></div>`}).join("");
+}
+
+/* ===== Moi ===== */
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;renderMe()});
+const isStandalone=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch(e){return false}};
+const guessOS=()=>{const u=navigator.userAgent||"";return /iPhone|iPad|iPod/i.test(u)?"ios":/Android/i.test(u)?"android":"pc"};
+const appUrl=()=>window.BOUSSOLE_PWA?location.href.split("#")[0]:ARTIFACT_URL;
+function renderMe(){
+  if(currentView()!=="moi")return;
+  const s=S.settings,name=(s.prenom||"").trim();
+  $("avatar").textContent=name?name[0].toUpperCase():"?";$("meTitle").textContent=name||"Mon espace";
+  const n=Object.values(S.done).filter(Boolean).length;
+  $("meSub").textContent=`${n} action${n>1?"s":""} faite${n>1?"s":""} · mode ${s.mode==="complet"?"complet":"rapide"}`;
+  const pi=$("s-prenom");if(document.activeElement!==pi)pi.value=s.prenom||"";
+  $("s-mode").innerHTML=[["rapide","Rapide","clock"],["complet","Complet","spark"]].map(([v,t,i])=>`<button type="button" data-set="mode" data-v="${v}" aria-pressed="${s.mode===v}">${ic(i)}${t}</button>`).join("");
+  $("s-theme").innerHTML=[["auto","Automatique","auto"],["light","Clair","sun"],["dark","Sombre","moon"]].map(([v,t,i])=>`<button type="button" data-set="theme" data-v="${v}" aria-pressed="${s.theme===v}">${ic(i)}${t}</button>`).join("");
+  const P=S.p;$("dataSum").textContent=`Enregistré sur cet appareil : ${(P.placements||[]).length} placement(s), ${(P.credits||[]).length} crédit(s), ${(P.biens||[]).length} bien(s). Pour retrouver tes chiffres sur un autre appareil, copie ta sauvegarde et restaure-la là-bas.`;
+  $("docsBox").innerHTML=docsHTML();
+  const os=S.installOS||guessOS();
+  const steps={
+    ios:[`Ouvre le lien ci-dessous dans <b>Safari</b>.`,`Touche le bouton <span class="k">${ic("share")}Partager</span> en bas de l'écran.`,`Fais défiler et touche <span class="k">${ic("plusbox")}Sur l'écran d'accueil</span>.`,`Touche <span class="k">Ajouter</span>. L'icône apparaît sur ton écran.`],
+    android:[`Ouvre le lien ci-dessous dans <b>Chrome</b>.`,`Touche le menu <span class="k">${ic("dots")}</span> en haut à droite.`,`Touche <span class="k">${ic("install")}Installer l'application</span> (ou <span class="k">Ajouter à l'écran d'accueil</span>).`,`Confirme. L'icône apparaît avec tes autres applis.`],
+    pc:[`Ouvre le lien ci-dessous dans <b>Chrome</b> ou <b>Edge</b>.`,`Clique sur l'icône <span class="k">${ic("install")}Installer</span> à droite de la barre d'adresse.`,`Sinon : menu <span class="k">${ic("dots")}</span> → <span class="k">Caster, enregistrer et partager</span> → <span class="k">Installer la page en tant qu'application</span>.`,`L'appli s'ouvre dans sa propre fenêtre.`]};
+  $("installBox").innerHTML=`<h3>${ic("install")}Installer l'application</h3>
+    ${isStandalone()?`<p><b style="color:var(--accent)">C'est installé.</b> Tu utilises Boussole Fiscale comme une appli.</p>`:`<p>Mets Boussole Fiscale sur ton écran d'accueil, comme une vraie appli. Tuto en images pour iPhone, Android et ordinateur.</p>`}
+    <a class="btn primary" href="#installer">${ic("phone")}Voir le tuto en images</a>
+    <div class="link-row"><code id="appLink">${esc(appUrl())}</code><button class="btn" type="button" id="copyLink">${ic("copy")}Copier</button></div>`;
+}
+/* ===== Tuto d'installation ===== */
+const MI={lock:'<svg viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>',
+ share:'<svg viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M7 10.5H5.5v10h13v-10H17"/></svg>',
+ plusbox:'<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/></svg>',
+ copy:'<svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5H4v11h4"/></svg>',
+ star:'<svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>',
+ book:'<svg viewBox="0 0 24 24"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>',
+ dots:'<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg>',
+ inst:'<svg viewBox="0 0 24 24"><path d="M12 3v10M8 9l4 4 4-4"/><rect x="3" y="15" width="18" height="6" rx="2"/></svg>'};
+const mIco=(big)=>`<span class="m-ico${big?" big":""}"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M5 10v9.5M10.5 13.5v6" stroke="#fff" stroke-width="3.6"/><path d="M16 17v2.5" stroke="#7CF0C2" stroke-width="3.6"/><path d="M4.5 4.5l7 2.4 7.5 4.2M15.6 8.9l3.4 2.2-3.7 1.4" stroke="#7CF0C2" stroke-width="2"/></svg></span>`;
+const mPage=()=>`<div class="m-app"><div class="m-hero"><i></i><b></b><em></em></div><div class="m-ln"></div><div class="m-ln s"></div><div class="m-card"></div><div class="m-card"></div></div>`;
+const iosSafari=hl=>`${mPage()}<div class="m-bar"><span class="m-b">‹</span><span class="m-url">${MI.lock}claude.ai</span><span class="m-b${hl==="share"?" hl":""}">${MI.share}</span><span class="m-b${hl==="dots"?" hl":""}">···</span></div>`;
+const iosSheet=()=>`${mPage()}<div class="m-dim"></div><div class="m-sheet"><div class="m-sh-h">${mIco()}<span><b>Boussole Fiscale</b><small>claude.ai</small></span></div><div class="m-grp"><div class="m-row">Copier${MI.copy}</div><div class="m-row">Ajouter aux favoris${MI.book}</div><div class="m-row">Ajouter à la liste de lecture${MI.star}</div><div class="m-row hl">Sur l'écran d'accueil${MI.plusbox}</div></div></div>`;
+const iosAdd=()=>`<div class="m-top"><span class="m-link">Annuler</span><b>Écran d'accueil</b><span class="m-link hl">Ajouter</span></div><div class="m-grp m-form">${mIco(1)}<div><div class="m-field">Boussole Fiscale</div><small>claude.ai</small></div></div><div class="m-grp"><div class="m-row">Ouvrir comme app web<i class="m-sw"></i></div></div><div class="m-kb"></div>`;
+const homeScr=()=>`<div class="m-home">${Array.from({length:14},(_,i)=>i===5?`<span class="m-hi hl">${mIco()}<small>Boussole</small></span>`:`<span class="m-hi"><span class="m-g" style="--h:${(i*47)%360}"></span><small></small></span>`).join("")}</div>`;
+const andChrome=hl=>`<div class="m-abar"><span class="m-url">${MI.lock}claude.ai</span><span class="m-b${hl?" hl":""}">${MI.dots}</span></div>${mPage()}`;
+const andMenu=()=>`<div class="m-abar"><span class="m-url">${MI.lock}claude.ai</span><span class="m-b">${MI.dots}</span></div>${mPage()}<div class="m-menu"><div class="m-row">Nouvel onglet</div><div class="m-row">Historique</div><div class="m-row">Partager...</div><div class="m-row hl">${MI.inst}Installer l'application</div><div class="m-row">Paramètres</div></div>`;
+const andConfirm=()=>`${mPage()}<div class="m-dim"></div><div class="m-dlg"><b>Installer l'application ?</b><div class="m-form">${mIco()}<span>Boussole Fiscale<br><small>claude.ai</small></span></div><div class="m-acts"><span class="m-link">Annuler</span><span class="m-link hl">Installer</span></div></div>`;
+const phone=(inner,os)=>`<div class="phone ${os}"><div class="scr">${inner}</div></div>`;
+const TUTO={
+ ios:{label:"iPhone / iPad",ic:"phone",steps:[
+  ["Ouvre le lien dans Safari","Safari, c'est l'appli à la boussole bleue. Si le lien s'est ouvert ailleurs (WhatsApp, Gmail...), touche le bouton pour l'ouvrir dans Safari.",phone(iosSafari(),"ios")],
+  ["Touche le bouton Partager","Le carré avec une flèche vers le haut, en bas de l'écran. Tu ne le vois pas ? Touche d'abord ··· en bas à droite, puis \"Partager\".",phone(iosSafari("share"),"ios")],
+  ["Touche \"Sur l'écran d'accueil\"","Fais défiler la liste vers le bas si tu ne le vois pas tout de suite.",phone(iosSheet(),"ios")],
+  ["Touche \"Ajouter\" en haut à droite","Si l'option \"Ouvrir comme app web\" apparaît, laisse-la activée.",phone(iosAdd(),"ios")],
+  ["C'est installé !","L'icône Boussole est sur ton écran d'accueil. Touche-la pour ouvrir l'appli, comme n'importe quelle autre.",phone(homeScr(),"ios")]],
+  note:"Avec Chrome sur iPhone, c'est pareil : touche le bouton Partager dans la barre d'adresse, puis \"Sur l'écran d'accueil\"."},
+ android:{label:"Android",ic:"phone",steps:[
+  ["Ouvre le lien dans Chrome","Chrome, c'est le rond rouge, jaune, vert et bleu.",phone(andChrome(),"and")],
+  ["Touche les 3 petits points","En haut à droite de l'écran.",phone(andChrome(1),"and")],
+  ["Touche \"Installer l'application\"","Selon ton téléphone, c'est écrit \"Ajouter à l'écran d'accueil\".",phone(andMenu(),"and")],
+  ["Confirme avec \"Installer\"","L'icône Boussole apparaît avec tes autres applis.",phone(andConfirm(),"and")]],
+  note:"Sur un Samsung avec Samsung Internet : menu ≡ en bas, puis \"Ajouter la page à\" → \"Écran d'accueil\"."},
+ pc:{label:"Ordinateur",ic:"monitor",steps:[
+  ["Ouvre le lien dans Chrome ou Edge","Firefox et Safari sur Mac proposent aussi l'ajout au Dock (Safari : menu Fichier → \"Ajouter au Dock\").",""],
+  ["Clique sur l'icône d'installation","À droite de la barre d'adresse : un petit écran avec une flèche. Sinon : menu ⋮ → \"Caster, enregistrer et partager\" → \"Installer la page en tant qu'application\".",""],
+  ["Clique sur \"Installer\"","L'appli s'ouvre dans sa propre fenêtre et apparaît dans tes applications.",""]],
+  note:"Sur un ordinateur, le plus pratique est souvent d'installer l'appli sur ton téléphone : scanne le QR code ci-dessus."}};
+let instOS=null;
+function renderInstaller(){
+  const shown=!isStandalone()&&currentView()!=="installer"&&!S.instHidden;$("installBanner").hidden=!shown;
+  if(currentView()!=="installer")return;
+  const os=instOS||guessOS(),T=TUTO[os];
+  $("instTabs").innerHTML=Object.entries(TUTO).map(([k,t])=>`<button type="button" data-ios="${k}" aria-pressed="${k===os}">${ic(t.ic)}${t.label}</button>`).join("");
+  $("instLink").textContent=appUrl();
+  const onPhone=guessOS()!=="pc";$("qrBox").hidden=onPhone;
+  if(onPhone){$("shareT").textContent="Partage l'appli à un proche";$("shareD").textContent="Copie le lien et envoie-le par message : il suffit de l'ouvrir et de suivre ce tuto.";}
+  const q=$("qrBox");if(!q.dataset.done){try{const qr=qrcode(0,"M");qr.addData(appUrl());qr.make();q.innerHTML=qr.createSvgTag({cellSize:4,margin:2,scalable:true});q.dataset.done="1"}catch(e){q.innerHTML=`<span class="muted" style="font-size:12px;padding:8px;text-align:center">QR code indisponible hors ligne</span>`}}
+  $("instNow").innerHTML=isStandalone()?`<div class="note">${ic("check")}<span><b>C'est déjà installé</b> sur cet appareil. Tu peux partager le lien ou le QR code à tes proches.</span></div>`:deferredPrompt?`<div class="note">${ic("install")}<span style="flex:1"><b>Ton navigateur peut l'installer en un clic.</b></span><button class="btn primary" type="button" id="installNow2">${ic("install")}Installer maintenant</button></div>`:"";
+  if(!window.BOUSSOLE_PWA&&!isStandalone())$("instNow").innerHTML+=`<div class="warn">${ic("alert")}<span><b>À savoir avant d'installer :</b> depuis ce lien claude.ai, l'icône sur ton écran sera <b>grise</b> (c'est claude.ai qui la choisit) et l'appli demandera internet et ta connexion Claude. Ça marche, mais ce n'est pas la version finale. La vraie appli, avec le logo vert et sans internet, aura son propre lien : utilise-le dès que tu l'as.</span></div>`;
+  $("tuto").className="tuto "+os;
+  const lastFix=(st,i)=>(!window.BOUSSOLE_PWA&&os!=="pc"&&i===T.steps.length-1)?[st[0],os==="ios"?"Une icône apparaît sur ton écran d'accueil. Depuis ce lien, elle est grise et générique : c'est normal.":"Une icône apparaît avec tes autres applis. Depuis ce lien, elle est grise et générique : c'est normal.",st[2].replace(/<span class="m-ico[^"]*">[\s\S]*?<\/svg><\/span>/,'<span class="m-gen"></span>')]:st;
+  $("tuto").innerHTML=T.steps.map(lastFix).map(([t,d,m],i)=>`<li class="tstep"><div class="tno">${i+1}</div><div class="ttxt"><h3>${t}</h3><p>${d}</p></div>${m?`<div class="tmock">${m}</div>`:""}</li>`).join("");
+  $("instNote").innerHTML=`${ic("bulb")}<span>${T.note}</span>`;
+}
+$("v-installer").addEventListener("click",e=>{const t=e.target.closest("[data-ios]");if(t){instOS=t.dataset.ios;renderInstaller();return}
+  if(e.target.closest("#instCopy")){copyText(appUrl(),"Lien copié",$("instLink"));return}
+  if(e.target.closest("#installNow2")&&deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.finally(()=>{deferredPrompt=null;renderInstaller()})}});
+$("instClose").addEventListener("click",()=>{S.instHidden=true;save();renderInstaller()});
+window.addEventListener("beforeinstallprompt",()=>setTimeout(renderInstaller,0));
+function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2200)}
+async function copyText(txt,ok,el){try{await navigator.clipboard.writeText(txt);toast(ok)}catch(e){if(el){if(el.select)el.select();else{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)}}toast("Texte sélectionné : fais Copier")}}
+$("v-moi").addEventListener("click",e=>{
+  const st=e.target.closest("[data-set]");if(st){S.settings[st.dataset.set]=st.dataset.v;if(st.dataset.set==="theme")applyTheme();update();return}
+  const dc=e.target.closest("[data-doc]");if(dc){S.docs=S.docs||{};S.docs[dc.dataset.doc]=!S.docs[dc.dataset.doc];update();return}
+  const os=e.target.closest("[data-os]");if(os){S.installOS=os.dataset.os;renderMe();return}
+  if(e.target.closest("#copyLink")){copyText(appUrl(),"Lien copié",$("appLink"));return}
+  if(e.target.closest("#installNow")&&deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.finally(()=>{deferredPrompt=null;renderMe()})}
+});
+$("s-prenom").addEventListener("input",e=>{S.settings.prenom=e.target.value.slice(0,30);update()});
+$("exportBtn").onclick=()=>{const code=btoa(unescape(encodeURIComponent(JSON.stringify({v:2,p:S.p,done:S.done,settings:S.settings,docs:S.docs||{}}))));$("importBox").hidden=false;$("importTxt").value=code;$("importMsg").textContent="";copyText(code,"Sauvegarde copiée",$("importTxt"))};
+$("importToggle").onclick=()=>{$("importBox").hidden=!$("importBox").hidden;$("importTxt").value="";$("importMsg").textContent=""};
+$("importBtn").onclick=()=>{try{const o=JSON.parse(decodeURIComponent(escape(atob($("importTxt").value.trim()))));if(!o.p)throw 0;
+  S.p=Object.assign({},DEFAULT,o.p);S.done=o.done||{};S.settings=Object.assign(S.settings,o.settings||{});if(o.docs)S.docs=o.docs;S.example=false;applyTheme();update();$("importMsg").textContent="Sauvegarde restaurée.";toast("Sauvegarde restaurée")}
+  catch(e){$("importMsg").textContent="Ce code n'est pas valide. Recopie-le en entier."}};
+$("wipeBtn").onclick=()=>{$("wipeConfirm").hidden=false;$("wipeBtn").hidden=true};
+$("wipeNo").onclick=()=>{$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false};
+$("wipeYes").onclick=()=>{S.p=JSON.parse(JSON.stringify(DEFAULT));S.done={};S.example=false;S.settings={prenom:"",mode:"rapide",theme:"auto"};applyTheme();$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false;toast("Tout est effacé");update()};
+
+hydrate(document);
+route();
+
+})();
+</script>
+
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
+</body></html>
