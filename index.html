@@ -794,7 +794,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 15 du 11/11/2026";
+const APP_VERSION="version 16 du 11/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1789,9 +1789,9 @@ const GD_TYPES=[
  ["decl","Déclaration de revenus",1,"fullText contains 'déclaration des revenus' and fullText contains '1AJ'"],
  ["paie","Fiches de paie",2,"(fullText contains 'net imposable' or fullText contains 'bulletin de salaire' or fullText contains 'bulletin de paie')"],
  ["tf","Taxe foncière",2,"fullText contains 'taxe foncière'"],
- ["pret","Prêts",3,"(fullText contains 'tableau d''amortissement' or fullText contains 'capital restant dû' or fullText contains 'offre de prêt')"],
+ ["pret","Prêts",3,"(fullText contains 'tableau d\\'amortissement' or fullText contains 'capital restant dû' or fullText contains 'offre de prêt')"],
  ["ifu","Relevés fiscaux de banque",3,"(fullText contains 'imprimé fiscal unique' or fullText contains 'IFU')"],
- ["plac","Placements",5,"(fullText contains 'valeur de rachat' or fullText contains 'plan d''épargne' or fullText contains 'assurance vie' or fullText contains 'relevé de situation')"]];
+ ["plac","Placements",5,"(fullText contains 'valeur de rachat' or fullText contains 'plan d\\'épargne' or fullText contains 'assurance vie' or fullText contains 'relevé de situation')"]];
 function gdLoad(){return new Promise((res,rej)=>{if(window.google&&google.accounts&&google.accounts.oauth2)return res();const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.onload=()=>res();s.onerror=()=>rej(new Error("gsi"));document.head.appendChild(s)})}
 const IS_IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 const GD_SCOPE="https://www.googleapis.com/auth/drive.readonly",GD_REDIRECT=location.origin+location.pathname;
@@ -1811,7 +1811,7 @@ function gdConnect(){
   history.replaceState(null,"",GD_REDIRECT+"#importer");
   if(q.get("access_token")){gdSetToken(q.get("access_token"),q.get("expires_in"));setTimeout(gdSearch,400)}
   else GD.msg=q.get("error")==="access_denied"?"Connexion Google annulée ou refusée.":"Connexion Google impossible ("+(q.get("error")||"erreur")+").";})();
-async function gdApi(path){const t=GD.token;if(!t||Date.now()>GD.exp-30000){GD.token=null;throw new Error("auth")}const r=await fetch("https://www.googleapis.com/drive/v3/"+path,{headers:{Authorization:"Bearer "+t}});if(r.status===401){GD.token=null;throw new Error("auth")}if(!r.ok)throw new Error("http "+r.status);return r}
+async function gdApi(path){const t=GD.token;if(!t||Date.now()>GD.exp-30000){GD.token=null;throw new Error("auth")}const r=await fetch("https://www.googleapis.com/drive/v3/"+path,{headers:{Authorization:"Bearer "+t}});if(r.status===401){GD.token=null;throw new Error("auth")}if(!r.ok){let m="";try{const j=await r.json();m=j.error&&j.error.message||""}catch(_){}throw new Error("http "+r.status+(m?" ("+m+")":""))}return r}
 const normTxt=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase();
 const GD_KEEP={avis:1,decl:1,paie:2,tf:2,pret:3,ifu:3,plac:5};
 async function gdWho(){if(S.settings.nomDocs)return;try{const r=await gdApi("about?fields=user(displayName)");const j=await r.json();const dn=((j.user&&j.user.displayName)||"").trim();const last=dn.split(/\s+/).pop();if(last&&last.length>=2){S.settings.nomDocs=last;save()}}catch(e){}}
@@ -1837,11 +1837,12 @@ async function gdSearch(){
   GD.state="search";GD.msg="";GD.found=[];GD.prog="";renderGd();
   try{await gdWho();
     const since=(YEAR-3)+"-01-01T00:00:00";const seen=new Set(),seenName=new Set();
+    let fails=0,lastErr="";
     for(const [type,,,q] of GD_TYPES){
-      const query=`mimeType='application/pdf' and trashed=false and modifiedTime > '${since}' and ${q}`;
-      const r=await gdApi("files?pageSize=40&orderBy=modifiedTime desc&fields=files(id,name,modifiedTime,size)&q="+encodeURIComponent(query));
-      const js=await r.json();(js.files||[]).forEach(f=>{if(seen.has(f.id))return;seen.add(f.id);const k=f.name+"|"+f.size;const dup=seenName.has(k);seenName.add(k);GD.found.push({id:f.id,name:f.name,date:f.modifiedTime,qtype:type,dup})})}
-    if(!GD.found.length){GD.state="idle";GD.msg="Je n'ai trouvé aucun document fiscal en PDF dans ton Drive (3 dernières années).";renderGd();return}
+      const query=`mimeType='application/pdf' and trashed=false and modifiedTime > '${since}Z' and ${q}`;
+      let js;try{const r=await gdApi("files?pageSize=50&fields=files(id,name,modifiedTime,size)&q="+encodeURIComponent(query));js=await r.json()}catch(e){if(e.message==="auth")throw e;fails++;lastErr=e.message;continue}
+      (js.files||[]).sort((a,b)=>String(b.modifiedTime).localeCompare(String(a.modifiedTime)));(js.files||[]).forEach(f=>{if(seen.has(f.id))return;seen.add(f.id);const k=f.name+"|"+f.size;const dup=seenName.has(k);seenName.add(k);GD.found.push({id:f.id,name:f.name,date:f.modifiedTime,qtype:type,dup})})}
+    if(!GD.found.length){GD.state="idle";GD.msg=fails===GD_TYPES.length?"Google a refusé la recherche : "+lastErr:"Je n'ai trouvé aucun document fiscal en PDF dans ton Drive (3 dernières années).";renderGd();return}
     GD.state="sort";const todo=GD.found.filter(f=>!f.dup).slice(0,60);let i=0;
     for(const f of GD.found){if(f.dup){f.cat="out";f.reason="Doublon d'un autre fichier"}}
     for(const f of todo){i++;GD.prog=i+" / "+todo.length;renderGd();
