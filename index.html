@@ -799,7 +799,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 18 du 11/11/2026";
+const APP_VERSION="version 19 du 11/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1933,7 +1933,7 @@ function renderGd(){const box=$("gdBox");if(!box)return;if(GD.state==="auth"&&!G
   if(!window.BOUSSOLE_PWA){box.innerHTML=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div class="gd-txt"><b>Chercher dans mon Google Drive</b><span class="muted">Disponible dans l'appli installée : <a href="https://crbntheo-png.github.io/boussole-fiscale/#importer" target="_blank" rel="noopener">l'ouvrir</a></span></div></div></div>`;return}
   if(!GDRIVE_CLIENT_ID){box.innerHTML=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div class="gd-txt"><b>Chercher dans mon Google Drive</b><span class="muted">Bientôt disponible.</span></div></div></div>`;return}
   gdInit();const busy=["search","sort","dl","auth"].includes(GD.state);
-  const lbl=GD.state==="auth"?"Connexion à Google...":GD.state==="search"?"Recherche...":GD.state==="sort"?"Tri en cours "+GD.prog:GD.found.length?"Relancer la recherche":"Me connecter et chercher";
+  const lbl=GD.state==="auth"?"Connexion à Google...":GD.state==="search"?"Recherche...":GD.state==="sort"?"Tri en cours "+GD.prog:GD.found.length?"Relancer la recherche":gdRT()||(GD.token&&Date.now()<GD.exp-60000)?"Chercher mes documents":"Me connecter et chercher";
   let h=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div class="gd-txt"><b>Chercher dans mon Google Drive</b><span class="muted">L'appli parcourt ton Drive, lit chaque document et ne garde que ceux qui te concernent. Lecture seule.</span></div>
     <button type="button" class="btn primary" id="gdGo" ${busy?"disabled":""}>${lbl}</button></div>`;
   if(gdRT())h+=`<div class="gd-on">${ic("check")}<span><b>Connecté en continu à ton Google Drive.</b> L'appli regarde toute seule les nouveaux documents à chaque ouverture.</span><button type="button" class="btn ghost" id="gdOff">Déconnecter</button></div>`;
