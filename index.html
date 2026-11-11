@@ -435,6 +435,15 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .gd-f small{color:var(--muted);font-size:12px}
 .banner.old{background:var(--amber-soft)}
 .banner.old .t>span>svg{color:var(--amber)}
+.forms-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.form-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow);min-width:0}
+.form-card p{margin:0;font-size:14px;color:var(--muted)}
+.form-card .sci-h b{font-size:17px}
+.form-card .muted{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.cases-t{display:flex;flex-direction:column;gap:6px}
+.ct-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--sunk);border-radius:10px;padding:7px 10px;font-size:13.5px}
+.ct-row b{font-family:var(--f-display);font-size:15px;white-space:nowrap}
+@media (max-width:420px){.forms-list{grid-template-columns:minmax(0,1fr)}}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -584,6 +593,26 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
     <div class="sec-h"><h2>L'année fiscale en un coup d'œil</h2><p>En vert, tes actions. En rouge, les dates à ne pas rater.</p></div>
     <div class="months" id="months"></div>
     <div class="note"><span data-ic="bulb"></span><span><b>À tout moment :</b> mariage, Pacs, naissance, séparation, perte d'emploi, gros changement de revenus ? Signale-le dans les 60 jours sur impots.gouv.fr, rubrique "Gérer mon prélèvement à la source". Ton taux est recalculé tout de suite.</span></div>
+  </section>
+
+  <section class="view" id="v-formulaires" aria-label="Mes formulaires" hidden>
+    <div class="imp-hero">
+      <div style="min-width:0;display:flex;flex-direction:column;gap:10px">
+        <span class="eyebrow"><span data-ic="receipt"></span>Déclaration <span id="formsSeason"></span> · <span id="formsCount"></span></span>
+        <h2>Mes formulaires à remplir</h2>
+        <p>Les déclarations que tu dois faire, pourquoi, et pour chacune les cases avec les montants que l'appli connaît déjà.</p>
+        <div class="row"><button class="btn primary" type="button" id="ficheDl"><span data-ic="download"></span>Télécharger ma fiche (PDF)</button><button class="btn" type="button" id="ficheCopy"><span data-ic="copy"></span>Copier le texte</button></div>
+      </div>
+      <label class="drop" for="fillFile">
+        <span class="tile c-case"><span data-ic="receipt"></span></span>
+        <b>Remplir un formulaire PDF</b>
+        <span class="muted">Donne un formulaire officiel (cerfa remplissable) : l'appli remplit les cases qu'elle connaît.</span>
+        <input type="file" id="fillFile" accept="application/pdf,.pdf" hidden>
+      </label>
+    </div>
+    <div id="fillOut" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="formsList" class="forms-list"></div>
+    <div class="note"><span data-ic="info"></span><span>Montants indicatifs calculés à partir de ta situation. La plupart des cases de la 2042 sont pré-remplies par les impôts : compare et corrige si besoin.</span></div>
   </section>
 
   <section class="view" id="v-sci" aria-label="Mes SCI" hidden>
@@ -739,6 +768,7 @@ const IC={
  lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>',
  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
  upload:'<path d="M12 20V9M7 14l5-5 5 5M4 4h16"/>',
+ download:'<path d="M12 4v11M7 10l5 5 5-5M4 20h16"/>',
  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z"/>',
  auto:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
@@ -764,7 +794,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 14 du 11/11/2026";
+const APP_VERSION="version 15 du 11/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -784,7 +814,7 @@ const DEFAULT={situation:"celib",age1:35,age2:35,enfants:0,under6:0,college:0,ly
   sal1:0,km1:0,sal2:0,km2:0,pension:0,ca:0,caType:"services",fraisPro:0,vl:false,capitaux:0,pv:0,prime:0,
   proprio:false,loyersNu:0,chargesNu:0,loyersMeub:0,reelMeub:false,immoNet:0,epargne:0,hasPEA:false,hasAV:false,perDeja:0,
   dons:0,domicile:0,garde:0,pensionEnf:0,aideParent:0,syndicat:0,placements:[],credits:[],biens:[],
-  gestion:"simple",risque:"equilibre",banque:"trad",perPlafond:0};
+  gestion:"simple",risque:"equilibre",banque:"trad",perPlafond:0,dispositif:"aucun",pinelPrix:0,pinelAnnee:0,pinelDuree:"9",etranger:false,crypto:false,cryptoVente:false};
 let uid=1;const nid=()=>"i"+Date.now().toString(36)+(uid++);
 const EXAMPLE=Object.assign({},DEFAULT,{situation:"pacse",age1:41,age2:39,enfants:2,under6:1,college:1,sal1:58000,km1:28,sal2:34000,km2:6,garde:2400,
   epargne:18000,hasAV:true,loyersNu:9600,chargesNu:4100,immoNet:380000,proprio:true,
@@ -795,7 +825,7 @@ const isCouple=p=>p.situation==="marie"||p.situation==="pacse";
 const hasPartner=p=>isCouple(p)||p.situation==="concubin";
 
 function derive(p,mode){
-  const d=Object.assign({},p);d.sciFonc=(p.sci||[]).filter(c=>c.regime==="IR"&&c.share!=null).reduce((t,c)=>t+c.res*c.share,0);if(mode!=="complet")return d;
+  const d=Object.assign({},p);d.sciFonc=(p.sci||[]).filter(c=>c.regime==="IR"&&c.share!=null).reduce((t,c)=>t+c.res*c.share,0);{const pi=pinelInfo(p);d.pinelRed=pi?pi.annual:0}if(mode!=="complet")return d;
   const P=p.placements||[],C=p.credits||[],B=p.biens||[];
   const sumP=t=>P.filter(x=>x.type===t).reduce((s,x)=>s+(+x.montant||0),0);
   d.epargne=sumP("courant")+sumP("livretA")+sumP("ldds")+sumP("lep");
@@ -832,10 +862,10 @@ function foyer(f){
   const base=f.couple?2:1;let brut=bareme(R,f.parts);
   if(f.parts>base){const t0=bareme(R,base),h=Math.round((f.parts-base)*2);brut=Math.max(brut,t0-(f.caseT?QF_T+(h-1)*QF_HALF:h*QF_HALF))}
   const [seuil,dec]=f.couple?DEC.duo:DEC.solo;if(brut<seuil)brut=Math.max(0,brut-(dec-brut*.4525));
-  const red=Math.min(f.dons,R*.2)*.66+(f.scol?f.scolAmt:0);
+  const red=Math.min(f.dons,R*.2)*.66+(f.scol?f.scolAmt:0)+(f.pinel||0);
   const cred=Math.min(f.domicile,Math.min(15000,12000+1500*f.kids))*.5+Math.min(f.garde,3500*f.under6)*.5+Math.min(f.syndicat,f.salTotal*.01)*.66;
   const ir=Math.max(0,brut-red)-cred,psFonc=(Math.max(0,fonc)+meub)*PS;
-  return {R,ir,vlTax,pfu,tmi:tmiOf(R,f.parts),parts:f.parts,brut,red,cred,psFonc,total:ir+vlTax+pfu+psFonc};
+  return {R,ir,vlTax,pfu,tmi:tmiOf(R,f.parts),parts:f.parts,brut,red,cred,psFonc,fonc,total:ir+vlTax+pfu+psFonc};
 }
 function partsOf(couple,kids,caseT,inval,veuf){let p=(couple||(veuf&&kids>0))?2:1;p+=kids<=2?kids*.5:1+(kids-2);if(caseT)p+=.5;if(inval)p+=.5;return p}
 function calc(p){
@@ -843,11 +873,11 @@ function calc(p){
   const c={pension:p.pension,ca:p.ca,caType:p.caType,fraisPro:p.fraisPro,vl:p.vl,reelPro:!!p.reelPro,loyersNu:p.loyersNu,chargesNu:p.chargesNu,reelNu:!!p.reelNu,
     loyersMeub:p.loyersMeub,reelMeub:p.reelMeub,capitaux:p.capitaux,optBareme:!!p.optBareme,per:p.perDeja+(p.perPlus||0),
     pensionEnf:p.declPensionEnf?Math.min(p.pensionEnf,PENSION_ENF*p.enfMaj):0,aideParent:p.declAideParent?p.aideParent:0,
-    sciFonc:p.sciFonc||0,dons:p.dons,scol:!!p.scol,scolAmt:61*p.college+153*p.lycee+183*p.sup,domicile:p.domicile,garde:p.garde,syndicat:p.syndicat,kids:p.enfants,under6:p.under6};
+    sciFonc:p.sciFonc||0,pinel:p.pinelRed||0,dons:p.dons,scol:!!p.scol,scolAmt:61*p.college+153*p.lycee+183*p.sup,domicile:p.domicile,garde:p.garde,syndicat:p.syndicat,kids:p.enfants,under6:p.under6};
   if(p.situation==="concubin"){
     const a=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal1,km:p.km1,fr:!!p.fr1}],parts:partsOf(false,p.enfants,false,p.inval,false),caseT:false,salTotal:p.sal1}));
-    const b=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal2,km:p.km2,fr:!!p.fr2}],pension:0,ca:0,loyersNu:0,loyersMeub:0,capitaux:0,sciFonc:0,per:0,pensionEnf:0,aideParent:0,dons:0,scol:false,domicile:0,garde:0,syndicat:0,kids:0,under6:0,parts:1,caseT:false,salTotal:p.sal2}));
-    return {R:a.R+b.R,ir:a.ir+b.ir,vlTax:a.vlTax,pfu:a.pfu,psFonc:a.psFonc,tmi:Math.max(a.tmi,b.tmi),parts:a.parts,total:a.total+b.total,sep:true,red:a.red+b.red,cred:a.cred+b.cred,brut:a.brut+b.brut};
+    const b=foyer(Object.assign({},c,{couple:false,sals:[{s:p.sal2,km:p.km2,fr:!!p.fr2}],pension:0,ca:0,loyersNu:0,loyersMeub:0,capitaux:0,sciFonc:0,pinel:0,per:0,pensionEnf:0,aideParent:0,dons:0,scol:false,domicile:0,garde:0,syndicat:0,kids:0,under6:0,parts:1,caseT:false,salTotal:p.sal2}));
+    return {fonc:a.fonc,R:a.R+b.R,ir:a.ir+b.ir,vlTax:a.vlTax,pfu:a.pfu,psFonc:a.psFonc,tmi:Math.max(a.tmi,b.tmi),parts:a.parts,total:a.total+b.total,sep:true,red:a.red+b.red,cred:a.cred+b.cred,brut:a.brut+b.brut};
   }
   const sals=[{s:p.sal1,km:p.km1,fr:!!p.fr1}];if(couple)sals.push({s:p.sal2,km:p.km2,fr:!!p.fr2});
   return foyer(Object.assign({},c,{couple,sals,parts:partsOf(couple,p.enfants,caseT,p.inval,p.situation==="veuf"),caseT,salTotal:p.sal1+(couple?p.sal2:0)}));
@@ -1048,6 +1078,14 @@ function rules(p,base,mode,raw){
       what:"Donner des parts de SCI plutôt que les biens eux-mêmes, petit à petit, en utilisant l'abattement de 100 000 € par parent et par enfant.",why:"La valeur des parts tient compte des crédits de la SCI : on donne moins cher. On peut aussi donner la nue-propriété et garder les loyers.",
       whenTxt:"Pas de date limite. Le compteur de 15 ans démarre au don.",how:["Fais évaluer les parts.","Rendez-vous chez un notaire."],cases:["2735"],link:SP("donation parts SCI")});
   });
+  {const pi=pinelInfo(p);if(pi&&pi.annual>0)add({id:"pinel",k:"case",ic:"home",title:"Déclarer ta réduction "+(p.dispositif==="denormandie"?"Denormandie":"Pinel")+" : "+fmt(pi.annual)+" cette année",gain:null,gainTxt:"Déjà comptée",when:decl,tags:["case","immo"],
+    what:"Reporte ton investissement sur la 2042-RICI (rubrique Pinel, case selon l'année d'achat)"+(pi.n===1?", et joins l'engagement de location de "+pi.d+" ans.":"."),why:"Réduction de "+pi.rate+" % du prix (plafonné à 300 000 €) étalée sur "+pi.d+" ans : "+fmt(pi.annual)+" par an jusqu'en "+pi.end+". Si tu oublies de la déclarer, tu la perds.",
+    whenTxt:"Chaque année à la déclaration, jusqu'en "+pi.end+".",how:["Ouvre la 2042-RICI dans ta déclaration en ligne.","Rubrique \"investissements locatifs\" : choisis l'année d'achat.","Indique le prix de revient."],cases:["2042-RICI","7Q…"],
+    warn:pi.end===YEAR&&pi.d<12?"Ton engagement finit cette année : tu peux le prolonger de 3 ans pour continuer à profiter de la réduction.":"Le loyer et les revenus du locataire doivent respecter les plafonds pendant tout l'engagement.",link:SP("réduction Pinel déclaration")});
+   if(p.dispositif==="locav")add({id:"locav",k:"case",ic:"home",title:"Déclarer ta réduction Loc'Avantages",gain:null,gainTxt:"À ne pas oublier",when:decl,tags:["case","immo"],what:"Reporte tes loyers conventionnés sur la 2042-RICI et la 2044.",why:"La réduction (15 à 65 % des loyers selon la convention) n'est accordée que si tu la déclares.",whenTxt:"À la déclaration.",how:["Garde la convention signée avec l'Anah.","Remplis la 2044 puis la 2042-RICI."],cases:["2044","2042-RICI"],link:SP("Loc'Avantages réduction d'impôt")})}
+  if(p.etranger)add({id:"3916",k:"case",ic:"card",title:"Déclarer tes comptes à l'étranger (3916)",gain:null,gainTxt:"Évite 1 500 € d'amende",when:decl,tags:["case"],what:"Revolut, N26, Trade Republic, PayPal, Wise... chaque compte ouvert hors de France doit être déclaré, même vide ou fermé dans l'année.",why:"L'oubli coûte 1 500 € d'amende par compte et par an.",whenTxt:"Chaque année avec ta déclaration.",how:["Coche la case 8UU de la 2042.","Remplis une 3916 par compte (banque, adresse, numéro)."],cases:["8UU","3916"],link:SP("déclaration 3916 compte étranger")});
+  if(p.crypto)add({id:"3916b",k:"case",ic:"key",title:"Déclarer tes comptes de cryptomonnaies (3916-bis)",gain:null,gainTxt:"Évite 750 € d'amende",when:decl,tags:["case"],what:"Chaque compte sur une plateforme crypto (Binance, Coinbase, Kraken...) doit être déclaré.",why:"L'oubli coûte 750 € d'amende par compte.",whenTxt:"Chaque année avec ta déclaration.",how:["Coche la case 8TT.","Remplis une 3916-bis par plateforme."],cases:["8TT","3916-bis"],link:SP("3916 bis cryptomonnaies")});
+  if(p.cryptoVente)add({id:"2086",k:"case",ic:"key",title:"Calculer tes gains sur cryptos (2086)",gain:null,gainTxt:"Obligatoire",when:decl,tags:["case","epargne"],what:"Tu as vendu des cryptos contre des euros : remplis la 2086 et reporte le gain case 3AN.",why:"Les gains sont taxés à 30 % (12,8 % d'impôt + prélèvements sociaux). Les échanges crypto contre crypto ne comptent pas, et les pertes se déduisent.",whenTxt:"À la déclaration.",how:["Exporte l'historique de tes ventes depuis ta plateforme.","Remplis la 2086 (un outil de ta plateforme peut la préparer).","Reporte le résultat en 3AN (ou 3BN si perte)."],cases:["2086","3AN"],link:SP("formulaire 2086 crypto")});
   if(p.sciCCA>0)add({id:"cca",k:"immo",ic:"coins",title:"Te faire rembourser ton compte courant d'associé",gain:null,gainTxt:"Sans impôt",when:any("Quand la trésorerie le permet"),tags:["immo"],
     what:"Les comptes de ta société montrent "+fmt(p.sciCCA)+" de comptes courants d'associés : c'est l'argent que les associés ont prêté à la société. Quand elle a de la trésorerie, elle peut te rembourser ta part.",
     why:"Ce remboursement n'est pas un revenu : il n'est ni imposé ni soumis aux prélèvements sociaux. C'est souvent la façon la moins taxée de récupérer de l'argent de ta société.",
@@ -1073,12 +1111,12 @@ applyTheme();
 
 /* ===== Navigation ===== */
 const VIEWS=[["plan","Mon plan","target"],["situation","Ma situation","list"],["calendrier","Calendrier","calendar"],["moi","Moi","user"]];
-const ALLV=[...VIEWS.map(v=>v[0]),"installer","importer","sci"];
+const ALLV=[...VIEWS.map(v=>v[0]),"installer","importer","sci","formulaires"];
 const currentView=()=>{const h=location.hash.replace("#","");return ALLV.includes(h)?h:"plan"};
 function renderNav(urgent){const v=currentView();
   const h=VIEWS.map(([id,l,i])=>`<a href="#${id}" ${v===id?'aria-current="page"':""}>${ic(i)}<span>${l}</span>${id==="plan"&&urgent?`<span class="dot">${urgent}</span>`:""}</a>`).join("");
   $("nav").innerHTML=h;$("bnav").innerHTML=h}
-function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();renderGd();renderSci();window.scrollTo(0,0)}
+function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();renderGd();renderSci();renderForms();window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 
 /* ===== Formulaire ===== */
@@ -1122,7 +1160,15 @@ const QP={proprio:{k:"proprio",t:"bool",l:"Propriétaire de ton logement"},loyer
   hasPEA:{k:"hasPEA",t:"bool",l:"Tu as un PEA"},hasAV:{k:"hasAV",t:"bool",l:"Tu as une assurance vie"},
   perDeja:{k:"perDeja",t:"num",l:"Déjà versé sur un PER cette année",u:"€",ic:"coins"},
   perPlafond:{k:"perPlafond",t:"num",l:"Ton plafond épargne retraite disponible",u:"€",ic:"receipt",h:"Facultatif. Sur ton dernier avis d'impôt, rubrique \"plafond épargne retraite\" (total des 4 années). Sinon on l'estime."}};
-const QUICK_ORDER=["proprio","loyersNu","chargesNu","loyersMeub","reelMeub","immoNet","epargne","hasPEA","hasAV","perDeja","perPlafond"];
+Object.assign(QP,{
+  dispositif:{k:"dispositif",t:"seg",l:"Un investissement avec réduction d'impôt ?",opts:[["aucun","Non"],["pinel","Pinel"],["denormandie","Denormandie"],["locav","Loc'Avantages"]]},
+  pinelPrix:{k:"pinelPrix",t:"num",l:"Prix d'achat du logement",u:"€",show:p=>["pinel","denormandie"].includes(p.dispositif)},
+  pinelAnnee:{k:"pinelAnnee",t:"num",l:"Année d'achat (ou de fin des travaux)",u:"",show:p=>["pinel","denormandie"].includes(p.dispositif)},
+  pinelDuree:{k:"pinelDuree",t:"seg",l:"Durée d'engagement de location",opts:[["6","6 ans"],["9","9 ans"],["12","12 ans"]],show:p=>["pinel","denormandie"].includes(p.dispositif)},
+  etranger:{k:"etranger",t:"bool",l:"Un compte ouvert hors de France",h:"Revolut, N26, Trade Republic, PayPal, Wise, Binance... même vide."},
+  crypto:{k:"crypto",t:"bool",l:"Tu as des cryptomonnaies"},
+  cryptoVente:{k:"cryptoVente",t:"bool",l:"Tu as vendu des cryptos contre des euros cette année",show:p=>p.crypto}});
+const QUICK_ORDER=["proprio","loyersNu","chargesNu","loyersMeub","reelMeub","immoNet","epargne","hasPEA","hasAV","perDeja","perPlafond","dispositif","pinelPrix","pinelAnnee","pinelDuree","etranger","crypto","cryptoVente"];
 const PROFIL=[
   {k:"gestion",t:"seg",l:"Comment veux-tu gérer ton épargne ?",opts:[["simple","Simple et pas cher","spark"],["pilote","Qu'on gère pour moi","users"],["actif","Je choisis mes actions","trend"]]},
   {k:"risque",t:"seg",l:"Face aux hauts et aux bas de la bourse, tu es plutôt",opts:[["prudent","Prudent","shield"],["equilibre","Équilibré","target"],["dynamique","Dynamique","trend"]]},
@@ -1159,7 +1205,7 @@ function patrimoineHTML(){
   return profilHTML()+sciLink()+listSec("placements","Mes placements","piggy","c-epargne","Comptes, livrets, assurance vie, PEA... Le taux est pré-rempli en gris : corrige-le si tu connais le tien.",PLAC)
    +listSec("credits","Mes crédits en cours","card","c-credit","Le reste à rembourser et le taux sont sur ton tableau d'amortissement ou ton appli bancaire.",CRED)
    +listSec("biens","Mes biens immobiliers","building","c-immo","Valeur estimée aujourd'hui. Pour une location : loyers et dépenses de l'année.",BIEN)
-   +fieldHTML(QP.reelMeub)+fieldHTML(QP.perDeja)+fieldHTML(QP.perPlafond);
+   +["reelMeub","perDeja","perPlafond","dispositif","pinelPrix","pinelAnnee","pinelDuree","etranger","crypto","cryptoVente"].map(k=>fieldHTML(QP[k])).join("");
 }
 function renderStepper(){
   $("stepper").innerHTML=STEPS.map((s,i)=>`<button class="stp ${i<S.step?"filled":""}" role="tab" type="button" aria-selected="${i===S.step}" data-step="${i}"><span class="tile">${ic(s.ic)}</span>${s.label}</button>`).join("");
@@ -1339,13 +1385,14 @@ function update(){
   $("chips").innerHTML=FILTERS.filter(([f])=>f==="all"||counts[f]>0).map(([f,t,i])=>`<button type="button" class="chip" data-f="${f}" aria-pressed="${S.filter===f}">${ic(i)}${t}<span class="n">${counts[f]}</span></button>`).join("");
   const list=out.filter(o=>S.filter==="all"||o.tags.includes(S.filter)).sort(sorter);
   $("groups").innerHTML=list.length?GROUPS.map(([g,t,i,c])=>{const items=list.filter(o=>o.when.grp===g);if(!items.length)return"";
-    return `<div class="group"><div class="group-h ${c}"><span class="tile">${ic(i)}</span><h2>${t}</h2><span class="cnt">${items.length} action${items.length>1?"s":""}</span></div>${items.map(cardHTML).join("")}</div>`}).join("")
+    return `<div class="group"><div class="group-h ${c}"><span class="tile">${ic(i)}</span><h2>${t}</h2><span class="cnt">${items.length} action${items.length>1?"s":""}</span></div>${g==="decl"?`<a class="imp-cta" style="margin:0" href="#formulaires"><span class="tile c-case">${ic("receipt")}</span><span style="min-width:0;flex:1"><b>Mes formulaires et les cases à remplir</b><span class="muted">Quelles déclarations faire (2044, Pinel, 3916...), avec les montants.</span></span>${ic("arrow")}</a>`:""}${items.map(cardHTML).join("")}</div>`}).join("")
     :`<div class="empty">${ic("compass")}<p><b>Ton plan est vide pour l'instant.</b><br>Remplis ta situation : les actions apparaissent au fur et à mesure.</p><a class="btn primary" href="#situation">Remplir ma situation</a></div>`;
   let side="";
   if(base.ir<=0&&base.brut<=0&&(d.sal1+d.sal2+d.pension+d.ca)>0)side+=`<div class="box"><h3>${ic("spark")}Bonne nouvelle</h3><p>Tu ne paies pas d'impôt sur le revenu. Concentre-toi sur les crédits d'impôt (remboursés) et ton épargne.</p></div>`;
   if(mode()!=="complet")side+=`<div class="box upgrade"><h3>${ic("spark")}Passe au mode complet</h3><p>Ajoute tes placements, crédits et biens un par un. On repère l'argent qui dort, les crédits trop chers, l'assurance de prêt à changer...</p><a class="btn" href="#situation" data-gomode="1">${ic("arrow")}Compléter</a></div>`;
   if(base.red+base.cred>10000)side+=`<div class="box"><h3>${ic("alert")}Plafond des niches</h3><p>Tes avantages fiscaux dépassent 10 000 €. Au-delà, ils sont plafonnés.</p></div>`;
   side+=`<div class="box"><h3>${ic("receipt")}Ton impôt en bref</h3><p>Revenu imposable : <b>${fmt(base.R)}</b><br>${base.sep?"2 déclarations séparées":String(base.parts).replace(".",",")+" part"+(base.parts>1?"s":"")}<br>Impôt sur le revenu : <b>${fmt(Math.max(0,base.ir))}</b>${base.ir<0?`<br>Remboursement attendu : <b>${fmt(-base.ir)}</b>`:""}${base.pfu>0?`<br>Impôt sur placements : <b>${fmt(base.pfu)}</b>`:""}${base.psFonc>0?`<br>Prélèv. sociaux sur loyers : <b>${fmt(base.psFonc)}</b>`:""}</p></div>`;
+  side+=`<div class="box"><h3>${ic("receipt")}Mes formulaires</h3><p>Les déclarations à faire au printemps ${DEC_SEASON} et les cases à remplir, avec tes montants.</p><a class="btn" href="#formulaires">${ic("arrow")}Voir mes formulaires</a></div>`;
   side+=`<div class="box"><h3>${ic("building")}Mes SCI</h3><p>${(S.p.sci||[]).length?S.p.sci.map(c=>`<b>${esc(c.nom)}</b> · ${c.regime} · ta part ${c.share!=null?fmt(c.res*c.share):"?"}`).join("<br>"):"Connecte ton appli de gestion SCI pour que tes sociétés soient prises en compte automatiquement."}</p><a class="btn" href="#sci">${ic("arrow")}${(S.p.sci||[]).length?"Voir le détail":"Connecter"}</a></div>`;
   {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn primary" href="#importer">${ic("upload")}Importer depuis Google Drive</a></div>`}
   if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
@@ -1417,6 +1464,78 @@ function renderMe(){
     <a class="btn primary" href="#installer">${ic("phone")}Voir le tuto en images</a>
     <div class="link-row"><code id="appLink">${esc(appUrl())}</code><button class="btn" type="button" id="copyLink">${ic("copy")}Copier</button></div>`;
 }
+/* ===== Mes formulaires : ce qu'il faut déclarer, case par case ===== */
+function pinelInfo(p){if(!["pinel","denormandie"].includes(p.dispositif)||!(+p.pinelPrix)||!(+p.pinelAnnee))return null;
+  const y=+p.pinelAnnee,d=+p.pinelDuree||9,base=Math.min(+p.pinelPrix,300000);
+  const R=p.dispositif==="denormandie"||y<=2022?{6:12,9:18,12:21}:y===2023?{6:10.5,9:15,12:17.5}:{6:9,9:12,12:14};
+  const n=YEAR-y+1;let an=0;
+  if(d===6){if(n>=1&&n<=6)an=base*R[6]/100/6}else{if(n>=1&&n<=9)an=base*R[9]/100/9;else if(d===12&&n>=10&&n<=12)an=base*(R[12]-R[9])/100/3}
+  return {annual:Math.round(an),n,d,y,base,end:y+d-1,rate:R[d],R}}
+function formsOf(){
+  const p=LAST.d||derive(S.p,mode()),base=LAST.base||calc(p),F=[],r=v=>Math.round(+v||0);
+  const add=(o)=>{o.cases=(o.cases||[]).filter(c=>c[2]!==null&&c[2]!==undefined&&c[2]!==0&&c[2]!=="");F.push(o)};
+  const couple=isCouple(p),pi=pinelInfo(p);
+  add({code:"2042",nom:"Déclaration des revenus",ic:"receipt",why:"Obligatoire pour tout le monde, même sans impôt à payer.",quand:"Au printemps "+DEC_SEASON+" sur impots.gouv.fr",
+    cases:[["1AJ","Salaires (toi)",r(p.sal1)],["1BJ","Salaires (conjoint)",couple?r(p.sal2):0],["1AS","Retraites et pensions",r(p.pension)],["6NS","Versements PER (toi)",r(p.perDeja)],["6EL","Pension versée à un enfant majeur",r(p.declPensionEnf?p.pensionEnf:0)],["6GU","Pension versée à un parent",r(p.declAideParent?p.aideParent:0)]],link:SP("déclaration de revenus en ligne")});
+  const c2=[["3VG","Gains sur actions (compte-titres)",r(p.pv)]];if(p.cryptoVente)c2.push(["3AN","Gains sur cryptos (reporté depuis la 2086)","à calculer"]);
+  if(p.loyersMeub>0&&!p.reelMeub)c2.push(["5ND","Loyers meublés (micro-BIC)",r(p.loyersMeub)]);if(p.ca>0)c2.push(["5KO/5KP/5HQ","Chiffre d'affaires micro-entreprise (case selon l'activité)",r(p.ca)]);
+  if(c2.some(c=>c[2]))add({code:"2042-C",nom:"Déclaration complémentaire",ic:"list",why:"Tu as des revenus qui ne sont pas sur la déclaration principale (plus-values, meublé, micro-entreprise, cryptos).",quand:"En même temps que la 2042",cases:c2,link:SP("déclaration 2042 C")});
+  const rici=[["7UF","Dons aux associations",r(p.dons)],["7DB","Emploi à domicile",r(p.domicile)],["7GA","Frais de garde (1er enfant)",r(p.garde)],["7EA","Enfants au collège (nombre)",r(p.college)],["7EC","Enfants au lycée (nombre)",r(p.lycee)],["7EF","Enfants en études sup (nombre)",r(p.sup)],["7AC","Cotisations syndicales",r(p.syndicat)]];
+  if(pi)rici.push(["7Q…","Réduction "+(p.dispositif==="denormandie"?"Denormandie":"Pinel")+" (case selon l'année d'achat) : prix retenu",r(pi.base)]);
+  if(rici.some(c=>c[2]))add({code:"2042-RICI",nom:"Réductions et crédits d'impôt",ic:"gift",why:"Pour récupérer tes avantages : dons, aide à domicile, garde, scolarité"+(pi?", investissement "+(p.dispositif==="denormandie"?"Denormandie":"Pinel"):"")+".",quand:"En même temps que la 2042",cases:rici,link:SP("déclaration 2042 RICI")});
+  const micro=p.loyersNu>0&&p.loyersNu<=15000&&!p.reelNu&&!(p.sciFonc)&&!(p.chargesNu>p.loyersNu*.3),fonc=(p.loyersNu>0?p.loyersNu-(p.chargesNu||0):0)+(p.sciFonc||0);
+  if(p.loyersNu>0&&micro)add({code:"2042 (4BE)",nom:"Loyers vides au micro-foncier",ic:"building",why:"Tu loues vide et tes loyers font moins de 15 000 € : une seule case suffit, 30 % sont déduits automatiquement.",quand:"Dans la 2042",cases:[["4BE","Loyers bruts encaissés",r(p.loyersNu)]],link:SP("micro-foncier 4BE")});
+  else if(p.loyersNu>0||p.sciFonc){const cs=[["211","Loyers encaissés (location en direct)",r(p.loyersNu)],["221 à 229","Charges, intérêts, taxe foncière, travaux",r(p.chargesNu)]];
+    (p.sci||[]).filter(c=>c.regime==="IR"&&c.share!=null).forEach(c=>cs.push(["440","Ta part du résultat de "+c.nom,r(c.res*c.share)]));
+    cs.push([fonc>=0?"4BA":"4BB/4BC",fonc>=0?"Résultat foncier à reporter":"Déficit foncier à reporter",r(Math.abs(fonc))]);
+    add({code:"2044",nom:"Revenus fonciers (régime réel)",ic:"building",why:(p.sciFonc?"Tu es associé d'une SCI à l'impôt sur le revenu : ta part passe par la 2044. ":"")+(p.loyersNu>15000?"Tes loyers dépassent 15 000 € : le réel est obligatoire.":p.loyersNu>0?"Le régime réel est plus avantageux pour ta location (voir ton plan).":""),quand:"Avant de finir ta 2042 (elle se remplit en ligne)",cases:cs,link:SP("déclaration 2044 revenus fonciers")})}
+  if(pi)add({code:"Engagement de location",nom:(p.dispositif==="denormandie"?"Denormandie":"Pinel")+" : engagement et réduction",ic:"home",why:"Ton investissement de "+pi.y+" donne droit à "+fmt(pi.annual)+" de réduction cette année (année "+Math.max(1,pi.n)+" sur "+pi.d+"). "+(pi.n===1?"Première année : tu dois joindre l'engagement de louer "+pi.d+" ans.":pi.end===YEAR&&pi.d<12?"Dernière année : tu peux prolonger l'engagement pour garder la réduction.":""),quand:"Chaque année avec ta déclaration, jusqu'en "+pi.end,cases:[["Réduction","Réduction de l'année",pi.annual]],link:SP("réduction Pinel déclaration")});
+  if(p.loyersMeub>0&&p.reelMeub)add({code:"2031",nom:"Location meublée au réel (LMNP)",ic:"building",why:"Tu as choisi le réel pour ton meublé : la liasse 2031 est obligatoire (souvent faite par ton comptable).",quand:"Début mai",cases:[["5NA","Résultat à reporter sur la 2042-C-PRO","voir ton comptable"]],link:SP("LMNP liasse 2031")});
+  (p.sci||[]).filter(c=>c.regime==="IR").forEach(c=>add({code:"2072",nom:"Déclaration de la "+c.nom,ic:"bank",why:"Une SCI à l'impôt sur le revenu dépose chaque année sa 2072. C'est le gérant qui s'en charge.",quand:"Début mai, sur l'espace professionnel impots.gouv.fr",cases:[["Résultat","Résultat de la SCI ("+c.year+")",r(c.res)],["Ta part","Ta quote-part",c.share!=null?r(c.res*c.share):"?"]],link:SP("déclaration 2072 SCI")}));
+  if(p.etranger)add({code:"3916",nom:"Comptes à l'étranger",ic:"card",why:"Revolut, N26, Trade Republic, PayPal, Wise... : chaque compte ouvert hors de France doit être déclaré, même s'il est vide. Oubli = 1 500 € d'amende par compte.",quand:"Avec ta 2042, chaque année",cases:[["8UU","Cocher : j'ai un compte à l'étranger","Oui"]],link:SP("déclaration 3916 compte étranger")});
+  if(p.crypto)add({code:"3916-bis",nom:"Comptes de cryptomonnaies",ic:"key",why:"Chaque compte sur une plateforme crypto (Binance, Coinbase, Kraken...) doit être déclaré. Oubli = 750 € d'amende par compte.",quand:"Avec ta 2042",cases:[["8TT","Cocher : j'ai un compte d'actifs numériques","Oui"]],link:SP("déclaration 3916 bis crypto")});
+  if(p.cryptoVente)add({code:"2086",nom:"Plus-values sur cryptos",ic:"key",why:"Tu as vendu des cryptos contre des euros (ou payé avec) : il faut calculer le gain sur la 2086. Les échanges crypto contre crypto ne comptent pas.",quand:"Avec ta 2042",cases:[["3AN","Gain à reporter","calculé sur la 2086"]],link:SP("formulaire 2086 crypto")});
+  if(p.immoNet>1300000)add({code:"2042-IFI",nom:"Impôt sur la fortune immobilière",ic:"bank",why:"Ton immobilier net dépasse 1,3 million €.",quand:"Avec ta 2042",cases:[["Patrimoine","Valeur nette de ton immobilier",r(p.immoNet)]],link:SP("déclaration IFI")});
+  return F}
+function caseMap(){const m={};formsOf().forEach(f=>f.cases.forEach(([c,,v])=>{if(/^[0-9][A-Z]{2}$/.test(c)&&typeof v==="number")m[c]=v}));return m}
+function ficheText(){return formsOf().map(f=>f.code+" - "+f.nom+"\n"+f.cases.map(([c,l,v])=>"  "+c+" : "+l+" = "+(typeof v==="number"?fmt(v).replace(" €"," euros"):v)).join("\n")).join("\n\n")}
+function renderForms(){if(currentView()!=="formulaires")return;
+  const F=formsOf();
+  $("formsList").innerHTML=F.map(f=>`<div class="form-card"><div class="sci-h"><span class="tile c-case">${ic(f.ic)}</span><div style="min-width:0;flex:1"><b>${esc(f.nom)}</b><span class="muted"><span class="case">${esc(f.code)}</span> ${esc(f.quand)}</span></div></div>
+    <p>${esc(f.why)}</p>${f.cases.length?`<div class="cases-t">${f.cases.map(([c,l,v])=>`<div class="ct-row"><span class="case">${esc(c)}</span><span class="ct-l">${esc(l)}</span><b class="tnum">${typeof v==="number"?(/nombre/.test(l)?v:fmt(v)):esc(v)}</b></div>`).join("")}</div>`:""}
+    <a href="${f.link[0]}" target="_blank" rel="noopener">${f.link[1]} ↗</a></div>`).join("");
+  $("formsCount").textContent=F.length+" formulaire"+(F.length>1?"s":"");
+}
+/* --- PDF : fiche récapitulative et remplissage de formulaires --- */
+function loadPdfLib(){return new Promise((res,rej)=>{if(window.PDFLib)return res();const s=document.createElement("script");s.src=window.BOUSSOLE_PWA?"lib/pdf-lib.min.js":"https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js";s.onload=()=>res();s.onerror=()=>rej(new Error("lib"));document.head.appendChild(s)})}
+const winAnsi=t=>String(t).replace(/[  ]/g," ").replace(/≈/g,"env.").replace(/→/g,"->").replace(/[’]/g,"'").replace(/[^\x20-\x7E -ÿ€œŒ]/g,"");
+function offerDownload(bytes,name,label){const url=URL.createObjectURL(new Blob([bytes],{type:"application/pdf"}));
+  if(!window.BOUSSOLE_PWA){toast("Le téléchargement marche dans l'appli installée");return}
+  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  $("fillOut").insertAdjacentHTML("afterbegin",`<div class="note">${ic("check")}<span><b>${esc(label)}</b> · <a href="${url}" download="${esc(name)}">Télécharger à nouveau</a></span></div>`)}
+async function ficheDownload(){try{await loadPdfLib();const {PDFDocument,StandardFonts,rgb}=PDFLib;const doc=await PDFDocument.create();const font=await doc.embedFont(StandardFonts.Helvetica),bold=await doc.embedFont(StandardFonts.HelveticaBold);
+  let page=doc.addPage([595,842]),y=800;const line=(t,f=font,sz=10,c=rgb(.1,.1,.1),x=40)=>{if(y<50){page=doc.addPage([595,842]);y=800}page.drawText(winAnsi(t),{x,y,size:sz,font:f,color:c});y-=sz+6};
+  line("Boussole Fiscale - Ma fiche de déclaration",bold,16,rgb(.04,.3,.22));line("Préparée le "+TODAY.toLocaleDateString("fr-FR")+" pour la déclaration "+DEC_SEASON+". Montants indicatifs, à vérifier.",font,9,rgb(.4,.4,.4));y-=6;
+  formsOf().forEach(f=>{y-=4;line(f.code+"  -  "+f.nom,bold,12,rgb(.04,.3,.22));f.cases.forEach(([c,l,v])=>{line(c,bold,10,rgb(.1,.1,.1),50);y+=16;line(l+"  :  "+(typeof v==="number"?(/nombre/.test(l)?v:fmt(v)):v),font,10,rgb(.1,.1,.1),130)});line(f.quand,font,9,rgb(.4,.4,.4),50)});
+  offerDownload(await doc.save(),"ma-fiche-declaration.pdf","Ta fiche de déclaration est prête")}catch(e){toast("Impossible de créer le PDF")}}
+async function fillPdf(file){const out=$("fillOut");out.innerHTML=`<div class="imp-bar"><i></i></div>`;
+  try{await loadPdfLib();const {PDFDocument,PDFTextField,PDFCheckBox}=PDFLib;const doc=await PDFDocument.load(await file.arrayBuffer(),{ignoreEncryption:true});
+    const fields=doc.getForm().getFields();
+    if(!fields.length){out.innerHTML=`<div class="warn">${ic("alert")}<span><b>Ce PDF n'a pas de cases à remplir.</b> C'est un document "à plat" (scan ou simple impression). Utilise plutôt ta fiche de déclaration ci-dessus : elle donne chaque case et son montant.</span></div>`;return}
+    const vals=caseMap(),id={PRENOM:S.settings.prenom,NOM:S.settings.nomDocs};const done=[];
+    fields.forEach(fl=>{const n=fl.getName(),N=normTxt(n);let v=null,lab=null;
+      const m=N.match(/(?:^|[^0-9A-Z])([0-9][A-Z]{2})(?:[^A-Z]|$)/);
+      if(m&&vals[m[1]]!=null){v=String(Math.round(vals[m[1]]));lab="Case "+m[1]}
+      else if(/PRENOM/.test(N)&&id.PRENOM){v=id.PRENOM;lab="Prénom"}
+      else if(/(^|[^A-Z])NOM([^A-Z]|$)/.test(N)&&!/PRENOM/.test(N)&&id.NOM){v=id.NOM.toUpperCase();lab="Nom"}
+      if(v!=null&&fl instanceof PDFTextField){try{fl.setText(v);done.push([lab,v])}catch(e){}}});
+    const bytes=await doc.save();
+    out.innerHTML=`<div class="box"><h3>${ic(done.length?"check":"info")}${done.length} case${done.length>1?"s":""} remplie${done.length>1?"s":""} sur ${fields.length}</h3>${done.length?`<ul class="skip-list">${done.map(([l,v])=>`<li>${ic("check")}<span><b>${esc(l)}</b><span>${esc(v)}</span></span></li>`).join("")}</ul>`:`<p>Je n'ai reconnu aucune case de ce formulaire. Envoie-le à Claude dans la conversation : il ajoutera ce modèle à l'appli.</p>`}<p>Relis toujours le formulaire avant de l'envoyer. Les cases que l'appli ne connaît pas restent vides.</p></div>`;
+    if(done.length)offerDownload(bytes,file.name.replace(/\.pdf$/i,"")+"-rempli.pdf","Formulaire rempli")}
+  catch(e){out.innerHTML=`<div class="warn">${ic("alert")}<span>${e.message==="lib"?"Impossible de charger l'outil PDF. Vérifie ta connexion.":"Je n'ai pas réussi à ouvrir ce PDF."}</span></div>`}}
+$("v-formulaires").addEventListener("click",e=>{if(e.target.closest("#ficheCopy"))copyText(ficheText(),"Fiche copiée",null);else if(e.target.closest("#ficheDl"))ficheDownload()});
+$("fillFile").addEventListener("change",e=>{if(e.target.files[0])fillPdf(e.target.files[0]);e.target.value=""});
+
 /* ===== Connexion à l'appli de gestion SCI (lecture seule, compte Supabase de l'appli SCI) ===== */
 const SCI_CFG={url:"https://bcfcrqmpeyaoovluvhhn.supabase.co",cle:"sb_publishable_23UtXl16W2EQ61M3In4R8A_wIEDNHDm",app:"https://github.com/crbntheo-png/logements-"};
 let SCI_SB=null,SCI_UI={etape:"email",email:"",busy:false,msg:""};
@@ -1850,7 +1969,7 @@ $("wipeNo").onclick=()=>{$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false}
 $("wipeYes").onclick=()=>{S.p=JSON.parse(JSON.stringify(DEFAULT));S.done={};S.example=false;S.settings={prenom:"",mode:"rapide",theme:"auto"};applyTheme();$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false;toast("Tout est effacé");update()};
 
 hydrate(document);
-$("appVer").textContent=APP_VERSION;$("oldBanner").hidden=!!window.BOUSSOLE_PWA;
+$("appVer").textContent=APP_VERSION;$("formsSeason").textContent=DEC_SEASON;$("oldBanner").hidden=!!window.BOUSSOLE_PWA;
 route();
 
 })();
