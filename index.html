@@ -794,7 +794,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 16 du 11/11/2026";
+const APP_VERSION="version 17 du 11/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1585,11 +1585,15 @@ function renderSci(){
   else{h+=`<form class="box" id="sciForm"><h3>${ic("user")}Ton e-mail de l'appli SCI</h3><p>Celui avec lequel tu te connectes à ton appli de gestion locative. Tu vas recevoir un code.</p><div class="inp"><input id="sciEmail" type="email" autocomplete="email" placeholder="ton@email.fr" value="${esc(U.email)}"></div><button class="btn primary" ${U.busy?"disabled":""}>${U.busy?"Envoi...":"Recevoir mon code"}</button>${U.msg?`<p class="err">${esc(U.msg)}</p>`:""}</form>`}
   box.innerHTML=h;
 }
-$("v-sci").addEventListener("submit",async e=>{e.preventDefault();const U=SCI_UI;U.msg="";U.busy=true;renderSci();
+$("v-sci").addEventListener("submit",async e=>{e.preventDefault();const U=SCI_UI;
+  const emailIn=$("sciEmail")?($("sciEmail").value||"").trim().toLowerCase():"",codeIn=$("sciCode")?($("sciCode").value||"").replace(/\s/g,""):"";
+  if(U.etape!=="code"&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailIn)){U.msg="Tape ton adresse e-mail complète.";renderSci();return}
+  if(U.etape==="code"&&codeIn.length<4){U.msg="Tape le code reçu par e-mail.";renderSci();return}
+  U.msg="";U.busy=true;if(U.etape!=="code")U.email=emailIn;renderSci();
   try{const sb=await sciClient();
-    if(U.etape!=="code"){U.email=($("sciEmail").value||"").trim().toLowerCase();const r=await sb.auth.signInWithOtp({email:U.email,options:{shouldCreateUser:false}});
+    if(U.etape!=="code"){const r=await sb.auth.signInWithOtp({email:U.email,options:{shouldCreateUser:false}});
       if(r.error)U.msg=/signups not allowed|not found|user/i.test(r.error.message)?"Aucun compte de l'appli SCI avec cet e-mail.":/rate|seconds/i.test(r.error.message)?"Trop de demandes. Attends une minute et réessaie.":"Envoi impossible : "+r.error.message;else U.etape="code"}
-    else{const r=await sb.auth.verifyOtp({email:U.email,token:($("sciCode").value||"").trim(),type:"email"});
+    else{const r=await sb.auth.verifyOtp({email:U.email,token:codeIn,type:"email"});
       if(r.error)U.msg="Code incorrect ou expiré. Vérifie le dernier e-mail reçu.";else{U.etape="ok";U.busy=false;await sciSync();toast("Tes SCI sont connectées")}}}
   catch(err){U.msg=err&&err.message==="lib"?"Impossible de charger la connexion. Vérifie ton internet.":"Erreur : "+(err&&err.message||err)}
   U.busy=false;renderSci()});
