@@ -424,6 +424,10 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .gd-logo{width:48px;height:48px;border-radius:14px;background:var(--sunk);display:grid;place-items:center;flex:none}
 .gd-grp{display:flex;flex-direction:column;gap:6px}
 .gd-f.off{opacity:.65}
+.gd-on{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--accent-soft);border-radius:12px;padding:10px 12px;font-size:14px}
+.gd-on>svg{color:var(--accent)}.gd-on span{flex:1;min-width:200px}
+.gd-sum{background:var(--sunk);border-radius:12px;padding:10px 12px;font-size:14px}
+.next.newdocs{border-color:var(--accent);background:var(--accent-soft)}
 .gd-drop{border-top:1px solid var(--line);padding-top:10px}
 .gd-drop summary{cursor:pointer;font-weight:600;font-size:14px;display:flex;gap:6px;align-items:center;list-style:none}
 .gd-drop[open] summary{margin-bottom:10px}
@@ -527,6 +531,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   </div>
 
   <section class="view" id="v-plan" aria-label="Mon plan">
+    <div class="next newdocs" id="newDocs" hidden></div>
     <div class="hero">
       <div style="position:relative;z-index:1;min-width:0">
         <div class="hello" id="hello"></div>
@@ -794,7 +799,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 17 du 11/11/2026";
+const APP_VERSION="version 18 du 11/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1103,8 +1108,8 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||"null");
   if(s&&s.p){S.p=Object.assign({},DEFAULT,s.p);S.example=!!s.example;S.done=s.done||{};S.step=s.step||0;S.settings=Object.assign(S.settings,s.settings||{})}
   else{const o=JSON.parse(localStorage.getItem("boussole-v1")||"null");if(o&&o.p&&!o.example){S.p=Object.assign({},DEFAULT,o.p);S.example=false;S.done=o.done||{};S.settings.mode="rapide"}}
 }catch(e){}
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.docs)S.docs=s.docs;if(s&&s.instHidden)S.instHidden=true}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({p:S.p,example:S.example,done:S.done,step:S.step,settings:S.settings,docs:S.docs||{},instHidden:!!S.instHidden}))}catch(e){}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.docs)S.docs=s.docs;if(s&&s.instHidden)S.instHidden=true;if(s){S.gdSeen=s.gdSeen||{};S.gdLast=s.gdLast||null;S.gdNew=s.gdNew||[];S.found=s.found||{}}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({p:S.p,example:S.example,done:S.done,step:S.step,settings:S.settings,docs:S.docs||{},instHidden:!!S.instHidden,gdSeen:S.gdSeen||{},gdLast:S.gdLast||null,gdNew:S.gdNew||[],found:S.found||{}}))}catch(e){}};
 const mode=()=>S.settings.mode;
 function applyTheme(){const t=S.settings.theme;if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
 applyTheme();
@@ -1304,10 +1309,30 @@ const DOCS=[
  {id:"tf",n:"Avis de taxe foncière",ic:"home",d:"Les charges de tes locations, la valeur locative de tes biens.",w:"impots.gouv.fr → Espace particulier → Documents"},
  {id:"loc",n:"Baux, loyers reçus et charges de copropriété",ic:"building",d:"Choisir entre micro-foncier et réel, prévoir des travaux.",w:"Ton agence ou tes relevés de compte"},
  {id:"att",n:"Attestations : crèche, aide à domicile, dons",ic:"gift",d:"Vérifier que tous tes crédits d'impôt sont bien comptés.",w:"Pajemploi, CESU, la crèche, les associations"}];
-function docsHTML(){const have=S.docs||{},n=DOCS.filter(d=>have[d.id]).length;
-  return `<h3>${ic("receipt")}Mes documents <span class="pill ${n===DOCS.length?"ok":""}">${n} / ${DOCS.length}</span></h3>
-  <p>Plus tu rassembles de documents, plus les conseils sont précis. Le plus simple : <b>importe-les directement</b>, l'appli lit les PDF et remplit ta situation toute seule.</p><a class="btn primary" href="#importer">${ic("upload")}Importer depuis Google Drive</a>
-  <ul class="docs">${DOCS.map(d=>`<li class="doc${have[d.id]?" ok":""}"><span class="tile c-case">${ic(d.ic)}</span><span style="min-width:0;flex:1"><b>${d.n}</b><span class="dd">${d.d}</span><span class="dw">${ic("compass")}${d.w}</span></span><button type="button" class="switch" role="switch" aria-checked="${!!have[d.id]}" aria-label="J'ai ce document" data-doc="${d.id}"></button></li>`).join("")}</ul>`}
+function dossier(){const p=LAST.d||S.p,F=S.found||{},M=S.docs||{},it=[],cr=S.p.credits||[],pl=S.p.placements||[];
+  const add=(id,lab,why,where,ok,link)=>it.push({id,lab,why,where,ok:!!(ok||M[id]),link});
+  const lm=(MONTH+11)%12,ly=MONTH===0?YEAR-1:YEAR,pk=F.paieKeys||[];
+  add("avis","Ton avis d'impôt "+YEAR+" (revenus "+(YEAR-1)+")","Ta vraie tranche, ton revenu fiscal, ton plafond épargne retraite.","impots.gouv.fr → Espace particulier → Documents",F.avis||M.avis,"https://www.impots.gouv.fr");
+  add("decl","La copie PDF de ta déclaration "+YEAR,"Voir les cases déjà remplies et celles oubliées l'an dernier.","impots.gouv.fr → Espace particulier → Documents",F.decl,"https://www.impots.gouv.fr");
+  if(p.sal1>0||p.sal2>0||(!p.pension&&!p.ca)){add("paie","Ta fiche de paie de "+MOIS[lm]+" "+ly,"Son cumul donne ton salaire "+YEAR+" au plus juste.","Ton employeur ou ton coffre-fort de paie",pk.some(k=>Math.floor((k-1)/12)===YEAR&&((k-1)%12)>=lm-1));
+    add("paiedec","Ta fiche de paie de décembre "+(YEAR-1),"Ton salaire de toute l'année "+(YEAR-1)+".","Ton employeur ou ton coffre-fort de paie",pk.includes((YEAR-1)*12+12))}
+  if(p.proprio||p.loyersNu>0||(S.p.biens||[]).length)add("tf","Ton avis de taxe foncière "+YEAR,"Une charge déductible si tu loues, et utile pour l'IFI.","impots.gouv.fr → Espace particulier → Documents",F.tf,"https://www.impots.gouv.fr");
+  if(cr.length||p.proprio)add("amort",cr.length>1?"Le tableau d'amortissement de chacun de tes "+cr.length+" prêts":"Le tableau d'amortissement de ton prêt","Reste à payer, taux, intérêts : rembourser en avance ou renégocier.","Espace client de ta banque → crédits",F.pret);
+  if(cr.some(c=>CRED[c.type]&&CRED[c.type].immo)||p.proprio)add("assur","Ton certificat d'assurance emprunteur","Changer d'assurance de prêt fait souvent gagner plusieurs milliers d'euros.","Dossier de prêt ou espace client de ta banque",false);
+  if(p.hasAV||p.hasPEA||pl.some(x=>["av","pea","per","cto","pee"].includes(x.type)))add("plac","Le dernier relevé annuel de chacun de tes placements","Frais, rendement, date d'ouverture : faut-il changer de contrat ?","Espace client de ta banque ou de ton assureur",F.plac);
+  if(p.capitaux>0||pl.some(x=>x.type==="cto"))add("ifu","Le relevé fiscal (IFU) "+(YEAR-1)+" de ta banque","Dividendes, intérêts et plus-values à déclarer.","Espace client de ta banque (mars-avril)",F.ifu);
+  if((S.p.sci||[]).length)add("scicomptes","Les comptes annuels "+(YEAR-1)+" de ta SCI","Ton compte courant d'associé et le vrai résultat fiscal.","Ton expert-comptable",S.p.sciCCA);
+  if(p.under6>0||p.garde>0)add("garde","L'attestation annuelle de frais de garde","Récupérer 50 % des frais (jusqu'à 3 500 € par enfant).","Crèche ou Pajemploi",false);
+  if(p.domicile>0)add("dom","L'attestation fiscale de l'aide à domicile","Justifier ton crédit d'impôt de 50 %.","CESU ou l'entreprise",false);
+  if(p.dons>0)add("dons","Les reçus fiscaux de tes dons","Justifier ta réduction de 66 %.","Les associations (souvent par e-mail)",false);
+  if(p.dispositif&&p.dispositif!=="aucun")add("pinel","L'acte d'achat et l'engagement de location","Calculer et justifier ta réduction chaque année.","Ton notaire",false);
+  if(p.etranger)add("etr","Les références de tes comptes à l'étranger","Remplir la 3916 sans erreur (banque, pays, numéro).","Ton appli bancaire (Revolut, N26...)",false);
+  return it}
+function docsHTML(){const it=dossier(),ok=it.filter(x=>x.ok).length,miss=it.filter(x=>!x.ok);
+  return `<h3>${ic("receipt")}Mon dossier <span class="pill ${ok===it.length?"ok":""}">${ok} / ${it.length}</span></h3>
+  <p>${miss.length?"Voici exactement ce qu'il me manque pour optimiser au mieux ta situation. Le plus simple : ":"Ton dossier est complet. "}<a href="#importer">laisse l'appli chercher dans ton Google Drive</a>.</p>
+  <ul class="docs">${it.sort((a,b)=>a.ok-b.ok).map(d=>`<li class="doc${d.ok?" ok":""}"><span class="tile ${d.ok?"c-epargne":"c-famille"}">${ic(d.ok?"check":"alert")}</span><span style="min-width:0;flex:1"><b>${d.lab}</b><span class="dd">${d.why}</span><span class="dw">${ic("compass")}${d.where}</span></span>${d.ok&&!(S.docs||{})[d.id]?`<span class="pill ok">Trouvé</span>`:`<button type="button" class="switch" role="switch" aria-checked="${!!(S.docs||{})[d.id]}" aria-label="Je l'ai déjà ou pas concerné" data-doc="${d.id}"></button>`}</li>`).join("")}</ul>
+  <p class="muted">L'interrupteur sert à dire "je l'ai déjà donné" ou "pas concerné".</p>`}
 
 /* ===== Rappels Google Agenda ===== */
 const ymd=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
@@ -1376,6 +1401,7 @@ function update(){
   $("hTax").textContent=fmt(tax);$("hTmi").textContent=Math.round(base.tmi*100)+" %";$("hDays").textContent=DAYS_LEFT+" jours";
   $("ringArc").style.strokeDashoffset=String(314.16*(1-score/100));$("ringPct").textContent=score+" %";
   $("ringCap").textContent=doneGain>0?`Tu as déjà sécurisé ${fmt(doneGain)} par an. Continue !`:"Coche \"C'est fait\" sur une action pour faire monter ton score.";
+  {const nd=S.gdNew||[];$("newDocs").hidden=!nd.length;if(nd.length)$("newDocs").innerHTML=`<span class="tile c-epargne">${ic("upload")}</span><div style="min-width:0"><span class="eyebrow">${ic("spark")}Nouveau dans ton Drive</span><h3>${nd.length} nouveau${nd.length>1?"x":""} document${nd.length>1?"s":""} pour toi : ${nd.slice(0,2).map(x=>esc(x.name)).join(", ")}${nd.length>2?"...":""}</h3></div><button type="button" class="btn primary" id="useNew">Mettre à jour${ic("arrow")}</button>`}
   const next=todo.slice().sort(sorter)[0];
   if(next){$("nextBox").hidden=false;$("nextBox").className="next c-"+next.k;
     $("nextBox").innerHTML=`<span class="tile">${ic(next.ic)}</span><div style="min-width:0"><span class="eyebrow">${ic("target")}Ta prochaine action</span><h3>${next.title}</h3></div><button type="button" class="btn primary" data-goto="${next.id}">Voir comment${ic("arrow")}</button>`}
@@ -1394,7 +1420,7 @@ function update(){
   side+=`<div class="box"><h3>${ic("receipt")}Ton impôt en bref</h3><p>Revenu imposable : <b>${fmt(base.R)}</b><br>${base.sep?"2 déclarations séparées":String(base.parts).replace(".",",")+" part"+(base.parts>1?"s":"")}<br>Impôt sur le revenu : <b>${fmt(Math.max(0,base.ir))}</b>${base.ir<0?`<br>Remboursement attendu : <b>${fmt(-base.ir)}</b>`:""}${base.pfu>0?`<br>Impôt sur placements : <b>${fmt(base.pfu)}</b>`:""}${base.psFonc>0?`<br>Prélèv. sociaux sur loyers : <b>${fmt(base.psFonc)}</b>`:""}</p></div>`;
   side+=`<div class="box"><h3>${ic("receipt")}Mes formulaires</h3><p>Les déclarations à faire au printemps ${DEC_SEASON} et les cases à remplir, avec tes montants.</p><a class="btn" href="#formulaires">${ic("arrow")}Voir mes formulaires</a></div>`;
   side+=`<div class="box"><h3>${ic("building")}Mes SCI</h3><p>${(S.p.sci||[]).length?S.p.sci.map(c=>`<b>${esc(c.nom)}</b> · ${c.regime} · ta part ${c.share!=null?fmt(c.res*c.share):"?"}`).join("<br>"):"Connecte ton appli de gestion SCI pour que tes sociétés soient prises en compte automatiquement."}</p><a class="btn" href="#sci">${ic("arrow")}${(S.p.sci||[]).length?"Voir le détail":"Connecter"}</a></div>`;
-  {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn primary" href="#importer">${ic("upload")}Importer depuis Google Drive</a></div>`}
+  {const it=dossier(),miss=it.filter(x=>!x.ok);side+=`<div class="box"><h3>${ic("receipt")}Mon dossier : ${it.length-miss.length} / ${it.length}</h3>${miss.length?`<p>Il me manque pour être précis :</p><ul class="skip-list">${miss.slice(0,4).map(d=>`<li>${ic("alert")}<span><b>${d.lab}</b><span>${d.where}</span></span></li>`).join("")}</ul>${miss.length>4?`<p>Et ${miss.length-4} autre(s).</p>`:""}`:`<p>Ton dossier est complet.</p>`}<a class="btn primary" href="#importer">${ic("upload")}Chercher dans mon Drive</a><a class="btn" href="#moi">${ic("list")}Voir le détail</a></div>`}
   if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
   $("side").innerHTML=side;
   if($("simR"))simUpdate(+$("simR").value);
@@ -1407,6 +1433,7 @@ function update(){
 $("groups").addEventListener("click",e=>{const dn=e.target.closest("[data-done]");if(dn){const id=dn.dataset.done;S.done[id]=!S.done[id];if(S.done[id]){S.open=null;toast("Bravo, une action de moins !")}update();return}
   const h=e.target.closest(".card-h");if(h){S.open=S.open===h.dataset.id?null:h.dataset.id;update()}});
 $("chips").addEventListener("click",e=>{const c=e.target.closest("[data-f]");if(c){S.filter=c.dataset.f;update()}});
+$("newDocs").addEventListener("click",e=>{if(e.target.closest("#useNew"))gdUseNew()});
 $("nextBox").addEventListener("click",e=>{const b=e.target.closest("[data-goto]");if(!b)return;S.filter="all";S.open=b.dataset.goto;update();const el=document.querySelector(`.card-h[data-id="${b.dataset.goto}"]`);el&&el.scrollIntoView({behavior:"smooth",block:"center"})});
 $("side").addEventListener("click",e=>{if(e.target.closest("[data-gomode]")){S.settings.mode="complet";S.step=2;save()}});
 
@@ -1769,7 +1796,8 @@ function applyImport(){
   if(mode()!=="complet"&&!p.placements.length&&!p.biens.length){if(p.epargne>0)p.placements.push({id:nid(),type:"livretA",montant:p.epargne,taux:""});
     if(p.loyersNu>0)p.biens.push({id:nid(),type:"nu",valeur:"",loyers:p.loyersNu,charges:p.chargesNu||""});if(p.proprio)p.biens.push({id:nid(),type:"rp",valeur:""})}
   let n=0;S.docs=S.docs||{};
-  IMP.filter(d=>d.status==="ok").forEach(d=>{const c={};d.fields.forEach(fl=>{if(!fl.on)return;const v=fl.unit==="flag"?fl.v:num(fl.v);fl.apply(p,v,c);n++});if(d.finish)d.finish(p,c);const k=(DT[d.type]||[])[2];if(k)S.docs[k]=true});
+  IMP.filter(d=>d.status==="ok").forEach(d=>{const c={};d.fields.forEach(fl=>{if(!fl.on)return;const v=fl.unit==="flag"?fl.v:num(fl.v);fl.apply(p,v,c);n++});if(d.finish)d.finish(p,c);const k=(DT[d.type]||[])[2];if(k)S.docs[k]=true;
+    S.found=S.found||{};S.found[d.type]={name:d.name,at:new Date().toISOString()};if(d.type==="paie"&&d.lines){const kk=docKey({lines:d.lines,name:d.name,date:new Date().toISOString(),type:"paie"});S.found.paieKeys=[...new Set([...(S.found.paieKeys||[]),kk])]}});
   S.p=Object.assign({},DEFAULT,p);S.example=false;S.settings.mode="complet";IMP=[];S.open=null;save();
   toast(n+" information"+(n>1?"s":"")+" ajoutée"+(n>1?"s":"")+" à ta situation");location.hash="#plan";
 }
@@ -1800,21 +1828,51 @@ function gdLoad(){return new Promise((res,rej)=>{if(window.google&&google.accoun
 const IS_IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 const GD_SCOPE="https://www.googleapis.com/auth/drive.readonly",GD_REDIRECT=location.origin+location.pathname;
 function gdSetToken(t,exp){GD.token=t;GD.exp=Date.now()+(+exp||3600)*1000}
-function gdInit(){if(IS_IOS||GD.client||GD.loading||!GDRIVE_CLIENT_ID||!window.BOUSSOLE_PWA)return;GD.loading=true;
+/* Connexion durable : le serveur garde le secret Google, l'appareil garde un jeton de renouvellement */
+const GD_FN="https://bcfcrqmpeyaoovluvhhn.supabase.co/functions/v1/boussole-google",GD_RTK="boussole-gd-rt";
+let GD_PERSIST=null;
+const gdRT=()=>{try{return localStorage.getItem(GD_RTK)}catch(e){return null}};
+const gdSetRT=v=>{try{v?localStorage.setItem(GD_RTK,v):localStorage.removeItem(GD_RTK)}catch(e){}};
+async function gdFn(body){const r=await fetch(GD_FN,{method:"POST",headers:{"Content-Type":"application/json",apikey:"sb_publishable_23UtXl16W2EQ61M3In4R8A_wIEDNHDm"},body:JSON.stringify(body)});let j={};try{j=await r.json()}catch(e){}return {ok:r.ok,j}}
+async function gdCheckPersist(){if(GD_PERSIST!==null)return GD_PERSIST;try{GD_PERSIST=(await gdFn({action:"ping"})).ok}catch(e){GD_PERSIST=false}return GD_PERSIST}
+async function gdSilent(){if(GD.token&&Date.now()<GD.exp-60000)return true;const rt=gdRT();if(!rt||!window.BOUSSOLE_PWA)return false;
+  try{const r=await gdFn({action:"refresh",refresh_token:rt});if(r.ok&&r.j.access_token){gdSetToken(r.j.access_token,r.j.expires_in);return true}if(r.j.error==="invalid_grant")gdSetRT(null)}catch(e){}return false}
+function gdInit(){if(IS_IOS||GD.client||GD.loading||!GDRIVE_CLIENT_ID||!window.BOUSSOLE_PWA)return;GD.loading=true;gdCheckPersist();
   gdLoad().then(()=>{GD.client=google.accounts.oauth2.initTokenClient({client_id:GDRIVE_CLIENT_ID,scope:GD_SCOPE,
     callback:r=>{if(r.error){GD.state="idle";GD.msg="Connexion Google refusée ("+r.error+").";renderGd();return}gdSetToken(r.access_token,r.expires_in);gdSearch()},
     error_callback:e=>{GD.state="idle";GD.msg=e&&e.type==="popup_failed_to_open"?"Ton téléphone a bloqué la fenêtre Google. Autorise les fenêtres pop-up pour ce site, puis réessaie.":"Connexion Google annulée.";renderGd()}});GD.loading=false})
   .catch(()=>{GD.loading=false;GD.msg="Impossible de joindre Google. Vérifie ta connexion internet.";renderGd()})}
-function gdConnect(){
-  if(GD.token&&Date.now()<GD.exp-60000)return gdSearch();
-  if(IS_IOS){const q=new URLSearchParams({client_id:GDRIVE_CLIENT_ID,redirect_uri:GD_REDIRECT,response_type:"token",scope:GD_SCOPE,include_granted_scopes:"true",state:"gdrive",prompt:"select_account"});
+async function gdConnect(){
+  if(await gdSilent())return gdSearch();
+  if(GD_PERSIST===null)await gdCheckPersist();
+  if(GD_PERSIST||IS_IOS){const q=new URLSearchParams({client_id:GDRIVE_CLIENT_ID,redirect_uri:GD_REDIRECT,scope:GD_SCOPE,include_granted_scopes:"true",state:"gdrive",
+      response_type:GD_PERSIST?"code":"token",...(GD_PERSIST?{access_type:"offline",prompt:"consent"}:{prompt:"select_account"})});
     GD.state="auth";renderGd();location.href="https://accounts.google.com/o/oauth2/v2/auth?"+q.toString();return}
   if(!GD.client){gdInit();GD.msg="La connexion Google se prépare. Touche à nouveau le bouton dans 2 secondes.";renderGd();return}
   GD.msg="";GD.state="auth";renderGd();GD.client.requestAccessToken({prompt:""})}
-(function(){const h=location.hash.slice(1);if(!/state=gdrive/.test(h))return;const q=new URLSearchParams(h);
+function gdDisconnect(){const rt=gdRT();if(rt)gdFn({action:"revoke",refresh_token:rt}).catch(()=>{});gdSetRT(null);GD.token=null;GD.exp=0;GD.found=[];GD.state="idle";S.gdSeen={};S.gdNew=[];save();renderGd();update();toast("Google Drive déconnecté")}
+/* retour de Google : jeton (connexion simple) ou code (connexion durable) */
+(function(){const qs=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.slice(1));
+  const st=qs.get("state")||h.get("state");if(st!=="gdrive")return;
   history.replaceState(null,"",GD_REDIRECT+"#importer");
-  if(q.get("access_token")){gdSetToken(q.get("access_token"),q.get("expires_in"));setTimeout(gdSearch,400)}
-  else GD.msg=q.get("error")==="access_denied"?"Connexion Google annulée ou refusée.":"Connexion Google impossible ("+(q.get("error")||"erreur")+").";})();
+  if(qs.get("code")){GD.state="auth";gdFn({action:"exchange",code:qs.get("code"),redirect_uri:GD_REDIRECT}).then(r=>{
+      if(r.ok&&r.j.access_token){gdSetToken(r.j.access_token,r.j.expires_in);if(r.j.refresh_token)gdSetRT(r.j.refresh_token);GD_PERSIST=true;gdSearch()}
+      else{GD.state="idle";GD.msg="Connexion Google impossible ("+(r.j.error_description||r.j.error||"erreur")+").";renderGd()}}).catch(()=>{GD.state="idle";GD.msg="Connexion Google impossible : vérifie ta connexion internet.";renderGd()});return}
+  if(h.get("access_token")){gdSetToken(h.get("access_token"),h.get("expires_in"));setTimeout(gdSearch,400);return}
+  const err=qs.get("error")||h.get("error");GD.msg=err==="access_denied"?"Connexion Google annulée ou refusée.":"Connexion Google impossible ("+(err||"erreur")+").";})();
+/* surveillance : à chaque ouverture et toutes les 30 minutes, regarder les nouveaux documents */
+async function gdWatch(){if(!window.BOUSSOLE_PWA||GD.state!=="idle"&&GD.state!=="list"||!gdRT())return;
+  if(!(await gdSilent()))return;
+  const since=S.gdLast||new Date(Date.now()-30*864e5).toISOString();
+  try{const found=await gdCandidates(since);const fresh=found.filter(f=>!(S.gdSeen||{})[f.id]&&!f.dup);
+    for(const f of fresh.slice(0,15)){try{const r=await gdApi("files/"+f.id+"?alt=media");f.file=new File([await r.blob()],f.name,{type:"application/pdf"});f.lines=await pdfLines(f.file);gdClassify(f)}catch(e){f.cat="out"}
+      S.gdSeen=S.gdSeen||{};S.gdSeen[f.id]=1}
+    const mine=fresh.filter(f=>f.cat==="perso");
+    if(mine.length){S.gdNew=(S.gdNew||[]).concat(mine.map(f=>({id:f.id,name:f.name,type:f.type,date:f.date})));GD.pending=(GD.pending||[]).concat(mine)}
+    const cca=Math.max(0,...fresh.filter(f=>f.cca).map(f=>f.cca));if(cca>0)S.p.sciCCA=cca;
+    S.gdLast=new Date().toISOString();save();update()}catch(e){}}
+function gdUseNew(){if(!(GD.pending||[]).length){location.hash="#importer";gdConnect();return}
+  GD.found=GD.pending.map(f=>Object.assign(f,{on:true}));GD.pending=[];S.gdNew=[];save();location.hash="#importer";setTimeout(gdRead,200)}
 async function gdApi(path){const t=GD.token;if(!t||Date.now()>GD.exp-30000){GD.token=null;throw new Error("auth")}const r=await fetch("https://www.googleapis.com/drive/v3/"+path,{headers:{Authorization:"Bearer "+t}});if(r.status===401){GD.token=null;throw new Error("auth")}if(!r.ok){let m="";try{const j=await r.json();m=j.error&&j.error.message||""}catch(_){}throw new Error("http "+r.status+(m?" ("+m+")":""))}return r}
 const normTxt=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase();
 const GD_KEEP={avis:1,decl:1,paie:2,tf:2,pret:3,ifu:3,plac:5};
@@ -1837,15 +1895,16 @@ function gdClassify(d){
   if(mine===false){d.cat="out";d.reason="Pas à ton nom (locataire, garant, associé ?)";return}
   d.cat="perso";d.reason=mine===null?"À vérifier : indique ton nom dans Moi pour un tri plus sûr":"";
   if(d.type==="paie"&&names[1]&&N.includes(names[1])&&!N.includes(names[0]))d.target="2"}
+async function gdCandidates(since){const seen=new Set(),seenName=new Set(),out=[];out.fails=0;out.lastErr="";
+  for(const [type,,,q] of GD_TYPES){
+    const query=`mimeType='application/pdf' and trashed=false and modifiedTime > '${since}' and ${q}`;
+    let js;try{const r=await gdApi("files?pageSize=100&fields=files(id,name,modifiedTime,size)&q="+encodeURIComponent(query));js=await r.json()}catch(e){if(e.message==="auth")throw e;out.fails++;out.lastErr=e.message;continue}
+    (js.files||[]).sort((a,b)=>String(b.modifiedTime).localeCompare(String(a.modifiedTime)));(js.files||[]).forEach(f=>{if(seen.has(f.id))return;seen.add(f.id);const k=f.name+"|"+f.size;const dup=seenName.has(k);seenName.add(k);out.push({id:f.id,name:f.name,date:f.modifiedTime,qtype:type,dup})})}
+  return out}
 async function gdSearch(){
   GD.state="search";GD.msg="";GD.found=[];GD.prog="";renderGd();
   try{await gdWho();
-    const since=(YEAR-3)+"-01-01T00:00:00";const seen=new Set(),seenName=new Set();
-    let fails=0,lastErr="";
-    for(const [type,,,q] of GD_TYPES){
-      const query=`mimeType='application/pdf' and trashed=false and modifiedTime > '${since}Z' and ${q}`;
-      let js;try{const r=await gdApi("files?pageSize=50&fields=files(id,name,modifiedTime,size)&q="+encodeURIComponent(query));js=await r.json()}catch(e){if(e.message==="auth")throw e;fails++;lastErr=e.message;continue}
-      (js.files||[]).sort((a,b)=>String(b.modifiedTime).localeCompare(String(a.modifiedTime)));(js.files||[]).forEach(f=>{if(seen.has(f.id))return;seen.add(f.id);const k=f.name+"|"+f.size;const dup=seenName.has(k);seenName.add(k);GD.found.push({id:f.id,name:f.name,date:f.modifiedTime,qtype:type,dup})})}
+    const res=await gdCandidates((YEAR-3)+"-01-01T00:00:00Z"),fails=res.fails,lastErr=res.lastErr;GD.found=res.slice();
     if(!GD.found.length){GD.state="idle";GD.msg=fails===GD_TYPES.length?"Google a refusé la recherche : "+lastErr:"Je n'ai trouvé aucun document fiscal en PDF dans ton Drive (3 dernières années).";renderGd();return}
     GD.state="sort";const todo=GD.found.filter(f=>!f.dup).slice(0,60);let i=0;
     for(const f of GD.found){if(f.dup){f.cat="out";f.reason="Doublon d'un autre fichier"}}
@@ -1859,7 +1918,7 @@ async function gdSearch(){
         arr.filter(x=>!x.on).forEach(x=>{x.cat="out";x.reason="Fiche de paie plus ancienne : pas nécessaire"})}
       else arr.forEach((x,j)=>{if(j<(GD_KEEP[t]||2)){x.on=true}else{x.cat="out";x.reason="Plus ancien : la version récente suffit"}})});
     const cca=Math.max(0,...GD.found.filter(f=>f.cca).map(f=>f.cca));if(cca>0){S.p.sciCCA=cca;save()}
-    GD.state="list";GD.prog="";
+    GD.state="list";GD.prog="";S.gdSeen=S.gdSeen||{};GD.found.forEach(f=>S.gdSeen[f.id]=1);S.gdLast=new Date().toISOString();S.gdNew=[];save();
   }catch(e){GD.state="idle";GD.msg=e.message==="auth"?"Ta connexion Google a expiré : touche à nouveau le bouton.":"Erreur Google Drive : "+e.message}
   renderGd()}
 async function gdRead(){
@@ -1877,10 +1936,14 @@ function renderGd(){const box=$("gdBox");if(!box)return;if(GD.state==="auth"&&!G
   const lbl=GD.state==="auth"?"Connexion à Google...":GD.state==="search"?"Recherche...":GD.state==="sort"?"Tri en cours "+GD.prog:GD.found.length?"Relancer la recherche":"Me connecter et chercher";
   let h=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div class="gd-txt"><b>Chercher dans mon Google Drive</b><span class="muted">L'appli parcourt ton Drive, lit chaque document et ne garde que ceux qui te concernent. Lecture seule.</span></div>
     <button type="button" class="btn primary" id="gdGo" ${busy?"disabled":""}>${lbl}</button></div>`;
+  if(gdRT())h+=`<div class="gd-on">${ic("check")}<span><b>Connecté en continu à ton Google Drive.</b> L'appli regarde toute seule les nouveaux documents à chaque ouverture.</span><button type="button" class="btn ghost" id="gdOff">Déconnecter</button></div>`;
+  else if(GD_PERSIST===false)h+=`<p class="muted" style="margin:0">Connexion durable pas encore activée : Google te redemandera de te connecter environ toutes les heures.</p>`;
   if(busy)h+=`<div class="imp-bar"><i></i></div>${GD.state==="sort"?`<p class="muted" style="margin:0">Lecture et tri des documents : ${GD.prog}</p>`:""}`;
   if(GD.msg)h+=`<div class="warn">${ic("alert")}<span>${esc(GD.msg)}</span></div>`;
   if(GD.state==="list"&&GD.found.length){
     const keep=GD.found.filter(f=>f.on),drop=GD.found.filter(f=>!f.on),lab=t=>(DT[t]||DT.inconnu)[0];
+    const cnt=r=>GD.found.filter(f=>f.reason&&f.reason.startsWith(r)).length,nb=GD.found.length;
+    h+=`<div class="gd-sum"><b>${nb} PDF fiscaux trouvés dans ton Drive.</b> ${[[keep.length,"te concerne et est utile","te concernent et sont utiles"],[cnt("Pas à ton nom"),"est à une autre personne","sont à d'autres personnes"],[cnt("Document de société"),"est de ta société","sont de ta société"],[cnt("Fiche de paie plus")+cnt("Plus ancien"),"est une version plus ancienne","sont des versions plus anciennes"],[cnt("Doublon"),"est un doublon","sont des doublons"],[cnt("Pas un document")+cnt("Document scanné")+cnt("Impossible")+cnt("Protégé"),"n'est pas lisible ou pas utile","ne sont pas lisibles ou pas utiles"]].filter(x=>x[0]).map(x=>x[0]+" "+(x[0]>1?x[2]:x[1])).join(", ")}.</div>`;
     const row=f=>`<label class="gd-f${f.on?"":" off"}"><input type="checkbox" data-gd="${f.id}" ${f.on?"checked":""} ${f.lines?"":"disabled"}><span style="min-width:0;flex:1"><b>${esc(f.name)}</b><small>${f.on?lab(f.type)+(f.why?" · "+f.why:"")+(f.reason?" · "+f.reason:""):esc(f.reason||"")}</small></span></label>`;
     h+=`<div class="gd-grp"><h4>${ic("check")} Retenus pour toi <span class="muted">(${keep.length})</span></h4>${keep.length?keep.map(row).join(""):`<p class="muted">Aucun document à ton nom trouvé. Vérifie ton nom dans l'onglet Moi.</p>`}</div>`;
     const groups={};drop.forEach(f=>{const r=f.reason||"Écarté";(groups[r]=groups[r]||[]).push(f)});
@@ -1889,7 +1952,7 @@ function renderGd(){const box=$("gdBox");if(!box)return;if(GD.state==="auth"&&!G
     h+=`<div class="row"><button type="button" class="btn primary" id="gdRead" ${keep.length?"":"disabled"}>${ic("check")}Utiliser ces ${keep.length} document${keep.length>1?"s":""}</button><span class="muted">Tu peux cocher ou décocher avant.</span></div>`}
   box.innerHTML=h+`</div>`}
 const GD_LOGO='<svg viewBox="0 0 87.3 78" width="28" height="25" aria-hidden="true"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>';
-$("gdBox").addEventListener("click",e=>{if(e.target.closest("#gdGo"))gdConnect();else if(e.target.closest("#gdRead"))gdRead()});
+$("gdBox").addEventListener("click",e=>{if(e.target.closest("#gdOff")){gdDisconnect();return}if(e.target.closest("#gdGo"))gdConnect();else if(e.target.closest("#gdRead"))gdRead()});
 $("gdBox").addEventListener("change",e=>{const id=e.target.dataset.gd;if(id){const f=GD.found.find(x=>x.id===id);f.on=e.target.checked;renderGd()}});
 
 /* ===== Tuto d'installation ===== */
@@ -1974,7 +2037,8 @@ $("wipeNo").onclick=()=>{$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false}
 $("wipeYes").onclick=()=>{S.p=JSON.parse(JSON.stringify(DEFAULT));S.done={};S.example=false;S.settings={prenom:"",mode:"rapide",theme:"auto"};applyTheme();$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false;toast("Tout est effacé");update()};
 
 hydrate(document);
-$("appVer").textContent=APP_VERSION;$("formsSeason").textContent=DEC_SEASON;$("oldBanner").hidden=!!window.BOUSSOLE_PWA;
+$("appVer").textContent=APP_VERSION;
+if(window.BOUSSOLE_PWA){setTimeout(()=>gdCheckPersist().then(()=>{gdWatch();renderGd()}),1500);setInterval(gdWatch,30*60e3);document.addEventListener("visibilitychange",()=>{if(!document.hidden)gdWatch()})}$("formsSeason").textContent=DEC_SEASON;$("oldBanner").hidden=!!window.BOUSSOLE_PWA;
 route();
 
 })();
