@@ -418,6 +418,9 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .gd-card{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
 .gd-h{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .gd-h b{display:block;font-family:var(--f-display);font-size:18px}
+.gd-txt{flex:1 1 240px;min-width:0}
+.gd-txt .muted{display:block}
+@media (max-width:560px){.gd-h #gdGo{flex:1 1 100%;justify-content:center}}
 .gd-logo{width:48px;height:48px;border-radius:14px;background:var(--sunk);display:grid;place-items:center;flex:none}
 .gd-grp{display:flex;flex-direction:column;gap:6px}
 .gd-grp h4{font-size:14px}
@@ -425,6 +428,8 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .gd-f input{width:20px;height:20px;accent-color:var(--accent);flex:none}
 .gd-f b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gd-f small{color:var(--muted);font-size:12px}
+.banner.old{background:var(--amber-soft)}
+.banner.old .t>span>svg{color:var(--amber)}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -494,13 +499,17 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 </header>
 
 <main class="wrap">
+  <div class="banner old" id="oldBanner" hidden>
+    <span class="t"><span data-ic="alert"></span><span><b>Tu es sur l'ancienne adresse (claude.ai).</b> Google Drive et la connexion SCI n'y marchent pas.</span></span>
+    <a class="btn primary" href="https://crbntheo-png.github.io/boussole-fiscale/" target="_blank" rel="noopener"><span data-ic="arrow"></span>Ouvrir la version complète</a>
+  </div>
   <div class="banner inst" id="installBanner" hidden>
     <span class="t"><span class="logo sm" data-ic="logo"></span><span><b>Installe Boussole Fiscale sur ton téléphone.</b> Une icône sur ton écran d'accueil, comme une vraie appli.</span></span>
     <span class="row"><a class="btn primary" href="#installer"><span data-ic="install"></span>Voir le tuto</a><button class="icon-btn" type="button" id="instClose" aria-label="Masquer"><span data-ic="x"></span></button></span>
   </div>
   <div class="banner" id="exampleBanner" hidden>
     <span class="t"><span data-ic="info"></span><span><b>Ceci est un exemple.</b> Une famille avec 2 enfants, un appartement en location, des crédits et des placements.</span></span>
-    <span class="row"><a class="btn primary" href="#importer"><span data-ic="upload"></span>Importer mes PDF</a><button class="btn" id="clearBtn" type="button"><span data-ic="arrow"></span>Tout saisir à la main</button></span>
+    <span class="row"><a class="btn primary" href="#importer"><span data-ic="upload"></span>Importer depuis Google Drive</a><button class="btn" id="clearBtn" type="button"><span data-ic="arrow"></span>Tout saisir à la main</button></span>
   </div>
 
   <section class="view" id="v-plan" aria-label="Mon plan">
@@ -537,7 +546,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   <section class="view" id="v-situation" aria-label="Ma situation" hidden>
     <div class="sit-grid">
       <div class="form">
-        <a class="imp-cta" href="#importer"><span class="tile c-epargne"><span data-ic="upload"></span></span><span style="min-width:0;flex:1"><b>Pas envie de tout taper ?</b><span class="muted">Importe tes PDF (avis d'impôt, paies, prêts...) : l'appli remplit pour toi.</span></span><span data-ic="arrow"></span></a>
+        <a class="imp-cta" href="#importer"><span class="tile c-epargne"><span data-ic="upload"></span></span><span style="min-width:0;flex:1"><b>Pas envie de tout taper ?</b><span class="muted">Connecte ton Google Drive : l'appli trouve tes documents et remplit tout.</span></span><span data-ic="arrow"></span></a>
         <div class="form-top">
           <div class="mode" role="group" aria-label="Niveau de détail" id="modeSw">
             <button type="button" data-mode="rapide"><span>Rapide</span><small>2 minutes, ordres de grandeur</small></button>
@@ -585,6 +594,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   </section>
 
   <section class="view" id="v-importer" aria-label="Importer mes documents" hidden>
+    <div id="gdBox"></div>
     <div class="imp-hero">
       <div style="min-width:0;display:flex;flex-direction:column;gap:10px">
         <span class="eyebrow"><span data-ic="lock"></span>Lu sur ton appareil · rien n'est envoyé</span>
@@ -598,7 +608,6 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
         <input type="file" id="impFiles" accept="application/pdf,.pdf" multiple hidden>
       </label>
     </div>
-    <div id="gdBox"></div>
     <div class="note"><span data-ic="info"></span><span><b>Tu préfères choisir toi-même ?</b> Touche "Choisir mes PDF". Sur Android, ouvre le menu ☰ de la fenêtre puis "Drive". Sur iPhone, touche "Parcourir" puis "Google Drive". L'appli ne reçoit que les fichiers que tu choisis, pas l'accès à tout ton Drive.</span></div>
     <div id="impList" class="imp-list"></div>
     <div id="impApply"></div>
@@ -673,7 +682,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
       </div>
     </div>
   </section>
-  <p class="foot">Boussole Fiscale · estimation indicative · barème 2026 sur revenus 2025.</p>
+  <p class="foot">Boussole Fiscale · <span id="appVer"></span> · estimation indicative · barème 2026 sur revenus 2025.</p>
 </main>
 
 <nav class="bnav" id="bnav" aria-label="Navigation"></nav>
@@ -748,6 +757,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
+const APP_VERSION="version 13 du 11/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1238,7 +1248,7 @@ const DOCS=[
  {id:"att",n:"Attestations : crèche, aide à domicile, dons",ic:"gift",d:"Vérifier que tous tes crédits d'impôt sont bien comptés.",w:"Pajemploi, CESU, la crèche, les associations"}];
 function docsHTML(){const have=S.docs||{},n=DOCS.filter(d=>have[d.id]).length;
   return `<h3>${ic("receipt")}Mes documents <span class="pill ${n===DOCS.length?"ok":""}">${n} / ${DOCS.length}</span></h3>
-  <p>Plus tu rassembles de documents, plus les conseils sont précis. Le plus simple : <b>importe-les directement</b>, l'appli lit les PDF et remplit ta situation toute seule.</p><a class="btn primary" href="#importer">${ic("upload")}Importer mes PDF</a>
+  <p>Plus tu rassembles de documents, plus les conseils sont précis. Le plus simple : <b>importe-les directement</b>, l'appli lit les PDF et remplit ta situation toute seule.</p><a class="btn primary" href="#importer">${ic("upload")}Importer depuis Google Drive</a>
   <ul class="docs">${DOCS.map(d=>`<li class="doc${have[d.id]?" ok":""}"><span class="tile c-case">${ic(d.ic)}</span><span style="min-width:0;flex:1"><b>${d.n}</b><span class="dd">${d.d}</span><span class="dw">${ic("compass")}${d.w}</span></span><button type="button" class="switch" role="switch" aria-checked="${!!have[d.id]}" aria-label="J'ai ce document" data-doc="${d.id}"></button></li>`).join("")}</ul>`}
 
 /* ===== Rappels Google Agenda ===== */
@@ -1325,7 +1335,7 @@ function update(){
   if(base.red+base.cred>10000)side+=`<div class="box"><h3>${ic("alert")}Plafond des niches</h3><p>Tes avantages fiscaux dépassent 10 000 €. Au-delà, ils sont plafonnés.</p></div>`;
   side+=`<div class="box"><h3>${ic("receipt")}Ton impôt en bref</h3><p>Revenu imposable : <b>${fmt(base.R)}</b><br>${base.sep?"2 déclarations séparées":String(base.parts).replace(".",",")+" part"+(base.parts>1?"s":"")}<br>Impôt sur le revenu : <b>${fmt(Math.max(0,base.ir))}</b>${base.ir<0?`<br>Remboursement attendu : <b>${fmt(-base.ir)}</b>`:""}${base.pfu>0?`<br>Impôt sur placements : <b>${fmt(base.pfu)}</b>`:""}${base.psFonc>0?`<br>Prélèv. sociaux sur loyers : <b>${fmt(base.psFonc)}</b>`:""}</p></div>`;
   side+=`<div class="box"><h3>${ic("building")}Mes SCI</h3><p>${(S.p.sci||[]).length?S.p.sci.map(c=>`<b>${esc(c.nom)}</b> · ${c.regime} · ta part ${c.share!=null?fmt(c.res*c.share):"?"}`).join("<br>"):"Connecte ton appli de gestion SCI pour que tes sociétés soient prises en compte automatiquement."}</p><a class="btn" href="#sci">${ic("arrow")}${(S.p.sci||[]).length?"Voir le détail":"Connecter"}</a></div>`;
-  {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn primary" href="#importer">${ic("upload")}Importer mes PDF</a></div>`}
+  {const nd=DOCS.filter(x=>(S.docs||{})[x.id]).length;side+=`<div class="box"><h3>${ic("receipt")}Rends ton plan plus précis</h3><p>${nd} document${nd>1?"s":""} sur ${DOCS.length} rassemblé${nd>1?"s":""}. Avec ton avis d'impôt, tes relevés et tes tableaux de prêt, chaque conseil devient chiffré au centime.</p><a class="btn primary" href="#importer">${ic("upload")}Importer depuis Google Drive</a></div>`}
   if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
   $("side").innerHTML=side;
   if($("simR"))simUpdate(+$("simR").value);
@@ -1651,35 +1661,47 @@ const GD_TYPES=[
  ["ifu","Relevés fiscaux de banque",3,"(fullText contains 'imprimé fiscal unique' or fullText contains 'IFU')"],
  ["plac","Placements",5,"(fullText contains 'valeur de rachat' or fullText contains 'plan d''épargne' or fullText contains 'assurance vie' or fullText contains 'relevé de situation')"]];
 function gdLoad(){return new Promise((res,rej)=>{if(window.google&&google.accounts&&google.accounts.oauth2)return res();const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.onload=()=>res();s.onerror=()=>rej(new Error("gsi"));document.head.appendChild(s)})}
-async function gdToken(){
-  if(GD.token&&Date.now()<GD.exp-60000)return GD.token;
-  await gdLoad();
-  return new Promise((res,rej)=>{GD.client=google.accounts.oauth2.initTokenClient({client_id:GDRIVE_CLIENT_ID,scope:"https://www.googleapis.com/auth/drive.readonly",
-    callback:r=>{if(r.error){rej(new Error(r.error));return}GD.token=r.access_token;GD.exp=Date.now()+(+r.expires_in||3600)*1000;res(GD.token)},
-    error_callback:e=>rej(new Error(e&&e.type||"popup"))});GD.client.requestAccessToken({prompt:""})})}
-async function gdApi(path){const t=await gdToken();const r=await fetch("https://www.googleapis.com/drive/v3/"+path,{headers:{Authorization:"Bearer "+t}});if(r.status===401){GD.token=null;throw new Error("auth")}if(!r.ok)throw new Error("http "+r.status);return r}
+const IS_IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const GD_SCOPE="https://www.googleapis.com/auth/drive.readonly",GD_REDIRECT=location.origin+location.pathname;
+function gdSetToken(t,exp){GD.token=t;GD.exp=Date.now()+(+exp||3600)*1000}
+function gdInit(){if(IS_IOS||GD.client||GD.loading||!GDRIVE_CLIENT_ID||!window.BOUSSOLE_PWA)return;GD.loading=true;
+  gdLoad().then(()=>{GD.client=google.accounts.oauth2.initTokenClient({client_id:GDRIVE_CLIENT_ID,scope:GD_SCOPE,
+    callback:r=>{if(r.error){GD.state="idle";GD.msg="Connexion Google refusée ("+r.error+").";renderGd();return}gdSetToken(r.access_token,r.expires_in);gdSearch()},
+    error_callback:e=>{GD.state="idle";GD.msg=e&&e.type==="popup_failed_to_open"?"Ton téléphone a bloqué la fenêtre Google. Autorise les fenêtres pop-up pour ce site, puis réessaie.":"Connexion Google annulée.";renderGd()}});GD.loading=false})
+  .catch(()=>{GD.loading=false;GD.msg="Impossible de joindre Google. Vérifie ta connexion internet.";renderGd()})}
+function gdConnect(){
+  if(GD.token&&Date.now()<GD.exp-60000)return gdSearch();
+  if(IS_IOS){const q=new URLSearchParams({client_id:GDRIVE_CLIENT_ID,redirect_uri:GD_REDIRECT,response_type:"token",scope:GD_SCOPE,include_granted_scopes:"true",state:"gdrive",prompt:"select_account"});
+    GD.state="auth";renderGd();location.href="https://accounts.google.com/o/oauth2/v2/auth?"+q.toString();return}
+  if(!GD.client){gdInit();GD.msg="La connexion Google se prépare. Touche à nouveau le bouton dans 2 secondes.";renderGd();return}
+  GD.msg="";GD.state="auth";renderGd();GD.client.requestAccessToken({prompt:""})}
+(function(){const h=location.hash.slice(1);if(!/state=gdrive/.test(h))return;const q=new URLSearchParams(h);
+  history.replaceState(null,"",GD_REDIRECT+"#importer");
+  if(q.get("access_token")){gdSetToken(q.get("access_token"),q.get("expires_in"));setTimeout(gdSearch,400)}
+  else GD.msg=q.get("error")==="access_denied"?"Connexion Google annulée ou refusée.":"Connexion Google impossible ("+(q.get("error")||"erreur")+").";})();
+async function gdApi(path){const t=GD.token;if(!t||Date.now()>GD.exp-30000){GD.token=null;throw new Error("auth")}const r=await fetch("https://www.googleapis.com/drive/v3/"+path,{headers:{Authorization:"Bearer "+t}});if(r.status===401){GD.token=null;throw new Error("auth")}if(!r.ok)throw new Error("http "+r.status);return r}
 async function gdSearch(){
   GD.state="search";GD.msg="";GD.found=[];renderGd();
-  try{await gdToken();
+  try{
     const since=(YEAR-3)+"-01-01T00:00:00";const seen=new Set();
     for(const [type,label,keep,q] of GD_TYPES){
       const query=`mimeType='application/pdf' and trashed=false and modifiedTime > '${since}' and ${q}`;
       const r=await gdApi("files?pageSize=30&orderBy=modifiedTime desc&fields=files(id,name,modifiedTime,size)&q="+encodeURIComponent(query));
       const js=await r.json();(js.files||[]).forEach((f,i)=>{if(seen.has(f.id))return;seen.add(f.id);GD.found.push({id:f.id,name:f.name,date:f.modifiedTime,type,label,on:i<keep})})}
     GD.state="list";if(!GD.found.length)GD.msg="Je n'ai trouvé aucun document fiscal en PDF dans ton Drive (3 dernières années).";
-  }catch(e){GD.state="idle";GD.msg=e.message==="gsi"?"Impossible de joindre Google. Vérifie ta connexion internet.":/popup|access_denied/.test(e.message)?"Connexion Google annulée.":"Erreur Google Drive : "+e.message}
+  }catch(e){GD.state="idle";GD.msg=e.message==="auth"?"Ta connexion Google a expiré : touche à nouveau le bouton.":"Erreur Google Drive : "+e.message}
   renderGd()}
 async function gdRead(){
   const sel=GD.found.filter(f=>f.on);if(!sel.length)return;GD.state="dl";renderGd();const files=[];
   for(const f of sel){try{const r=await gdApi("files/"+f.id+"?alt=media");const b=await r.blob();files.push(new File([b],f.name,{type:"application/pdf"}))}catch(e){}}
   GD.state="list";GD.found=[];renderGd();
   if(files.length){await readFiles(files);toast(files.length+" document"+(files.length>1?"s":"")+" récupéré"+(files.length>1?"s":"")+" depuis Drive")}else toast("Aucun document n'a pu être téléchargé")}
-function renderGd(){const box=$("gdBox");if(!box)return;
+function renderGd(){const box=$("gdBox");if(!box)return;if(GD.state==="auth"&&!GD.authAt)GD.authAt=Date.now();if(GD.state!=="auth")GD.authAt=0;if(GD.state==="auth"&&Date.now()-GD.authAt>90000)GD.state="idle";
   if(!window.BOUSSOLE_PWA){box.innerHTML=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div><b>Chercher dans mon Google Drive</b><span class="muted">Disponible dans l'appli installée : <a href="https://crbntheo-png.github.io/boussole-fiscale/#importer" target="_blank" rel="noopener">l'ouvrir</a></span></div></div></div>`;return}
   if(!GDRIVE_CLIENT_ID){box.innerHTML=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div><b>Chercher dans mon Google Drive</b><span class="muted">Bientôt disponible : la connexion Google est en cours d'activation.</span></div></div></div>`;return}
-  const busy=GD.state==="search"||GD.state==="dl";
-  let h=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div style="min-width:0;flex:1"><b>Chercher dans mon Google Drive</b><span class="muted">L'appli trouve toute seule tes avis d'impôt, paies, taxes foncières, prêts et relevés. Lecture seule.</span></div>
-    <button type="button" class="btn primary" id="gdGo" ${busy?"disabled":""}>${GD.state==="search"?"Recherche...":GD.state==="dl"?"Téléchargement...":GD.found.length?"Relancer":"Lancer la recherche"}</button></div>`;
+  gdInit();const busy=GD.state==="search"||GD.state==="dl"||GD.state==="auth";
+  let h=`<div class="gd-card"><div class="gd-h"><span class="gd-logo">${GD_LOGO}</span><div class="gd-txt"><b>Chercher dans mon Google Drive</b><span class="muted">L'appli trouve toute seule tes avis d'impôt, paies, taxes foncières, prêts et relevés. Lecture seule.</span></div>
+    <button type="button" class="btn primary" id="gdGo" ${busy?"disabled":""}>${GD.state==="auth"?"Connexion à Google...":GD.state==="search"?"Recherche...":GD.state==="dl"?"Téléchargement...":GD.found.length?"Relancer la recherche":"Me connecter et chercher"}</button></div>`;
   if(busy)h+=`<div class="imp-bar"><i></i></div>`;
   if(GD.msg)h+=`<div class="warn">${ic("alert")}<span>${esc(GD.msg)}</span></div>`;
   if(GD.found.length){const n=GD.found.filter(f=>f.on).length;
@@ -1688,7 +1710,7 @@ function renderGd(){const box=$("gdBox");if(!box)return;
     h+=`<div class="row"><button type="button" class="btn primary" id="gdRead" ${n&&!busy?"":"disabled"}>${ic("check")}Lire ces ${n} document${n>1?"s":""}</button><span class="muted">Les plus récents sont déjà cochés.</span></div>`}
   box.innerHTML=h+`</div>`}
 const GD_LOGO='<svg viewBox="0 0 87.3 78" width="28" height="25" aria-hidden="true"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>';
-$("gdBox").addEventListener("click",e=>{if(e.target.closest("#gdGo"))gdSearch();else if(e.target.closest("#gdRead"))gdRead()});
+$("gdBox").addEventListener("click",e=>{if(e.target.closest("#gdGo"))gdConnect();else if(e.target.closest("#gdRead"))gdRead()});
 $("gdBox").addEventListener("change",e=>{const id=e.target.dataset.gd;if(id){const f=GD.found.find(x=>x.id===id);f.on=e.target.checked;renderGd()}});
 
 /* ===== Tuto d'installation ===== */
@@ -1771,6 +1793,7 @@ $("wipeNo").onclick=()=>{$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false}
 $("wipeYes").onclick=()=>{S.p=JSON.parse(JSON.stringify(DEFAULT));S.done={};S.example=false;S.settings={prenom:"",mode:"rapide",theme:"auto"};applyTheme();$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false;toast("Tout est effacé");update()};
 
 hydrate(document);
+$("appVer").textContent=APP_VERSION;$("oldBanner").hidden=!!window.BOUSSOLE_PWA;
 route();
 
 })();
