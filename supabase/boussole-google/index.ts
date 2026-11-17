@@ -1,10 +1,12 @@
 // Garde Boussole Fiscale connectée à Google Drive : échange le code Google contre un jeton durable,
 // puis renouvelle l'accès quand il expire. Le code secret Google reste sur le serveur (secrets Supabase).
-const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
+const CORS = { "Access-Control-Allow-Origin": "https://crbntheo-png.github.io", "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const rep = (corps: unknown, statut = 200) => new Response(JSON.stringify(corps), { status: statut, headers: { ...CORS, "Content-Type": "application/json" } });
 const RETOURS = ["https://crbntheo-png.github.io/boussole-fiscale/"];
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  const origine = req.headers.get("Origin") || "";
+  if (origine && origine !== "https://crbntheo-png.github.io") return rep({ error: "origine refusée" }, 403);
   try {
     const c = await req.json();
     const id = Deno.env.get("BOUSSOLE_GOOGLE_CLIENT_ID"), sec = Deno.env.get("BOUSSOLE_GOOGLE_SECRET");
