@@ -64,7 +64,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nav{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);padding:4px;border-radius:14px;box-shadow:var(--shadow)}
 .nav a{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600;font-size:14px;position:relative}
 .nav a[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
-.nav .dot{min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
+.nav .ni{position:relative;display:flex}
+.nav .dot,.bnav .dot{position:absolute;top:-7px;right:-10px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--rose);color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center;border:2px solid var(--surface)}
+.top-in .nav{margin-left:auto}
+.me-btn{width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:17px;text-decoration:none;flex:none;border:2px solid transparent}
+.me-btn[aria-current="page"]{border-color:var(--accent)}
+.me-btn svg.i{width:20px;height:20px}
 .view{display:flex;flex-direction:column;gap:20px;padding-top:12px}
 
 .banner{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--blue-soft);border-radius:16px;padding:12px 16px;font-size:14px;margin-top:12px}
@@ -466,6 +471,30 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .pbar .pb .v{background:var(--accent-soft);border:1.5px solid var(--accent)}.pbar .pb .d{background:var(--accent)}
 .pbar b{font-family:var(--f-display);font-size:17px}.pbar>span:last-child{grid-column:2/-1;font-size:12.5px}
 @media (max-width:480px){.pbar{grid-template-columns:minmax(0,1fr) auto}.pbar .pb{grid-column:1/-1;grid-row:2}.pbar>span:last-child{grid-column:1/-1}}
+.card{position:relative}
+.card-h{padding-right:44px}
+.card-x{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;z-index:2}
+.card-x:hover{background:var(--rose-soft);color:var(--rose)}
+.card-x svg.i{width:16px;height:16px}
+.decide{display:flex;gap:8px;flex-wrap:wrap}
+.next .decide{grid-column:1/-1}
+.next{grid-template-columns:auto minmax(0,1fr)}
+.hid{background:var(--surface);border:1px dashed var(--line);border-radius:var(--r);padding:12px 14px}
+.hid summary{cursor:pointer;font-weight:600;display:flex;gap:8px;align-items:center;list-style:none}
+.hid[open] summary{margin-bottom:10px}
+.hid-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.hid-row .tile{width:32px;height:32px;border-radius:10px}.hid-row .tile svg.i{width:16px;height:16px}
+.hid-row b{display:block;font-size:14px;font-family:var(--f-body)}.hid-row small{color:var(--muted);font-size:12.5px}
+.toast{display:flex;gap:12px;align-items:center}
+.toast-undo{border:0;background:transparent;color:var(--accent-2,#7CF0C2);font-weight:700;text-decoration:underline;padding:0}
+.mstep.skipped{opacity:.6;border-left-color:var(--line)}
+.btn.sm{padding:6px 10px;font-size:13px}
+.doc-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:none}
+@media (max-width:480px){.doc{flex-wrap:wrap}.doc-acts{width:100%;justify-content:flex-start;padding-left:48px}}
+.hub-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.hub-links a{display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);font-weight:400}
+.hub-links .tile{width:36px;height:36px;border-radius:11px}.hub-links .tile svg.i{width:18px;height:18px}
+.hub-links b{font-size:14px}.hub-links .muted{font-size:12px}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -497,13 +526,16 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 }
 @media (max-width:760px){
   .nav{display:none}
-  .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:40;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
-    padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
-  .bnav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:var(--muted);text-decoration:none;font-size:11.5px;font-weight:600;position:relative}
-  .bnav a svg.i{width:24px;height:24px}
-  .bnav a[aria-current="page"]{color:var(--accent)}
-  .bnav .dot{position:absolute;top:0;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--rose);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
-  body{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+  .bnav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:40;
+    background:color-mix(in srgb,var(--surface) 96%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:24px;box-shadow:0 10px 30px -10px rgba(0,0,0,.25);padding:6px}
+  .bnav a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;color:var(--muted);text-decoration:none;font-size:12px;font-weight:600}
+  .bnav .ni{position:relative;width:56px;height:30px;border-radius:99px;display:grid;place-items:center;transition:background .2s}
+  .bnav a svg.i{width:22px;height:22px}
+  .bnav a[aria-current="page"]{color:var(--ink)}
+  .bnav a[aria-current="page"] .ni{background:var(--accent-soft);color:var(--accent)}
+  .bnav .dot{top:-2px;right:6px}
+  body{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 112px);max-width:calc(100vw - 32px)}
   .hero{grid-template-columns:minmax(0,1fr);padding:22px}
   .ring-box{flex-direction:row;justify-content:flex-start}
   .ring{width:96px;height:96px}
@@ -531,6 +563,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   <div class="top-in">
     <a class="brand" href="#plan"><span class="logo" data-ic="logo"></span><b>Boussole Fiscale</b></a>
     <nav class="nav" id="nav" aria-label="Navigation"></nav>
+    <a class="me-btn" id="meBtn" href="#moi" aria-label="Mon espace et réglages" title="Mon espace et réglages"></a>
   </div>
 </header>
 
@@ -553,7 +586,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
     <div class="hero">
       <div style="position:relative;z-index:1;min-width:0">
         <div class="hello" id="hello"></div>
-        <h1>Ce que tu peux gagner chaque année</h1>
+        <h1 id="hTitle">Ce que tu peux gagner chaque année</h1>
         <div class="money tnum" id="hGain">0 €</div>
         <div class="split" id="hSplit"></div>
         <div class="hero-stats">
@@ -666,7 +699,9 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   </section>
 
   <section class="view" id="v-importer" aria-label="Importer mes documents" hidden>
+    <div class="hub-links"><a href="#formulaires"><span class="tile c-case"><span data-ic="receipt"></span></span><b>Mes formulaires</b><span class="muted">Cases à remplir</span></a><a href="#calendrier"><span class="tile c-famille"><span data-ic="calendar"></span></span><b>Calendrier</b><span class="muted">Mes échéances</span></a><a href="#sci"><span class="tile c-immo"><span data-ic="building"></span></span><b>Mes SCI</b><span class="muted">Connexion</span></a></div>
     <div id="gdBox"></div>
+    <div class="box" id="docHub"></div>
     <div class="imp-hero">
       <div style="min-width:0;display:flex;flex-direction:column;gap:10px">
         <span class="eyebrow"><span data-ic="lock"></span>Lu sur ton appareil · rien n'est envoyé</span>
@@ -832,7 +867,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 20 du 17/11/2026";
+const APP_VERSION="version 21 du 18/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1148,12 +1183,14 @@ function applyTheme(){const t=S.settings.theme;if(t==="auto")document.documentEl
 applyTheme();
 
 /* ===== Navigation ===== */
-const VIEWS=[["plan","Mon plan","target"],["argent","Mon argent","wallet"],["situation","Ma situation","list"],["calendrier","Calendrier","calendar"],["moi","Moi","user"]];
-const ALLV=[...VIEWS.map(v=>v[0]),"installer","importer","sci","formulaires"];
+const VIEWS=[["plan","Plan","target"],["argent","Argent","wallet"],["importer","Documents","receipt"],["situation","Profil","user"]];
+const NAVOF={plan:"plan",calendrier:"plan",argent:"argent",importer:"importer",formulaires:"importer",sci:"importer",situation:"situation"};
+const ALLV=["plan","argent","situation","calendrier","moi","installer","importer","sci","formulaires"];
 const currentView=()=>{const h=location.hash.replace("#","");return ALLV.includes(h)?h:"plan"};
-function renderNav(urgent){const v=currentView();
-  const h=VIEWS.map(([id,l,i])=>`<a href="#${id}" ${v===id?'aria-current="page"':""}>${ic(i)}<span>${l}</span>${id==="plan"&&urgent?`<span class="dot">${urgent}</span>`:""}</a>`).join("");
-  $("nav").innerHTML=h;$("bnav").innerHTML=h}
+function renderNav(urgent){const v=NAVOF[currentView()];
+  const h=VIEWS.map(([id,l,i])=>`<a href="#${id}" ${v===id?'aria-current="page"':""}><span class="ni">${ic(i)}${id==="plan"&&urgent?`<span class="dot">${urgent}</span>`:""}</span><span>${l}</span></a>`).join("");
+  $("nav").innerHTML=h;$("bnav").innerHTML=h;
+  const nm=(S.settings.prenom||"").trim();$("meBtn").innerHTML=nm?esc(nm[0].toUpperCase()):ic("user");$("meBtn").setAttribute("aria-current",currentView()==="moi"?"page":"false")}
 function route(){const v=currentView();ALLV.forEach(id=>$("v-"+id).hidden=id!==v);renderStepper();renderFields();update();renderInstaller();renderImport();renderGd();renderSci();renderForms();renderMoney();window.scrollTo(0,0)}
 window.addEventListener("hashchange",route);
 
@@ -1364,8 +1401,9 @@ function dossier(){const p=LAST.d||S.p,F=S.found||{},M=S.docs||{},it=[],cr=S.p.c
 function docsHTML(){const it=dossier(),ok=it.filter(x=>x.ok).length,miss=it.filter(x=>!x.ok);
   return `<h3>${ic("receipt")}Mon dossier <span class="pill ${ok===it.length?"ok":""}">${ok} / ${it.length}</span></h3>
   <p>${miss.length?"Voici exactement ce qu'il me manque pour optimiser au mieux ta situation. Le plus simple : ":"Ton dossier est complet. "}<a href="#importer">laisse l'appli chercher dans ton Google Drive</a>.</p>
-  <ul class="docs">${it.sort((a,b)=>a.ok-b.ok).map(d=>`<li class="doc${d.ok?" ok":""}"><span class="tile ${d.ok?"c-epargne":"c-famille"}">${ic(d.ok?"check":"alert")}</span><span style="min-width:0;flex:1"><b>${d.lab}</b><span class="dd">${d.why}</span><span class="dw">${ic("compass")}${d.where}</span></span>${d.ok&&!(S.docs||{})[d.id]?`<span class="pill ok">Trouvé</span>`:`<button type="button" class="switch" role="switch" aria-checked="${!!(S.docs||{})[d.id]}" aria-label="Je l'ai déjà ou pas concerné" data-doc="${d.id}"></button>`}</li>`).join("")}</ul>
-  <p class="muted">L'interrupteur sert à dire "je l'ai déjà donné" ou "pas concerné".</p>`}
+  <ul class="docs">${it.sort((a,b)=>a.ok-b.ok).map(d=>`<li class="doc${d.ok?" ok":""}"><span class="tile ${d.ok?"c-epargne":"c-famille"}">${ic(d.ok?"check":"alert")}</span><span style="min-width:0;flex:1"><b>${d.lab}</b><span class="dd">${d.why}</span><span class="dw">${ic("compass")}${d.where}</span></span>${(()=>{const mv=(S.docs||{})[d.id];if(d.ok&&!mv)return `<span class="pill ok">Trouvé</span>`;if(mv)return `<span class="doc-acts"><span class="pill ${mv==="na"?"":"ok"}">${mv==="na"?"Pas concerné":"Je l'ai"}</span><button type="button" class="btn ghost sm" data-docset="${d.id}|">Annuler</button></span>`;
+    return `<span class="doc-acts"><button type="button" class="btn sm" data-docset="${d.id}|have">${ic("check")}Je l'ai</button><button type="button" class="btn ghost sm" data-docset="${d.id}|na">Pas concerné</button></span>`})()}</li>`).join("")}</ul>`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-docset]");if(!b)return;const [id,v]=b.dataset.docset.split("|");S.docs=S.docs||{};if(v)S.docs[id]=v;else delete S.docs[id];update();renderImport()});
 
 /* ===== Rappels Google Agenda ===== */
 const ymd=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
@@ -1397,11 +1435,17 @@ const GROUPS=[["annee","Avant le 31 décembre","clock","c-famille"],["libre","D�
 let LAST={out:[],skip:[],base:null,d:null};
 function pillWhen(w){const cls=w.lvl==="urgent"?"urgent":w.lvl==="soon"?"soon":"";return `<span class="pill ${cls}">${ic("clock")}${w.label}${w.grp==="annee"?" · J-"+DAYS_LEFT:""}</span>`}
 const firstSentence=s=>{const m=String(s).match(/^.*?[.!?](\s|$)/);return m?m[0]:s};
+const stOf=id=>{const v=S.done[id];if(!v)return null;if(v===true)return"done";if(v.s==="later"&&v.until&&new Date(v.until)<=new Date())return null;return v.s||null};
+function setSt(id,s){const prev=S.done[id];if(s==="done")S.done[id]=true;else if(s==="later")S.done[id]={s:"later",until:new Date(Date.now()+30*864e5).toISOString()};else if(s==="no")S.done[id]={s:"no"};else delete S.done[id];
+  S.open=null;update();const msg={done:"Bravo, c'est fait !",later:"Mise de côté : elle reviendra dans 30 jours",no:"Masquée : elle ne te sera plus proposée"}[s];
+  if(msg)toast(msg,()=>{if(prev===undefined)delete S.done[id];else S.done[id]=prev;update()})}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(!b)return;e.preventDefault();e.stopPropagation();const [id,st]=b.dataset.st.split("|");setSt(id,st==="reset"?null:st)},true);
 function cardHTML(o){
-  const open=S.open===o.id,done=!!S.done[o.id];
+  const open=S.open===o.id,done=false;
   const gain=typeof o.gain==="number"?`<div class="gain"><b class="tnum">${o.approx?"≈ ":""}${fmt(o.gain)}</b><span>par an${o.money?" · budget":""}</span></div>`:`<div class="gain soft"><b>${o.gainTxt||""}</b></div>`;
   const pills=pillWhen(o.when)+(o.free?`<span class="pill free">${ic("check")}Gratuit</span>`:"")+(o.pro?`<span class="pill pro">${ic("spark")}Analyse détaillée</span>`:"")+(done?`<span class="pill ok">${ic("check")}Fait</span>`:"");
-  return `<article class="card c-${o.k}${done?" done":""}" data-open="${open}">
+  return `<article class="card c-${o.k}" data-open="${open}">
+  <button type="button" class="card-x" data-st="${o.id}|no" aria-label="Pas pour moi" title="Pas pour moi">${ic("x")}</button>
   <button type="button" class="card-h" data-id="${o.id}" aria-expanded="${open}"><span class="tile">${ic(o.ic)}</span>
     <span class="card-t" style="min-width:0"><h3>${o.title}</h3><p>${firstSentence(o.why)}</p><span class="meta">${pills}</span></span>
     <span class="gain-wrap">${gain}<span class="chev">${ic("chev")}</span></span></button>
@@ -1416,36 +1460,41 @@ function cardHTML(o){
     ${whereHTML(o)}
     ${o.warn?`<div class="warn">${ic("alert")}<span>${o.warn}</span></div>`:""}
     <div class="card-f"><span class="cases">${o.cases.length?"Sur la déclaration :"+o.cases.map(c=>`<span class="case">${c}</span>`).join(""):""}</span>
-      <span class="acts"><a class="btn ghost" href="${remindUrl(o)}" target="_blank" rel="noopener">${ic("calendar")}Me le rappeler</a><a href="${o.link[0]}" target="_blank" rel="noopener">${o.link[1]} ↗</a><button type="button" class="btn${done?"":" primary"}" data-done="${o.id}">${done?"Annuler":ic("check")+"C'est fait"}</button></span></div>
+      <span class="acts"><a class="btn ghost" href="${remindUrl(o)}" target="_blank" rel="noopener">${ic("calendar")}Me le rappeler</a><a href="${o.link[0]}" target="_blank" rel="noopener">${o.link[1]} ↗</a></span></div>
+    <div class="decide"><button type="button" class="btn primary" data-st="${o.id}|done">${ic("check")}C'est fait</button><button type="button" class="btn" data-st="${o.id}|later">${ic("clock")}Plus tard</button><button type="button" class="btn ghost" data-st="${o.id}|no">${ic("x")}Pas pour moi</button></div>
   </div></article>`;
 }
 const sorter=(a,b)=>{const g={annee:0,libre:1,decl:2};const ga=g[a.when.grp]??1,gb=g[b.when.grp]??1;if(ga!==gb)return ga-gb;return (typeof b.gain==="number"?b.gain:-1)-(typeof a.gain==="number"?a.gain:-1)};
 function update(){
   const d=derive(S.p,mode()),base=calc(d),r=rules(d,base,mode(),S.p),out=r.out,skip=r.skip;LAST={out,skip,base,d};
-  const todo=out.filter(o=>!S.done[o.id]),isNum=o=>typeof o.gain==="number";
+  const todo=out.filter(o=>!stOf(o.id)),hid=out.filter(o=>stOf(o.id)),isNum=o=>typeof o.gain==="number";
   const annual=todo.filter(isNum).reduce((s,o)=>s+o.gain,0),taxPart=todo.filter(o=>isNum(o)&&!o.money).reduce((s,o)=>s+o.gain,0);
-  const doneGain=out.filter(o=>isNum(o)&&S.done[o.id]).reduce((s,o)=>s+o.gain,0);
+  const doneGain=out.filter(o=>isNum(o)&&stOf(o.id)==="done").reduce((s,o)=>s+o.gain,0);
   const score=(annual+doneGain)>0?Math.round(doneGain/(annual+doneGain)*100):100;
   const tax=Math.max(0,base.ir+base.vlTax+base.pfu),name=(S.settings.prenom||"").trim();
   $("hello").innerHTML=`${ic(TODAY.getHours()>=18||TODAY.getHours()<6?"moon":"sun")}<span>Bonjour${name?" "+esc(name):""} · ${TODAY.toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"})}</span>`;
-  $("hGain").innerHTML=fmt(annual).replace(" €","<small>€/an</small>");
+  if(annual>0){$("hTitle").textContent="Ce que tu peux gagner chaque année";$("hGain").innerHTML=fmt(annual).replace(" €","<small>€/an</small>")}
+  else{$("hTitle").textContent="Ton plan d'action";$("hGain").innerHTML=todo.length?todo.length+`<small>action${todo.length>1?"s":""} à regarder</small>`:`À jour<small>rien d'urgent</small>`}
   const parts=[];if(taxPart>0)parts.push(fmt(taxPart)+" d'impôts en moins");if(annual-taxPart>0)parts.push(fmt(annual-taxPart)+" d'économies sur ton budget (crédits, épargne)");
-  $("hSplit").textContent=parts.length?"Dont "+parts.join(" et ")+".":"Remplis ta situation pour voir ce que tu peux gagner.";
+  $("hSplit").textContent=parts.length?"Dont "+parts.join(" et ")+".":todo.length?"Aucun gain chiffré pour l'instant. Ajoute tes documents (onglet Documents) pour que l'appli calcule ce que tu peux gagner.":"Tout est fait ou mis de côté. L'appli te préviendra s'il y a du nouveau.";
   $("hTax").textContent=fmt(tax);$("hTmi").textContent=Math.round(base.tmi*100)+" %";$("hDays").textContent=DAYS_LEFT+" jours";
   $("ringArc").style.strokeDashoffset=String(314.16*(1-score/100));$("ringPct").textContent=score+" %";
   $("ringCap").textContent=doneGain>0?`Tu as déjà sécurisé ${fmt(doneGain)} par an. Continue !`:"Coche \"C'est fait\" sur une action pour faire monter ton score.";
   {const nd=S.gdNew||[];$("newDocs").hidden=!nd.length;if(nd.length)$("newDocs").innerHTML=`<span class="tile c-epargne">${ic("upload")}</span><div style="min-width:0"><span class="eyebrow">${ic("spark")}Nouveau dans ton Drive</span><h3>${nd.length} nouveau${nd.length>1?"x":""} document${nd.length>1?"s":""} pour toi : ${nd.slice(0,2).map(x=>esc(x.name)).join(", ")}${nd.length>2?"...":""}</h3></div><button type="button" class="btn primary" id="useNew">Mettre à jour${ic("arrow")}</button>`}
   const next=todo.slice().sort(sorter)[0];
   if(next){$("nextBox").hidden=false;$("nextBox").className="next c-"+next.k;
-    $("nextBox").innerHTML=`<span class="tile">${ic(next.ic)}</span><div style="min-width:0"><span class="eyebrow">${ic("target")}Ta prochaine action</span><h3>${next.title}</h3></div><button type="button" class="btn primary" data-goto="${next.id}">Voir comment${ic("arrow")}</button>`}
+    $("nextBox").innerHTML=`<span class="tile">${ic(next.ic)}</span><div style="min-width:0"><span class="eyebrow">${ic("target")}Ta prochaine action</span><h3>${next.title}</h3></div><div class="decide"><button type="button" class="btn primary" data-goto="${next.id}">Voir comment${ic("arrow")}</button><button type="button" class="btn" data-st="${next.id}|later">${ic("clock")}Plus tard</button><button type="button" class="btn ghost" data-st="${next.id}|no">${ic("x")}Pas pour moi</button></div>`}
   else $("nextBox").hidden=true;
-  const counts={};FILTERS.forEach(([f])=>counts[f]=f==="all"?out.length:out.filter(o=>o.tags.includes(f)).length);
+  const counts={};FILTERS.forEach(([f])=>counts[f]=f==="all"?todo.length:todo.filter(o=>o.tags.includes(f)).length);
   if(S.filter!=="all"&&!counts[S.filter])S.filter="all";
   $("chips").innerHTML=FILTERS.filter(([f])=>f==="all"||counts[f]>0).map(([f,t,i])=>`<button type="button" class="chip" data-f="${f}" aria-pressed="${S.filter===f}">${ic(i)}${t}<span class="n">${counts[f]}</span></button>`).join("");
-  const list=out.filter(o=>S.filter==="all"||o.tags.includes(S.filter)).sort(sorter);
+  const list=todo.filter(o=>S.filter==="all"||o.tags.includes(S.filter)).sort(sorter);
+  const hidHTML=hid.length?`<details class="hid"><summary>${ic("check")}Faites ou mises de côté <span class="muted">(${hid.length})</span></summary>${hid.map(o=>{const st=stOf(o.id),v=S.done[o.id];const lab=st==="done"?"Fait":st==="later"?"Plus tard · revient le "+new Date(v.until).toLocaleDateString("fr-FR"):"Pas pour moi";
+    return `<div class="hid-row"><span class="tile c-${o.k}">${ic(o.ic)}</span><span style="min-width:0;flex:1"><b>${o.title}</b><small>${lab}</small></span><button type="button" class="btn ghost" data-st="${o.id}|reset">Remettre</button></div>`}).join("")}</details>`:"";
   $("groups").innerHTML=list.length?GROUPS.map(([g,t,i,c])=>{const items=list.filter(o=>o.when.grp===g);if(!items.length)return"";
     return `<div class="group"><div class="group-h ${c}"><span class="tile">${ic(i)}</span><h2>${t}</h2><span class="cnt">${items.length} action${items.length>1?"s":""}</span></div>${g==="decl"?`<a class="imp-cta" style="margin:0" href="#formulaires"><span class="tile c-case">${ic("receipt")}</span><span style="min-width:0;flex:1"><b>Mes formulaires et les cases à remplir</b><span class="muted">Quelles déclarations faire (2044, Pinel, 3916...), avec les montants.</span></span>${ic("arrow")}</a>`:""}${items.map(cardHTML).join("")}</div>`}).join("")
-    :`<div class="empty">${ic("compass")}<p><b>Ton plan est vide pour l'instant.</b><br>Remplis ta situation : les actions apparaissent au fur et à mesure.</p><a class="btn primary" href="#situation">Remplir ma situation</a></div>`;
+    :hid.length?`<div class="empty">${ic("check")}<p><b>Tout est fait ou mis de côté.</b><br>L'appli te préviendra si une nouvelle action te concerne.</p></div>`:`<div class="empty">${ic("compass")}<p><b>Ton plan est vide pour l'instant.</b><br>Ajoute tes documents ou remplis ton profil : les actions apparaissent au fur et à mesure.</p><a class="btn primary" href="#importer">Ajouter mes documents</a></div>`;
+  $("groups").insertAdjacentHTML("beforeend",hidHTML);
   let side="";
   if(base.ir<=0&&base.brut<=0&&(d.sal1+d.sal2+d.pension+d.ca)>0)side+=`<div class="box"><h3>${ic("spark")}Bonne nouvelle</h3><p>Tu ne paies pas d'impôt sur le revenu. Concentre-toi sur les crédits d'impôt (remboursés) et ton épargne.</p></div>`;
   if(mode()!=="complet")side+=`<div class="box upgrade"><h3>${ic("spark")}Passe au mode complet</h3><p>Ajoute tes placements, crédits et biens un par un. On repère l'argent qui dort, les crédits trop chers, l'assurance de prêt à changer...</p><a class="btn" href="#situation" data-gomode="1">${ic("arrow")}Compléter</a></div>`;
@@ -1464,7 +1513,7 @@ function update(){
   renderNav(todo.filter(o=>o.when.grp==="annee").length);
   renderCal();renderMe();renderMoney();save();
 }
-$("groups").addEventListener("click",e=>{const dn=e.target.closest("[data-done]");if(dn){const id=dn.dataset.done;S.done[id]=!S.done[id];if(S.done[id]){S.open=null;toast("Bravo, une action de moins !")}update();return}
+$("groups").addEventListener("click",e=>{
   const h=e.target.closest(".card-h");if(h){S.open=S.open===h.dataset.id?null:h.dataset.id;update()}});
 $("chips").addEventListener("click",e=>{const c=e.target.closest("[data-f]");if(c){S.filter=c.dataset.f;update()}});
 $("newDocs").addEventListener("click",e=>{if(e.target.closest("#useNew"))gdUseNew()});
@@ -1480,7 +1529,7 @@ const BASE_EV={0:[["Mi-janvier : 60 % de tes crédits d'impôt de l'an dernier v
 const nextDate=(m,d)=>{let dt=new Date(YEAR,m,d);if(dt<TODAY)dt=new Date(YEAR+1,m,d);return dt};
 function renderCal(){
   if(currentView()!=="calendrier")return;
-  const todo=LAST.out.filter(o=>!S.done[o.id]),nY=todo.filter(o=>o.when.grp==="annee"),nD=todo.filter(o=>o.when.grp==="decl");
+  const todo=LAST.out.filter(o=>!stOf(o.id)),nY=todo.filter(o=>o.when.grp==="annee"),nD=todo.filter(o=>o.when.grp==="decl");
   const dls=[
     {d:new Date(YEAR,11,31),t:"Dernier jour pour agir sur l'impôt "+YEAR,s:nY.length?`${nY.length} action${nY.length>1?"s":""} de ton plan à faire avant.`:"Rien d'urgent pour toi.",hot:nY.length>0},
     {d:nextDate(0,15),t:"Avance de crédits d'impôt",s:"60 % de tes crédits d'impôt (aide à domicile, garde, dons) arrivent sur ton compte."},
@@ -1507,7 +1556,7 @@ function renderMe(){
   if(currentView()!=="moi")return;
   const s=S.settings,name=(s.prenom||"").trim();
   $("avatar").textContent=name?name[0].toUpperCase():"?";$("meTitle").textContent=name||"Mon espace";
-  const n=Object.values(S.done).filter(Boolean).length;
+  const n=Object.keys(S.done).filter(k=>stOf(k)==="done").length;
   $("meSub").textContent=`${n} action${n>1?"s":""} faite${n>1?"s":""} · mode ${s.mode==="complet"?"complet":"rapide"}`;
   const pi=$("s-prenom");if(document.activeElement!==pi)pi.value=s.prenom||"";
   [["s-nom","nomDocs"],["s-nom2","nomDocs2"]].forEach(([id,k])=>{const el=$(id);if(document.activeElement!==el)el.value=s[k]||""});
@@ -1812,7 +1861,7 @@ async function readFiles(files){
 const TARGETS={paie:[["1","Moi"],["2","Mon conjoint"]],tf:Object.entries(BIEN).map(([k,v])=>[k,v.l]),pret:Object.entries(CRED).map(([k,v])=>[k,v.l]),plac:Object.entries(PLAC).map(([k,v])=>[k,v.l])};
 const TLABEL={paie:"C'est la fiche de paie de",tf:"Ce bien est",pret:"C'est un",plac:"Type de placement"};
 function renderImport(){
-  if(currentView()!=="importer")return;
+  if(currentView()!=="importer")return;$("docHub").innerHTML=docsHTML();
   const list=$("impList");
   list.innerHTML=IMP.map(d=>{const t=DT[d.type||"inconnu"]||DT.inconnu;
     const head=`<div class="imp-h"><span class="tile ${d.type==="inconnu"||d.status==="err"||d.status==="scan"?"c-famille":"c-case"}">${ic(d.status==="read"||d.status==="wait"?"clock":t[1])}</span><div style="min-width:0;flex:1"><b class="imp-n">${esc(d.name)}</b><span class="imp-t">${d.status==="wait"?"En attente...":d.status==="read"?"Lecture en cours...":t[0]}</span></div><button type="button" class="icon-btn" data-imp-del="${d.id}" aria-label="Retirer">${ic("x")}</button></div>`;
@@ -2008,38 +2057,39 @@ function moneyPlan(){
   const precMois=(p.ca>0||(!couple&&p.enfants>0))?6:3;
   const precCible=Math.round(depMois*precMois/100)*100;
   const liquide=mode()==="complet"?sumP("courant")+sumP("livretA")+sumP("ldds")+sumP("lep"):(+p.epargne||0);
-  const gap=Math.max(0,precCible-liquide),tmi=base.tmi,risk=p.risque||"equilibre";
+  const gap=Math.max(0,precCible-liquide),tmi=base.tmi,risk=p.risque||"equilibre",sk=B.skip||{};
   const lepOk=base.R>0&&(p.rfr>0?p.rfr:base.R)<=23028+(base.parts-1)*2*6150&&sumP("lep")<10000;
   const steps=[];let rest=M;
   const take=v=>{v=r10(Math.min(rest,v));rest-=v;return v};
   const cher=C.filter(c=>(+c.taux||0)>=5&&!(CRED[c.type]||{}).immo&&(+c.capital||0)>0);
-  steps.push({id:"cher",ic:"card",k:"credit",t:"Solder tes crédits chers",ok:!cher.length,
+  steps.push({id:"cher",ic:"card",k:"credit",t:"Solder tes crédits chers",ok:!cher.length,skip:!!sk.cher,
     amt:0,dest:cher.length?cher.map(c=>(CRED[c.type]||{}).l+" à "+pct(+c.taux)).join(", "):"Aucun crédit à plus de 5 %",
     why:"Un crédit à 5 % ou plus coûte plus que ce que rapporte n'importe quel placement sans risque. Le rembourser, c'est un gain garanti.",
     how:cher.length?"Dès que ton épargne de sécurité est faite, rembourse en avance (voir ton plan d'action).":"Rien à faire."});
-  const a1=gap>0?take(Math.max(M*.5,Math.min(gap/12,M))):0;
-  steps.push({id:"prec",ic:"shield",k:"epargne",t:"Ton épargne de sécurité",ok:gap<=0,amt:a1,rate:lepOk?2.5:1.7,
+  const a1=gap>0&&!sk.prec?take(Math.max(M*.5,Math.min(gap/12,M))):0;
+  steps.push({id:"prec",ic:"shield",k:"epargne",t:"Ton épargne de sécurité",ok:gap<=0,skip:!!sk.prec,amt:a1,rate:lepOk?2.5:1.7,
     dest:lepOk?"LEP (2,5 %) puis Livret A":"Livret A puis LDDS (1,7 %, sans impôt, disponible)",prog:[Math.min(liquide,precCible),precCible],
     why:precMois+" mois de dépenses ("+fmt(precCible)+") disponibles à tout moment : panne, perte d'emploi, imprévu. Sans ça, on revend ses placements au mauvais moment.",
     how:gap>0?"Encore "+fmt(gap)+" à mettre de côté : environ "+Math.ceil(gap/Math.max(a1,1))+" mois au rythme proposé.":"C'est fait. Ne mets plus rien de plus sur les livrets."});
   const projM=+B.projet>0&&+B.projetAns>0;
-  if(projM){const need=Math.max(0,(+B.projet)/(+B.projetAns*12));const a=take(need);const short=+B.projetAns<4;
-    steps.push({id:"projet",ic:"home",k:"immo",t:"Ton projet : "+fmt(+B.projet)+" dans "+B.projetAns+" an"+(+B.projetAns>1?"s":""),ok:false,amt:a,rate:short?1.7:2.5,
+  if(projM){const need=Math.max(0,(+B.projet)/(+B.projetAns*12));const a=sk.projet?0:take(need);const short=+B.projetAns<4;
+    steps.push({id:"projet",ic:"home",k:"immo",t:"Ton projet : "+fmt(+B.projet)+" dans "+B.projetAns+" an"+(+B.projetAns>1?"s":""),ok:false,skip:!!sk.projet,amt:a,rate:short?1.7:2.5,
       dest:short?"Livret A ou LDDS (pas de risque à court terme)":"Fonds euros d'une assurance vie",why:"Un projet à moins de 8 ans ne doit pas être exposé à la bourse : tu dois être sûr d'avoir l'argent à la date prévue.",
       how:a<need?"Il faudrait "+fmt(need)+" par mois pour y arriver : allonge le délai ou réduis le montant.":"Au rythme proposé, tu y arrives à temps.",picks:short?null:picksAV(p)})}
   if(tmi>=.30&&(p.sal1>0||p.ca>0)){const plaf=p.perPlafond>0?p.perPlafond:Math.max(PASS*.1,Math.min(((+p.sal1||0)+(+p.sal2||0))*.09,PASS*.8));
-    const a=take(Math.min(plaf/12,rest*.4));
-    steps.push({id:"per",ic:"coins",k:"epargne",t:"Ta retraite avec le plan d'épargne retraite",ok:false,amt:a,rate:5,
+    const a=sk.per?0:take(Math.min(plaf/12,rest*.4));
+    steps.push({id:"per",ic:"coins",k:"epargne",t:"Ta retraite avec le plan d'épargne retraite",ok:false,skip:!!sk.per,amt:a,rate:5,
       dest:"PER en ETF, versement mensuel automatique",why:"Avec ta tranche à "+Math.round(tmi*100)+" %, chaque 100 € versés ne te coûtent que "+fmt(100*(1-tmi))+" : l'État paie le reste. L'argent est bloqué jusqu'à la retraite.",
       how:"Soit "+fmt(a*12)+" par an, déduits de tes revenus.",picks:picksPER(p),inside:insideTxt("per",p)})}
-  const shPEA=risk==="dynamique"?.7:risk==="prudent"?.3:.55,r0=rest;
-  const aPEA=take(r0*shPEA),aAV=take(rest);
-  steps.push({id:"pea",ic:"trend",k:"epargne",t:"Faire grossir ton argent : le PEA",ok:false,amt:aPEA,rate:5,
+  const shPEA=sk.pea?0:sk.av?1:risk==="dynamique"?.7:risk==="prudent"?.3:.55,r0=rest;
+  const aPEA=sk.pea?0:take(r0*shPEA),aAV=sk.av?0:take(rest);
+  steps.push({id:"pea",ic:"trend",k:"epargne",t:"Faire grossir ton argent : le PEA",ok:false,skip:!!sk.pea,amt:aPEA,rate:5,
     dest:(p.hasPEA?"Ton PEA":"Ouvre un PEA")+", un ETF monde en versement automatique",why:"Sur 8 ans et plus, les actions mondiales ont toujours fait mieux que les livrets. Après 5 ans, plus d'impôt sur les gains (seulement les prélèvements sociaux).",
     how:"Programme le virement le lendemain de ta paie, et ne regarde pas les variations.",picks:picksPEA(p),inside:insideTxt("pea",p)});
-  steps.push({id:"av",ic:"shield",k:"famille",t:"Sécuriser et transmettre : l'assurance vie",ok:false,amt:aAV,rate:risk==="prudent"?2.6:risk==="dynamique"?4.5:3.5,
+  steps.push({id:"av",ic:"shield",k:"famille",t:"Sécuriser et transmettre : l'assurance vie",ok:false,skip:!!sk.av,amt:aAV,rate:risk==="prudent"?2.6:risk==="dynamique"?4.5:3.5,
     dest:(p.hasAV?"Ton assurance vie":"Ouvre une assurance vie")+" (fonds euros + ETF)",why:"Souple : tu retires quand tu veux. Après 8 ans, 4 600 € de gains par an sans impôt (9 200 € en couple), et jusqu'à 152 500 € transmis par bénéficiaire sans droits.",
     how:"Idéal pour l'argent dont tu pourrais avoir besoin dans 3 à 10 ans.",picks:picksAV(p),inside:insideTxt("av",p)});
+  if(rest>=10)steps.push({id:"reste",ic:"piggy",k:"epargne",t:"Le reste, en attendant",ok:false,amt:take(rest),rate:1.7,dest:"Livret A ou LDDS",why:"Tu as mis de côté certains placements : cet argent reste disponible et sans risque en attendant.",how:"Tu pourras le replacer quand tu veux."});
   const proj=y=>{let v=0,vers=0;steps.forEach(s=>{if(!s.amt||s.id==="projet")return;const r=(s.rate||0)/100/12,n=y*12;vers+=s.amt*n;v+=r?s.amt*((Math.pow(1+r,n)-1)/r):s.amt*n});return {v:Math.round(v),vers:Math.round(vers)}};
   return {rev,revEst:!(+B.rev>0),fixes,courantes,known,capa,M,precCible,liquide,gap,steps,proj,credMois}}
 function renderMoney(){if(currentView()!=="argent")return;
@@ -2054,16 +2104,19 @@ function renderMoney(){if(currentView()!=="argent")return;
     <div class="budbar" aria-hidden="true"><i style="width:${w(m.fixes)}%;background:rgba(255,255,255,.35)"></i><i style="width:${w(m.courantes)}%;background:rgba(255,255,255,.2)"></i><i style="width:${w(m.M)}%;background:#7CF0C2"></i></div>
     <div class="budleg"><span><i style="background:rgba(255,255,255,.35)"></i>Fixes ${fmt(m.fixes)}</span><span><i style="background:rgba(255,255,255,.2)"></i>Vie courante ${fmt(m.courantes)}</span><span><i style="background:#7CF0C2"></i>Épargne ${fmt(m.M)}</span>${m.capa-m.M>0?`<span>Marge de sécurité ${fmt(m.capa-m.M)}</span>`:""}</div>`;
   let n=0;
-  $("moneySteps").innerHTML=m.steps.map(s=>{if(!s.ok)n++;const num=s.ok?ic("check"):n;
+  $("moneySteps").innerHTML=m.steps.map(s=>{if(s.skip)return `<div class="mstep skipped"><div class="mstep-h"><span class="mnum">${ic("x")}</span><div style="min-width:0;flex:1"><b>${s.t}</b><span class="muted">Pas pour moi : l'argent va aux autres étapes</span></div><button type="button" class="btn ghost" data-mskip="${s.id}">Remettre</button></div></div>`;
+    if(!s.ok)n++;const num=s.ok?ic("check"):n;
     return `<div class="mstep c-${s.k}${s.ok?" ok":""}"><div class="mstep-h"><span class="mnum">${num}</span><div style="min-width:0;flex:1"><b>${s.t}</b><span class="muted">${s.dest}</span></div>${s.amt?`<div class="gain"><b class="tnum">${fmt(s.amt)}</b><span>par mois</span></div>`:s.ok?`<span class="pill ok">${ic("check")}Fait</span>`:""}</div>
       ${s.prog?`<div class="prog"><i style="width:${Math.min(100,s.prog[0]/Math.max(1,s.prog[1])*100)}%"></i></div><span class="muted">${fmt(s.prog[0])} sur ${fmt(s.prog[1])}</span>`:""}
       <p>${s.why}</p><p class="muted">${s.how}</p>
       ${s.picks&&s.amt?`<div class="picks">${s.picks.map((x,i)=>`<div class="pick${i===0?" top":""}"><span class="tag">${i===0?"Mon choix pour toi":"Autre option"}</span><b>${x.n}</b><p>${x.w}</p>${x.u?`<a href="${x.u}" target="_blank" rel="noopener">Voir le site ↗</a>`:""}</div>`).join("")}</div>`:""}
-      ${s.inside&&s.amt?`<div class="inside">${ic("bulb")}<span><b>Quoi mettre dedans :</b> ${s.inside}</span></div>`:""}</div>`}).join("");
+      ${s.inside&&s.amt?`<div class="inside">${ic("bulb")}<span><b>Quoi mettre dedans :</b> ${s.inside}</span></div>`:""}
+      ${s.id!=="reste"&&!s.ok?`<div class="decide"><button type="button" class="btn ghost" data-mskip="${s.id}">${ic("x")}${s.id==="cher"?"C'est normal, je garde ce crédit":"Pas pour moi"}</button></div>`:""}</div>`}).join("");
   const p10=m.proj(10),p20=m.proj(20),mx=Math.max(p20.v,1);
   const bar=(lab,o)=>`<div class="pbar"><span class="muted">${lab}</span><div class="pb"><i class="v" style="width:${o.v/mx*100}%"></i><i class="d" style="width:${o.vers/mx*100}%"></i></div><b class="tnum">${fmt(o.v)}</b><span class="muted">dont ${fmt(o.vers)} versés et ${fmt(o.v-o.vers)} de gains</span></div>`;
   $("moneyProj").innerHTML=m.M>0?bar("Dans 10 ans",p10)+bar("Dans 20 ans",p20)+(m.steps.some(x=>x.id==="projet"&&x.amt)?`<p class="muted">Sans compter l'argent mis de côté pour ton projet, qui sera dépensé.</p>`:"")+`<p class="muted">Hypothèses prudentes : livrets 1,7 à 2,5 %, fonds euros 2,5 %, ETF monde 5 % par an après frais. Les performances passées ne garantissent pas l'avenir.</p>`:`<p class="muted">Indique ton budget pour voir ce que ton épargne peut devenir.</p>`;
 }
+$("moneySteps").addEventListener("click",e=>{const b=e.target.closest("[data-mskip]");if(!b)return;const k=b.dataset.mskip;S.p.budget=S.p.budget||{};const sk=S.p.budget.skip=S.p.budget.skip||{};sk[k]=!sk[k];S.example=false;save();update();toast(sk[k]?"Étape écartée : l'argent est réparti sur les autres":"Étape remise dans ton plan")});
 $("budForm").addEventListener("input",e=>{const k=e.target.dataset.bud;if(!k)return;const v=e.target.value.replace(/[^\d]/g,"");if(v!==e.target.value)e.target.value=v;S.p.budget=S.p.budget||{};S.p.budget[k]=v===""?0:+v;S.example=false;save();renderMoney()});
 
 /* ===== Tuto d'installation ===== */
@@ -2126,7 +2179,7 @@ $("v-installer").addEventListener("click",e=>{const t=e.target.closest("[data-io
   if(e.target.closest("#installNow2")&&deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.finally(()=>{deferredPrompt=null;renderInstaller()})}});
 $("instClose").addEventListener("click",()=>{S.instHidden=true;save();renderInstaller()});
 window.addEventListener("beforeinstallprompt",()=>setTimeout(renderInstaller,0));
-function toast(msg){const t=$("toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2200)}
+function toast(msg,undo){const t=$("toast");t.textContent=msg;if(undo){const b=document.createElement("button");b.type="button";b.className="toast-undo";b.textContent="Annuler";b.onclick=()=>{t.hidden=true;undo()};t.appendChild(b)}t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,undo?5000:2200)}
 async function copyText(txt,ok,el){try{await navigator.clipboard.writeText(txt);toast(ok)}catch(e){if(el){if(el.select)el.select();else{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)}}toast("Texte sélectionné : fais Copier")}}
 $("v-moi").addEventListener("click",e=>{
   const st=e.target.closest("[data-set]");if(st){S.settings[st.dataset.set]=st.dataset.v;if(st.dataset.set==="theme")applyTheme();update();return}
