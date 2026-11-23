@@ -519,6 +519,25 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .fold-row b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fold-row small{color:var(--muted);font-size:12px}
 .fold-row a{flex:none;font-size:13px}
 @media (max-width:480px){.fold-row{padding-left:0}}
+.help-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:18px;flex:none;margin-left:auto}
+.top-in .nav+.help-btn{margin-left:8px}
+.hero .hs{font:inherit;color:inherit;text-align:left;cursor:pointer}
+.hero-why{margin-top:14px;display:inline-flex;gap:6px;align-items:center;background:transparent;border:0;color:var(--hero-ink);opacity:.9;text-decoration:underline;font-size:14px;padding:0}
+.gl{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline dotted;text-decoration-color:var(--accent);text-underline-offset:3px;text-decoration-thickness:2px;cursor:help}
+.inaction{display:flex;gap:10px;background:var(--rose-soft);border-radius:14px;padding:11px 14px;font-size:14px}.inaction>svg{color:var(--rose);margin-top:2px}
+.sheet{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.sheet-card{position:relative;background:var(--surface);width:min(640px,100%);max-height:86vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px max(18px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:12px}
+@media (min-width:761px){.sheet{align-items:center}.sheet-card{border-radius:24px}}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;gap:10px}.sheet-h h2{font-size:21px}
+.sheet-body{display:flex;flex-direction:column;gap:10px;font-size:15px}.sheet-body p{margin:0}.sheet-body h4{font-size:15px;margin-top:6px}
+.sheet-body ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+body.noscroll{overflow:hidden}
+.xrow{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}.xrow b{white-space:nowrap}
+.xrow.minus{color:var(--muted)}.xrow.tot{border-bottom:0;font-weight:700;background:var(--accent-soft);padding:8px 10px;border-radius:10px}
+.lex details{border-bottom:1px solid var(--line);padding:10px 0}.lex summary{font-weight:700;cursor:pointer}.lex p{margin-top:6px}
+.wel{display:flex;flex-direction:column;gap:12px}.wel .tile{width:56px;height:56px;border-radius:18px}.wel .tile svg.i{width:28px;height:28px}
+.wel-f{display:flex;justify-content:space-between;align-items:center;margin-top:8px}.wdots{display:flex;gap:6px}.wdots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.wdots i.on{background:var(--accent);width:20px;border-radius:99px}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -587,6 +606,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   <div class="top-in">
     <a class="brand" href="#plan"><span class="logo" data-ic="logo"></span><b>Boussole Fiscale</b></a>
     <nav class="nav" id="nav" aria-label="Navigation"></nav>
+    <button type="button" class="help-btn" data-sheet="aide" aria-label="Aide sur cette page" title="Aide sur cette page">?</button>
     <a class="me-btn" id="meBtn" href="#moi" aria-label="Mon espace et réglages" title="Mon espace et réglages"></a>
   </div>
 </header>
@@ -615,10 +635,11 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
         <div class="money tnum" id="hGain">0 €</div>
         <div class="split" id="hSplit"></div>
         <div class="hero-stats">
-          <div class="hs"><span>Impôt estimé</span><b class="tnum" id="hTax">0 €</b></div>
-          <div class="hs"><span>Ta tranche</span><b class="tnum" id="hTmi">0 %</b></div>
+          <button type="button" class="hs" data-sheet="calcul"><span>Impôt estimé</span><b class="tnum" id="hTax">0 €</b></button>
+          <button type="button" class="hs" data-sheet="calcul"><span>Ta tranche</span><b class="tnum" id="hTmi">0 %</b></button>
           <div class="hs"><span>Avant le 31 déc.</span><b class="tnum" id="hDays">0 jours</b></div>
         </div>
+        <button type="button" class="hero-why" data-sheet="calcul"><span data-ic="info"></span>Comment ton impôt est calculé</button>
       </div>
       <div class="ring-box">
         <div class="ring">
@@ -788,7 +809,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
         <div class="box">
           <h3><span data-ic="user"></span>Mon profil</h3>
-          <button type="button" class="btn" id="guideShow">Revoir le guide "Par où commencer"</button>
+          <div class="row"><button type="button" class="btn" id="guideShow">Revoir le guide</button><button type="button" class="btn" data-sheet="welcome">Revoir la présentation</button><button type="button" class="btn" data-sheet="lexique">Lexique</button></div>
           <div class="field"><label for="s-nom">Ton nom de famille</label><span class="help">Sert à reconnaître tes documents dans Google Drive (et écarter ceux de tes locataires).</span><div class="inp"><input id="s-nom" autocomplete="family-name" placeholder="Rempli automatiquement avec Google"></div></div>
           <div class="field"><label for="s-nom2">Nom de famille de ton conjoint</label><div class="inp"><input id="s-nom2" placeholder="Si vous déclarez ensemble"></div></div>
           <div class="field"><label for="s-prenom">Ton prénom</label><div class="inp"><input id="s-prenom" autocomplete="given-name" placeholder="Pour te dire bonjour"></div></div>
@@ -824,6 +845,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 
 <nav class="bnav" id="bnav" aria-label="Navigation"></nav>
 <div class="toast" id="toast" hidden role="status"></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheet-bg"></div><div class="sheet-card"><div class="sheet-h"><h2 id="sheetTitle"></h2><button type="button" class="icon-btn" id="sheetClose" aria-label="Fermer"><span data-ic="x"></span></button></div><div class="sheet-body" id="sheetBody"></div></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
@@ -895,7 +917,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 22 du 23/11/2026";
+const APP_VERSION="version 23 du 23/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1204,8 +1226,8 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||"null");
   if(s&&s.p){S.p=Object.assign({},DEFAULT,s.p);S.example=!!s.example;S.done=s.done||{};S.step=s.step||0;S.settings=Object.assign(S.settings,s.settings||{})}
   else{const o=JSON.parse(localStorage.getItem("boussole-v1")||"null");if(o&&o.p&&!o.example){S.p=Object.assign({},DEFAULT,o.p);S.example=false;S.done=o.done||{};S.settings.mode="rapide"}}
 }catch(e){}
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.docs)S.docs=s.docs;if(s&&s.instHidden)S.instHidden=true;if(s){S.gdSeen=s.gdSeen||{};S.gdLast=s.gdLast||null;S.gdNew=s.gdNew||[];S.found=s.found||{};S.classeur=s.classeur||{};S.src=s.src||{};S.confirmed=s.confirmed||null;S.guideHidden=!!s.guideHidden}}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({p:S.p,example:S.example,done:S.done,step:S.step,settings:S.settings,docs:S.docs||{},instHidden:!!S.instHidden,gdSeen:S.gdSeen||{},gdLast:S.gdLast||null,gdNew:S.gdNew||[],found:S.found||{},classeur:S.classeur||{},src:S.src||{},confirmed:S.confirmed||null,guideHidden:!!S.guideHidden}))}catch(e){}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.docs)S.docs=s.docs;if(s&&s.instHidden)S.instHidden=true;if(s){S.gdSeen=s.gdSeen||{};S.gdLast=s.gdLast||null;S.gdNew=s.gdNew||[];S.found=s.found||{};S.classeur=s.classeur||{};S.src=s.src||{};S.confirmed=s.confirmed||null;S.guideHidden=!!s.guideHidden;S.welcomed=!!s.welcomed}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({p:S.p,example:S.example,done:S.done,step:S.step,settings:S.settings,docs:S.docs||{},instHidden:!!S.instHidden,gdSeen:S.gdSeen||{},gdLast:S.gdLast||null,gdNew:S.gdNew||[],found:S.found||{},classeur:S.classeur||{},src:S.src||{},confirmed:S.confirmed||null,guideHidden:!!S.guideHidden,welcomed:!!S.welcomed}))}catch(e){}};
 const mode=()=>S.settings.mode;
 function applyTheme(){const t=S.settings.theme;if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
 applyTheme();
@@ -1471,7 +1493,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(!
 function cardHTML(o){
   const open=S.open===o.id,done=false;
   const gain=typeof o.gain==="number"?`<div class="gain"><b class="tnum">${o.approx?"≈ ":""}${fmt(o.gain)}</b><span>par an${o.money?" · budget":""}</span></div>`:`<div class="gain soft"><b>${o.gainTxt||""}</b></div>`;
-  const pills=pillWhen(o.when)+(o.free?`<span class="pill free">${ic("check")}Gratuit</span>`:"")+(o.pro?`<span class="pill pro">${ic("spark")}Analyse détaillée</span>`:"")+(done?`<span class="pill ok">${ic("check")}Fait</span>`:"");
+  const eff=effortOf(o);const pills=pillWhen(o.when)+(eff?`<span class="pill">${ic("spark")}${eff}</span>`:"")+(o.free?`<span class="pill free">${ic("check")}Gratuit</span>`:"")+(o.pro?`<span class="pill pro">${ic("spark")}Analyse détaillée</span>`:"")+(done?`<span class="pill ok">${ic("check")}Fait</span>`:"");
   return `<article class="card c-${o.k}" data-open="${open}">
   <button type="button" class="card-x" data-st="${o.id}|no" aria-label="Pas pour moi" title="Pas pour moi">${ic("x")}</button>
   <button type="button" class="card-h" data-id="${o.id}" aria-expanded="${open}"><span class="tile">${ic(o.ic)}</span>
@@ -1484,6 +1506,7 @@ function cardHTML(o){
       <div class="step"><span class="si">${ic("clock")}</span><div><h4>Quand</h4><p>${o.whenTxt}</p></div></div>
       <div class="step"><span class="si">${ic("list")}</span><div><h4>Comment</h4><ol>${o.how.map(h=>`<li>${h}</li>`).join("")}</ol></div></div>
     </div>
+    ${typeof o.gain==="number"&&o.gain>=10?`<div class="inaction">${ic("alert")}<span><b>Si tu ne fais rien :</b> tu laisses environ ${fmt(o.gain)} par an${o.money?" sur ton budget":" aux impôts"}.</span></div>`:""}
     ${o.sim?simHTML(o):""}
     ${whereHTML(o)}
     ${o.warn?`<div class="warn">${ic("alert")}<span>${o.warn}</span></div>`:""}
@@ -1534,7 +1557,7 @@ function update(){
   side+=`<div class="box"><h3>${ic("building")}Mes SCI</h3><p>${(S.p.sci||[]).length?S.p.sci.map(c=>`<b>${esc(c.nom)}</b> · ${c.regime} · ta part ${c.share!=null?fmt(c.res*c.share):"?"}`).join("<br>"):"Connecte ton appli de gestion SCI pour que tes sociétés soient prises en compte automatiquement."}</p><a class="btn" href="#sci">${ic("arrow")}${(S.p.sci||[]).length?"Voir le détail":"Connecter"}</a></div>`;
   {const it=dossier(),miss=it.filter(x=>!x.ok);side+=`<div class="box"><h3>${ic("receipt")}Mon dossier : ${it.length-miss.length} / ${it.length}</h3>${miss.length?`<p>Il me manque pour être précis :</p><ul class="skip-list">${miss.slice(0,4).map(d=>`<li>${ic("alert")}<span><b>${d.lab}</b><span>${d.where}</span></span></li>`).join("")}</ul>${miss.length>4?`<p>Et ${miss.length-4} autre(s).</p>`:""}`:`<p>Ton dossier est complet.</p>`}<a class="btn primary" href="#importer">${ic("upload")}Chercher dans mon Drive</a><a class="btn" href="#moi">${ic("list")}Voir le détail</a></div>`}
   if(skip.length)side+=`<div class="box"><h3>${ic("x")}Inutile pour toi</h3><ul class="skip-list">${skip.map(([t,r])=>`<li>${ic("info")}<span><b>${t}</b><span>${r}</span></span></li>`).join("")}</ul></div>`;
-  $("side").innerHTML=side;
+  $("side").innerHTML=side;document.querySelectorAll("#groups .card").forEach(glossify);glossify($("knowBox"));glossify($("guideBox"));
   if($("simR"))simUpdate(+$("simR").value);
   $("lGain").innerHTML=fmt(annual).replace(" €","<small>€</small>");
   $("lSub").textContent=`par an · ${todo.length} action${todo.length>1?"s":""} trouvée${todo.length>1?"s":""} · impôt estimé ${fmt(tax)}`;
@@ -1643,7 +1666,7 @@ function renderForms(){if(currentView()!=="formulaires")return;
   $("formsList").innerHTML=F.map(f=>`<div class="form-card"><div class="sci-h"><span class="tile c-case">${ic(f.ic)}</span><div style="min-width:0;flex:1"><b>${esc(f.nom)}</b><span class="muted"><span class="case">${esc(f.code)}</span> ${esc(f.quand)}</span></div></div>
     <p>${esc(f.why)}</p>${f.cases.length?`<div class="cases-t">${f.cases.map(([c,l,v])=>`<div class="ct-row"><span class="case">${esc(c)}</span><span class="ct-l">${esc(l)}</span><b class="tnum">${typeof v==="number"?(/nombre/.test(l)?v:fmt(v)):esc(v)}</b></div>`).join("")}</div>`:""}
     <a href="${f.link[0]}" target="_blank" rel="noopener">${f.link[1]} ↗</a></div>`).join("");
-  $("formsCount").textContent=F.length+" formulaire"+(F.length>1?"s":"");
+  $("formsCount").textContent=F.length+" formulaire"+(F.length>1?"s":"");document.querySelectorAll("#formsList .form-card").forEach(glossify);
 }
 /* --- PDF : fiche récapitulative et remplissage de formulaires --- */
 function loadPdfLib(){return new Promise((res,rej)=>{if(window.PDFLib)return res();const s=document.createElement("script");s.src=window.BOUSSOLE_PWA?"lib/pdf-lib.min.js":"https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js";s.onload=()=>res();s.onerror=()=>rej(new Error("lib"));document.head.appendChild(s)})}
@@ -2145,7 +2168,7 @@ function renderMoney(){if(currentView()!=="argent")return;
       ${s.id!=="reste"&&!s.ok?`<div class="decide"><button type="button" class="btn ghost" data-mskip="${s.id}">${ic("x")}${s.id==="cher"?"C'est normal, je garde ce crédit":"Pas pour moi"}</button></div>`:""}</div>`}).join("");
   const p10=m.proj(10),p20=m.proj(20),mx=Math.max(p20.v,1);
   const bar=(lab,o)=>`<div class="pbar"><span class="muted">${lab}</span><div class="pb"><i class="v" style="width:${o.v/mx*100}%"></i><i class="d" style="width:${o.vers/mx*100}%"></i></div><b class="tnum">${fmt(o.v)}</b><span class="muted">dont ${fmt(o.vers)} versés et ${fmt(o.v-o.vers)} de gains</span></div>`;
-  $("moneyProj").innerHTML=m.M>0?bar("Dans 10 ans",p10)+bar("Dans 20 ans",p20)+(m.steps.some(x=>x.id==="projet"&&x.amt)?`<p class="muted">Sans compter l'argent mis de côté pour ton projet, qui sera dépensé.</p>`:"")+`<p class="muted">Hypothèses prudentes : livrets 1,7 à 2,5 %, fonds euros 2,5 %, ETF monde 5 % par an après frais. Les performances passées ne garantissent pas l'avenir.</p>`:`<p class="muted">Indique ton budget pour voir ce que ton épargne peut devenir.</p>`;
+  document.querySelectorAll("#moneySteps .mstep").forEach(glossify);$("moneyProj").innerHTML=m.M>0?bar("Dans 10 ans",p10)+bar("Dans 20 ans",p20)+(m.steps.some(x=>x.id==="projet"&&x.amt)?`<p class="muted">Sans compter l'argent mis de côté pour ton projet, qui sera dépensé.</p>`:"")+`<p class="muted">Hypothèses prudentes : livrets 1,7 à 2,5 %, fonds euros 2,5 %, ETF monde 5 % par an après frais. Les performances passées ne garantissent pas l'avenir.</p>`:`<p class="muted">Indique ton budget pour voir ce que ton épargne peut devenir.</p>`;
 }
 $("moneySteps").addEventListener("click",e=>{const b=e.target.closest("[data-mskip]");if(!b)return;const k=b.dataset.mskip;S.p.budget=S.p.budget||{};const sk=S.p.budget.skip=S.p.budget.skip||{};sk[k]=!sk[k];S.example=false;save();update();toast(sk[k]?"Étape écartée : l'argent est réparti sur les autres":"Étape remise dans ton plan")});
 $("budForm").addEventListener("input",e=>{const k=e.target.dataset.bud;if(!k)return;const v=e.target.value.replace(/[^\d]/g,"");if(v!==e.target.value)e.target.value=v;S.p.budget=S.p.budget||{};S.p.budget[k]=v===""?0:+v;S.example=false;save();renderMoney()});
@@ -2193,7 +2216,7 @@ function knowHTML(){const F=knowFacts(),doubt=F.filter(x=>!x.ok).length;
   return `<details class="box know" id="know"${S.confirmed?"":" open"}><summary><h3>${ic("user")}Ce que l'appli a compris de toi</h3>${S.confirmed?`<span class="pill ok">${ic("check")}Vérifié</span>`:doubt?`<span class="pill soon">${doubt} à vérifier</span>`:""}</summary>
   <p>Tous les conseils partent de ces chiffres. Chaque ligne dit d'où vient l'info. Si une est fausse, corrige-la : le plan se recalcule.</p>
   <div class="facts">${F.map(x=>`<div class="fact${x.ok?"":" doubt"}${x.calc?" calc":""}"><span class="fl">${x.lab}</span><b class="tnum">${x.val}</b><small>${x.ok?ic(x.calc?"spark":"check"):ic("alert")}${esc(x.src)}</small></div>`).join("")}</div>
-  <div class="decide"><button type="button" class="btn primary" id="knowOk">${ic("check")}C'est juste</button><a class="btn" href="#situation">${ic("list")}Corriger</a></div></details>`}
+  <div class="decide"><button type="button" class="btn" data-sheet="calcul">${ic("info")}Voir le calcul</button><button type="button" class="btn primary" id="knowOk">${ic("check")}C'est juste</button><a class="btn" href="#situation">${ic("list")}Corriger</a></div></details>`}
 function guideSteps(){const it=dossier(),miss=it.filter(x=>!x.ok).length,todo=(LAST.out||[]).filter(o=>!stOf(o.id)).length,nsrc=Object.keys(S.src||{}).length;
   return [
    {t:"Connecte ton Google Drive",why:"L'appli y trouve toute seule tes avis d'impôt, fiches de paie, prêts et relevés : tu n'as presque rien à taper. Elle ne fait que lire, elle ne modifie rien.",done:!!gdRT()||!!S.gdLast,go:"#importer",b:"Connecter mon Drive"},
@@ -2210,6 +2233,92 @@ document.addEventListener("click",e=>{const g=e.target.closest("[data-guide]");i
   if(e.target.closest("#guideHide")){S.guideHidden=true;save();update();toast("Guide masqué. Tu peux le remettre dans le rond en haut à droite.")}
   if(e.target.closest("#knowOk")){S.confirmed=new Date().toISOString();save();update();toast("Merci ! Les conseils sont calculés sur ces chiffres.")}
   if(e.target.closest("#guideShow")){S.guideHidden=false;save();location.hash="#plan"}});
+
+/* ===== Aide pour débutant : lexique, explications, présentation ===== */
+function openSheet(title,html){$("sheetTitle").textContent=title;$("sheetBody").innerHTML=html;$("sheet").hidden=false;document.body.classList.add("noscroll");setTimeout(()=>$("sheetClose").focus(),30)}
+function closeSheet(){$("sheet").hidden=true;document.body.classList.remove("noscroll")}
+const GLOSS=[
+ ["tranche","Ta tranche d'impôt (TMI)","C'est le taux appliqué à ton dernier euro gagné, pas à tous tes revenus. Exemple : avec une tranche à 30 %, si tu gagnes 100 € de plus, tu paies 30 € d'impôt en plus. À l'inverse, si tu déduis 100 € (par exemple en versant sur un PER), tu économises 30 €.",/tranche|TMI/i],
+ ["rfr","Revenu fiscal de référence","Un chiffre écrit sur ton avis d'impôt. Il sert à savoir si tu as droit à certaines aides : LEP, chèque énergie, bourses, tarifs sociaux... Ce n'est pas ce que tu as gagné exactement, c'est ton revenu après quelques déductions.",/revenu fiscal de référence/i],
+ ["rimp","Revenu imposable","Tes revenus après les déductions automatiques (par exemple 10 % sur les salaires pour les frais professionnels). C'est sur ce montant qu'on calcule ton impôt.",/revenu imposable/i],
+ ["parts","Les parts (quotient familial)","Ton revenu est divisé par un nombre de parts : 1 si tu es seul, 2 en couple marié ou pacsé, plus une demi-part par enfant (une part entière à partir du 3e). Plus tu as de parts, moins tu paies.",/\bparts\b|quotient familial/i],
+ ["decote","La décote","Une réduction automatique pour les petits impôts. Si ton impôt est faible, l'État en enlève une partie. Tu n'as rien à faire.",/décote/i],
+ ["reduc","Réduction ou crédit d'impôt ?","Une réduction d'impôt baisse ton impôt, mais pas en dessous de zéro : si tu ne paies pas d'impôt, elle ne sert à rien (dons, frais de scolarité). Un crédit d'impôt, lui, t'est remboursé même si tu ne paies pas d'impôt (aide à domicile, garde d'enfants).",/réduction d'impôt|crédit d'impôt/i],
+ ["per","Le PER (plan d'épargne retraite)","Un placement pour ta retraite. Ce que tu verses est retiré de tes revenus imposables : tu paies moins d'impôt cette année. En échange, l'argent est bloqué jusqu'à la retraite (sauf pour acheter ta résidence principale). Intéressant surtout si ta tranche est à 30 % ou plus.",/\bPER\b|plan d'épargne retraite/i],
+ ["pea","Le PEA (plan d'épargne en actions)","Un compte pour investir en bourse (actions européennes et fonds qui suivent le marché mondial). Après 5 ans, tes gains ne paient plus d'impôt sur le revenu, seulement les prélèvements sociaux. Plafond : 150 000 € de versements.",/\bPEA\b|plan d'épargne en actions/i],
+ ["av","L'assurance vie","Malgré son nom, c'est un placement, pas une assurance décès. Tu peux y mettre de l'argent sans risque (fonds euros) ou en bourse (ETF). Tu peux retirer quand tu veux. Après 8 ans, tes gains sont peu taxés, et c'est le meilleur outil pour transmettre de l'argent à tes proches.",/assurance[- ]vie/i],
+ ["fe","Le fonds euros","La partie sans risque d'une assurance vie : ton capital ne peut pas baisser. Elle rapporte un peu plus qu'un livret (autour de 2,5 à 3,5 % ces dernières années).",/fonds euros/i],
+ ["etf","Un ETF (ou fonds indiciel)","Un seul produit qui achète d'un coup des centaines ou des milliers d'entreprises (par exemple toutes les grandes entreprises du monde). Frais très bas, pas besoin de choisir des actions. C'est la façon la plus simple d'investir en bourse sur le long terme.",/\bETF\b|fonds indiciels?/i],
+ ["livret","Livret A, LDDS et LEP","Des comptes d'épargne sans risque, sans impôt, disponibles à tout moment. Livret A et LDDS rapportent 1,7 % (plafonds 22 950 € et 12 000 €). Le LEP rapporte plus (2,5 %), jusqu'à 10 000 €, mais il est réservé aux revenus modestes.",/Livret A|LDDS|\bLEP\b/],
+ ["fr","Les frais réels","Par défaut, les impôts retirent 10 % de ton salaire pour tes frais de travail. Si tes vrais frais (surtout les trajets en voiture) sont plus élevés, tu peux les déclarer à la place. Il faut garder les justificatifs.",/frais réels/i],
+ ["micro","Micro-foncier ou régime réel","Pour une location vide : au micro-foncier, les impôts retirent automatiquement 30 % de tes loyers comme dépenses. Au régime réel, tu déclares tes vraies dépenses (intérêts d'emprunt, taxe foncière, travaux...). Le réel est meilleur si tes dépenses dépassent 30 % des loyers.",/micro-foncier|régime réel|au réel\b/i],
+ ["deficit","Le déficit foncier","Quand tes dépenses de location (surtout des travaux) dépassent tes loyers, la différence se déduit de tes autres revenus, jusqu'à 10 700 € par an. C'est une vraie baisse d'impôt.",/déficit foncier/i],
+ ["ps","Les prélèvements sociaux","Une taxe de 17,2 % sur les revenus du patrimoine (loyers, intérêts, gains de placements). Elle s'ajoute à l'impôt sur le revenu. Elle finance la Sécurité sociale.",/prélèvements sociaux/i],
+ ["pfu","La flat tax (PFU)","Un taux unique de 30 % sur les revenus de placements (12,8 % d'impôt + 17,2 % de prélèvements sociaux). Si ta tranche est basse (0 ou 11 %), tu peux choisir d'être imposé au barème à la place : c'est souvent moins cher.",/flat tax|\bPFU\b/i],
+ ["sci","SCI à l'IR ou à l'IS","Une SCI est une société qui possède de l'immobilier. À l'IR (impôt sur le revenu), chaque associé déclare sa part du résultat avec ses propres revenus. À l'IS (impôt sur les sociétés), c'est la société qui paie l'impôt, et tu n'es imposé que sur ce qu'elle te verse.",/\bSCI\b/],
+ ["abat","Un abattement","Une somme retirée automatiquement avant de calculer l'impôt. Exemple : 10 % sur les salaires, 30 % sur les loyers au micro-foncier, 4 600 € de gains par an sur une assurance vie de plus de 8 ans.",/abattement/i],
+ ["ifu","Le relevé fiscal (IFU)","Un document que ta banque t'envoie chaque année (mars-avril). Il récapitule tes dividendes, intérêts et plus-values à déclarer. Les montants sont en général déjà pré-remplis dans ta déclaration.",/\bIFU\b|relevé fiscal/i],
+ ["cca","Le compte courant d'associé","L'argent que tu as prêté à ta société (par exemple pour l'apport d'un achat). Elle peut te le rembourser quand elle a de la trésorerie, et ce remboursement n'est pas imposé.",/compte courant d'associé|comptes courants d'associés/i],
+ ["lmnp","La location meublée (LMNP)","Louer un logement meublé quand ce n'est pas ton métier. Au régime réel, tu peux déduire chaque année une partie du prix du bien et des meubles (l'amortissement) : souvent, tu ne paies presque pas d'impôt sur les loyers pendant des années.",/\bLMNP\b|location meublée|meublé/i],
+ ["pinel","Pinel et Denormandie","Des réductions d'impôt pour avoir acheté un logement neuf (Pinel) ou rénové dans certains centres-villes (Denormandie) et l'avoir loué à un prix plafonné pendant 6, 9 ou 12 ans. Il faut déclarer la réduction chaque année.",/Pinel|Denormandie/],
+ ["form","Les numéros de formulaires","2042 : la déclaration principale. 2042-C : la complémentaire. 2042-RICI : réductions et crédits d'impôt. 2044 : revenus fonciers au réel. 2072 : déclaration de la SCI. 3916 : comptes à l'étranger. 2086 : cryptos. Tout se remplit en ligne sur impots.gouv.fr.",/\b(2042(-C|-RICI)?|2044|2072|3916(-bis)?|2086|2031)\b/],
+ ["amort","Le tableau d'amortissement","Le document de ta banque qui détaille chaque mensualité de ton prêt : combien d'intérêts, combien de capital remboursé, et ce qu'il reste à payer. Tu le trouves dans ton espace client.",/tableau d'amortissement/i],
+ ["assemp","L'assurance emprunteur","L'assurance obligatoire liée à ton prêt immobilier (décès, invalidité). Depuis 2022, tu peux en changer à tout moment, sans frais : c'est souvent plusieurs milliers d'euros d'économie.",/assurance emprunteur|assurance de prêt/i],
+ ["prec","L'épargne de sécurité","De l'argent disponible tout de suite en cas de coup dur (3 à 6 mois de dépenses), sur un livret. C'est la première chose à constituer, avant tout placement.",/épargne de (sécurité|précaution)/i],
+ ["plaf","Le plafond épargne retraite","Le montant maximum que tu peux déduire de tes revenus en versant sur un PER. Il est écrit sur ton avis d'impôt, et les plafonds non utilisés des 3 années précédentes s'ajoutent.",/plafond (épargne retraite|PER)/i]];
+const GL_RE=new RegExp(GLOSS.map(g=>"("+g[3].source+")").join("|"),"gi");
+function glossify(root){if(!root)return;const seen=new Set(),w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest("a,button,input,textarea,select,.gl,.card-h,h3,h4,label,summary,.case,.pill,.eyebrow")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT}),nodes=[];
+  while(w.nextNode())nodes.push(w.currentNode);
+  nodes.forEach(n=>{const t=n.nodeValue;GL_RE.lastIndex=0;let m,out=[],last=0;
+    while((m=GL_RE.exec(t))){const gi=GLOSS.findIndex(g=>{g[3].lastIndex=0;return new RegExp("^(?:"+g[3].source+")$",g[3].flags.replace("g","")).test(m[0])});if(gi<0||seen.has(gi))continue;seen.add(gi);out.push([m.index,m[0],gi])}
+    if(!out.length)return;const frag=document.createDocumentFragment();
+    out.forEach(([i,txt,gi])=>{frag.appendChild(document.createTextNode(t.slice(last,i)));const b=document.createElement("button");b.type="button";b.className="gl";b.dataset.gl=gi;b.textContent=txt;frag.appendChild(b);last=i+txt.length});
+    frag.appendChild(document.createTextNode(t.slice(last)));n.parentNode.replaceChild(frag,n)})}
+document.addEventListener("click",e=>{const g=e.target.closest(".gl");if(g){e.preventDefault();const x=GLOSS[+g.dataset.gl];openSheet(x[1],`<p>${x[2]}</p><button type="button" class="btn" data-sheet="lexique">${ic("list")}Voir tout le lexique</button>`);return}
+  const sh=e.target.closest("[data-sheet]");if(sh){const k=sh.dataset.sheet;if(k==="lexique")openSheet("Lexique : les mots des impôts en clair",`<div class="lex">${GLOSS.map(x=>`<details><summary>${x[1]}</summary><p>${x[2]}</p></details>`).join("")}</div>`);else if(k==="calcul")openSheet("Comment j'ai calculé ton impôt",explainTax());else if(k==="aide")openSheet(...pageHelp());else if(k==="welcome")showWelcome(0);return}
+  if(e.target.closest("#sheetClose")||e.target.classList.contains("sheet-bg"))closeSheet()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)closeSheet()});
+/* --- le calcul de l'impôt, pas à pas, avec tes chiffres --- */
+function explainTax(){const p=LAST.d||derive(S.p,mode()),b=LAST.base||calc(p),L=[],couple=isCouple(p);
+  if(p.situation==="concubin")return `<p>Vous êtes en couple sans Pacs : chacun fait sa propre déclaration. L'appli calcule les deux et les additionne (${fmt(Math.max(0,b.ir))} au total).</p>`;
+  const row=(a,v,c)=>L.push(`<div class="xrow${c?" "+c:""}"><span>${a}</span><b class="tnum">${v}</b></div>`);
+  L.push(`<h4>1. Tes revenus de l'année</h4>`);
+  [[p.sal1,p.km1,p.fr1,"Ton salaire"],[couple?p.sal2:0,p.km2,p.fr2,"Salaire de ton conjoint"]].forEach(([s,km,fr,l])=>{if(s>0){row(l,fmt(s));row(fr?"− tes frais réels de trajet":"− 10 % automatiques pour tes frais de travail","− "+fmt(s-salNet(s,km,fr)),"minus")}});
+  if(p.pension>0)row("Retraites (après 10 % automatiques)",fmt(p.pension-Math.min(p.pension,clamp(p.pension*.1,454,4439))));
+  if(b.fonc)row("Loyers et part de SCI (après dépenses)",fmt(b.fonc));
+  if(p.loyersMeub>0)row("Loyers meublés (après déduction)",fmt(p.reelMeub?p.loyersMeub*.15:p.loyersMeub*.5));
+  if(p.ca>0&&!p.vl)row("Bénéfice de ta micro-entreprise","inclus");
+  const ded=(p.perDeja||0)+(p.declPensionEnf?p.pensionEnf:0)+(p.declAideParent?p.aideParent:0);if(ded>0)row("− versements PER et pensions déductibles","− "+fmt(ded),"minus");
+  row("= Revenu imposable",fmt(b.R),"tot");
+  L.push(`<h4>2. Divisé par tes parts</h4>`);row("Nombre de parts",String(b.parts).replace(".",","));const q=b.R/b.parts;row("Revenu pour une part",fmt(q),"tot");
+  L.push(`<h4>3. Le barème, tranche par tranche (pour une part)</h4>`);let prev=0,tp=0;
+  for(const [lim,r] of BAREME){if(q>prev){const part=Math.min(q,lim)-prev,t=part*r;tp+=t;row(`${fmt(prev)} à ${lim===Infinity?"plus":fmt(lim)} taxés à ${Math.round(r*100)} %`,fmt(t))}prev=lim}
+  row("× "+String(b.parts).replace(".",",")+" part"+(b.parts>1?"s":""),fmt(tp*b.parts),"tot");
+  L.push(`<h4>4. Les ajustements</h4>`);row("Impôt après plafonnement et décote",fmt(b.brut));if(b.red)row("− réductions d'impôt (dons, scolarité, Pinel...)","− "+fmt(b.red),"minus");if(b.cred)row("− crédits d'impôt (aide à domicile, garde...)","− "+fmt(b.cred),"minus");
+  row("= Impôt sur le revenu",fmt(b.ir),"tot");if(b.pfu)row("+ impôt sur tes placements (12,8 %)",fmt(b.pfu));if(b.vlTax)row("+ versement libératoire micro-entreprise",fmt(b.vlTax));if(b.psFonc)row("+ prélèvements sociaux sur tes loyers (17,2 %)",fmt(b.psFonc));
+  L.push(`<div class="note">${ic("bulb")}<span><b>Ce qu'il faut retenir :</b> ta tranche est à ${Math.round(b.tmi*100)} %. Chaque 100 € que tu gagnes en plus te coûtent ${Math.round(b.tmi*100)} € d'impôt, et chaque 100 € que tu arrives à déduire t'en font économiser autant.</span></div>`);
+  L.push(`<p class="muted">Calcul indicatif avec le barème 2026. Le montant exact est sur ton avis d'impôt.</p>`);
+  return L.join("")}
+/* --- l'aide de chaque page --- */
+function pageHelp(){const v=currentView(),H={
+ plan:["La page Plan","<p><b>À quoi elle sert :</b> te dire quoi faire pour payer moins d'impôts et mieux gérer ton argent.</p><p><b>Comment la lire :</b> le gros chiffre vert est ce que tu peux gagner par an. En dessous, tes actions sont rangées par urgence : d'abord ce qui doit être fait avant le 31 décembre, puis ce qui peut se faire quand tu veux, puis ce qui se fait au moment de déclarer.</p><p><b>Pour chaque action :</b> touche-la pour voir quoi faire, pourquoi, quand et comment. Puis choisis : <b>C'est fait</b>, <b>Plus tard</b> (elle revient dans 30 jours) ou <b>Pas pour moi</b>. Rien n'est obligatoire.</p><p>Les mots soulignés en pointillés s'expliquent quand tu les touches.</p>"],
+ argent:["La page Argent","<p><b>À quoi elle sert :</b> te dire combien mettre de côté chaque mois, et où.</p><p><b>Comment ça marche :</b> l'appli part de ce qui arrive sur ton compte, enlève tes dépenses, et propose de placer une partie de ce qui reste. L'ordre des étapes compte : d'abord une réserve pour les coups durs, puis les placements qui rapportent le plus pour toi.</p><p><b>Le plus important :</b> programme un virement automatique le lendemain de ta paie. Si une étape ne te convient pas, touche \"Pas pour moi\" : l'argent est réparti sur les autres.</p>"],
+ importer:["La page Documents","<p><b>À quoi elle sert :</b> donner à l'appli tes papiers, pour qu'elle calcule avec tes vrais chiffres au lieu de deviner.</p><p><b>Le plus simple :</b> connecte ton Google Drive. L'appli cherche toute seule tes avis d'impôt, fiches de paie, prêts et relevés, garde ceux à ton nom, et range tout dans ton classeur. Elle ne modifie rien dans ton Drive.</p><p><b>Mon dossier</b> te dit exactement quels papiers manquent et où les trouver. Si l'un ne te concerne pas, touche \"Pas concerné\".</p>"],
+ situation:["La page Profil","<p><b>À quoi elle sert :</b> décrire ta situation (famille, revenus, patrimoine, dépenses). Tout le reste en dépend.</p><p><b>Mode rapide ou complet :</b> le rapide demande des totaux, le complet détaille chaque placement et chaque crédit. Le complet donne des conseils plus précis (crédit trop cher, épargne qui dort...).</p><p>Si tu as importé tes documents, la plupart des cases sont déjà remplies : vérifie simplement.</p>"],
+ formulaires:["Mes formulaires","<p>La liste des déclarations que tu dois faire, avec les cases et les montants. Garde cette page ou la fiche PDF à côté de toi quand tu déclares en ligne sur impots.gouv.fr.</p>"],
+ calendrier:["Le calendrier","<p>Les dates qui comptent dans l'année : fin des actions déductibles au 31 décembre, déclaration au printemps, taxe foncière en octobre... Le bouton \"Me le rappeler\" ajoute un rappel dans ton agenda Google.</p>"],
+ sci:["Mes SCI","<p>Boussole lit ton appli de gestion de SCI (sans rien y modifier) pour connaître le résultat de chaque société et ta part. Si ta SCI est à l'impôt sur le revenu, cette part s'ajoute à tes revenus.</p>"],
+ moi:["Mon espace","<p>Tes réglages : prénom, apparence, installation de l'appli, sauvegarde de tes données. Tes données restent sur ton téléphone : la sauvegarde sert à les retrouver sur un autre appareil.</p>"]};
+ const h=H[v]||H.plan;return [h[0],h[1]+`<div class="row"><button type="button" class="btn" data-sheet="lexique">${ic("list")}Lexique</button><button type="button" class="btn" data-sheet="welcome">${ic("compass")}Revoir la présentation</button></div>`]}
+/* --- présentation au premier lancement --- */
+const WELCOME=[["Bienvenue","compass","<p><b>Boussole Fiscale t'aide à payer moins d'impôts, légalement, et à mieux placer ton argent.</b></p><p>Elle fait comme un conseiller : elle lit tes papiers, calcule ton impôt, et te propose des actions concrètes, avec ce que chacune te fait gagner.</p>"],
+ ["Tu gardes la main","shield","<p>L'appli ne fait <b>rien à ta place</b> : elle explique, tu décides. Pour chaque conseil, tu choisis : c'est fait, plus tard, ou pas pour moi.</p><p>Tes données restent <b>sur ton téléphone</b>. Ton Drive est lu, jamais modifié.</p>"],
+ ["Comment démarrer","target","<p>Trois étapes, environ 5 minutes :</p><ol><li><b>Connecte ton Google Drive</b> : l'appli y trouve tes papiers.</li><li><b>Vérifie ce qu'elle a compris</b> de ta situation.</li><li><b>Regarde tes actions</b>, de la plus urgente à la moins urgente.</li></ol><p>Un doute sur un mot ? Touche-le, il s'explique. Un doute sur une page ? Touche le <b>?</b> en haut.</p>"]];
+function showWelcome(i){const w=WELCOME[i];openSheet(w[0],`<div class="wel"><span class="tile c-epargne">${ic(w[1])}</span>${w[2]}</div><div class="wel-f"><span class="wdots">${WELCOME.map((_,j)=>`<i class="${j===i?"on":""}"></i>`).join("")}</span>${i<WELCOME.length-1?`<button type="button" class="btn primary" id="welNext" data-i="${i+1}">Suivant${ic("arrow")}</button>`:`<button type="button" class="btn primary" id="welEnd">C'est parti${ic("arrow")}</button>`}</div>`)}
+document.addEventListener("click",e=>{const n=e.target.closest("#welNext");if(n){showWelcome(+n.dataset.i);return}if(e.target.closest("#welEnd")){S.welcomed=true;save();closeSheet()}});
+/* --- temps nécessaire et coût de l'inaction --- */
+const EFFORT={per:"10 min en ligne",fr1:"5 min à la déclaration",fr2:"5 min à la déclaration",pacs:"1 rendez-vous en mairie",caseT:"1 min : une case",inval:"1 min : une case",scol:"1 min : quelques cases",enfmaj:"5 min",parent:"5 min",bareme:"1 min : une case",mv:"10 min en ligne",dons:"5 min",dom:"selon tes besoins",avance:"5 min",garde:"2 min",pee:"2 min",reel:"30 min (formulaire guidé)",deficit:"selon les travaux",lmnp:"avec un comptable",reelpro:"avec un comptable",vl:"5 min en ligne",pea:"15 min en ligne",av:"15 min en ligne",lep:"1 passage en banque",don26:"avec un notaire",donation:"avec un notaire",ifi:"30 min",pas:"2 min en ligne",cash:"2 min : un virement",surplus:"15 min",lep2:"1 passage en banque",remb:"1 appel à ta banque",assur:"1 h pour 2 ou 3 devis",reneg:"1 rendez-vous",cto:"sur plusieurs mois",avpurge:"1 demande à ton assureur",av70:"15 min",scpi:"au prochain achat",pinel:"5 min",locav:"10 min","3916":"10 min","3916b":"10 min","2086":"30 min",cca:"1 assemblée + 1 virement","sci":"30 min"};
+const effortOf=o=>EFFORT[o.id]||EFFORT[o.id.split("-")[0]]||null;
 
 /* ===== Tuto d'installation ===== */
 const MI={lock:'<svg viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>',
@@ -2293,6 +2402,7 @@ $("wipeNo").onclick=()=>{$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false}
 $("wipeYes").onclick=()=>{S.p=JSON.parse(JSON.stringify(DEFAULT));S.done={};S.example=false;S.settings={prenom:"",mode:"rapide",theme:"auto"};applyTheme();$("wipeConfirm").hidden=true;$("wipeBtn").hidden=false;toast("Tout est effacé");update()};
 
 hydrate(document);
+setTimeout(()=>{if(!S.welcomed&&!navigator.webdriver&&$("sheet").hidden)showWelcome(0)},700);
 $("appVer").textContent=APP_VERSION;
 if(window.BOUSSOLE_PWA){setTimeout(()=>gdCheckPersist().then(()=>{gdWatch();renderGd()}),1500);setInterval(gdWatch,30*60e3);document.addEventListener("visibilitychange",()=>{if(!document.hidden)gdWatch()})}$("formsSeason").textContent=DEC_SEASON;$("oldBanner").hidden=!!window.BOUSSOLE_PWA;
 route();
