@@ -495,6 +495,30 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 .hub-links a{display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);font-weight:400}
 .hub-links .tile{width:36px;height:36px;border-radius:11px}.hub-links .tile svg.i{width:18px;height:18px}
 .hub-links b{font-size:14px}.hub-links .muted{font-size:12px}
+.guide{background:var(--surface);border:1.5px solid var(--accent);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.guide-h{display:flex;gap:14px;align-items:center}.guide-h>div:first-child{flex:none}.guide-h h2{font-size:20px}
+.gprog{flex:1;height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}.gprog i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.gsteps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.gsteps li{display:flex;gap:12px;align-items:flex-start;padding:8px 10px;border-radius:14px}
+.gsteps li.cur{background:var(--accent-soft)}.gsteps li.done{opacity:.6}.gsteps li.done b{text-decoration:line-through}
+.gsteps p{margin:4px 0 10px;font-size:14px;color:var(--ink)}
+.gn{width:28px;height:28px;border-radius:50%;background:var(--sunk);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.cur .gn{background:var(--accent);color:var(--accent-ink)}.done .gn{background:var(--accent-soft);color:var(--accent)}.gn svg.i{width:15px;height:15px}
+.know summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.know[open] summary{margin-bottom:10px}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.fact{background:var(--sunk);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.fact .fl{font-size:12.5px;color:var(--muted);font-weight:600}.fact b{font-family:var(--f-display);font-size:18px}
+.fact small{display:flex;gap:5px;align-items:center;font-size:12px;color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fact small svg.i{width:13px;height:13px;flex:none}
+.fact.doubt{background:var(--amber-soft)}.fact.doubt small{color:var(--amber)}.fact.calc small{color:var(--muted)}
+.fold{border-top:1px solid var(--line);padding:8px 0}.fold summary{list-style:none;cursor:pointer;display:flex;gap:10px;align-items:center}
+.fold summary b{display:block;font-size:14.5px}.fold summary small{display:block;font-size:12.5px;color:var(--muted)}
+.fold .tile{width:34px;height:34px;border-radius:11px}.fold .tile svg.i{width:17px;height:17px}
+.fold-row{display:flex;gap:10px;align-items:center;padding:8px 0 8px 44px;border-top:1px dashed var(--line);font-size:13.5px}
+.fold-row b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fold-row small{color:var(--muted);font-size:12px}
+.fold-row a{flex:none;font-size:13px}
+@media (max-width:480px){.fold-row{padding-left:0}}
 .where{display:flex;flex-direction:column;gap:10px}
 .where>h4{font-family:var(--f-body);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:6px}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
@@ -583,6 +607,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
 
   <section class="view" id="v-plan" aria-label="Mon plan">
     <div class="next newdocs" id="newDocs" hidden></div>
+    <div id="guideBox"></div>
     <div class="hero">
       <div style="position:relative;z-index:1;min-width:0">
         <div class="hello" id="hello"></div>
@@ -606,6 +631,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
     <div class="next" id="nextBox" hidden></div>
     <div class="plan-grid">
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div id="knowBox"></div>
         <div class="filters" id="chips" role="group" aria-label="Filtrer"></div>
         <div id="groups" style="display:flex;flex-direction:column;gap:18px"></div>
       </div>
@@ -701,6 +727,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
   <section class="view" id="v-importer" aria-label="Importer mes documents" hidden>
     <div class="hub-links"><a href="#formulaires"><span class="tile c-case"><span data-ic="receipt"></span></span><b>Mes formulaires</b><span class="muted">Cases à remplir</span></a><a href="#calendrier"><span class="tile c-famille"><span data-ic="calendar"></span></span><b>Calendrier</b><span class="muted">Mes échéances</span></a><a href="#sci"><span class="tile c-immo"><span data-ic="building"></span></span><b>Mes SCI</b><span class="muted">Connexion</span></a></div>
     <div id="gdBox"></div>
+    <div class="box" id="classeurBox" hidden></div>
     <div class="box" id="docHub"></div>
     <div class="imp-hero">
       <div style="min-width:0;display:flex;flex-direction:column;gap:10px">
@@ -761,6 +788,7 @@ textarea{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius
       <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
         <div class="box">
           <h3><span data-ic="user"></span>Mon profil</h3>
+          <button type="button" class="btn" id="guideShow">Revoir le guide "Par où commencer"</button>
           <div class="field"><label for="s-nom">Ton nom de famille</label><span class="help">Sert à reconnaître tes documents dans Google Drive (et écarter ceux de tes locataires).</span><div class="inp"><input id="s-nom" autocomplete="family-name" placeholder="Rempli automatiquement avec Google"></div></div>
           <div class="field"><label for="s-nom2">Nom de famille de ton conjoint</label><div class="inp"><input id="s-nom2" placeholder="Si vous déclarez ensemble"></div></div>
           <div class="field"><label for="s-prenom">Ton prénom</label><div class="inp"><input id="s-prenom" autocomplete="given-name" placeholder="Pour te dire bonjour"></div></div>
@@ -867,7 +895,7 @@ const PASS=47100,PS=.172,PENSION_ENF=6794;
 const TODAY=new Date(),YEAR=TODAY.getFullYear(),MONTH=TODAY.getMonth();
 const DAYS_LEFT=Math.max(0,Math.ceil((new Date(YEAR,11,31,23,59)-TODAY)/864e5));
 const DEC_SEASON=MONTH>=6?YEAR+1:YEAR;
-const APP_VERSION="version 21 du 18/11/2026";
+const APP_VERSION="version 22 du 23/11/2026";
 const ARTIFACT_URL="https://claude.ai/artifact/9wHV1m4TrGNHJLyDjXK2wY";
 const fmt=n=>Math.round(n).toLocaleString("fr-FR").replace(/ | /g," ")+" €";
 const pct=n=>(Math.round(n*100)/100).toLocaleString("fr-FR")+" %";
@@ -1176,8 +1204,8 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||"null");
   if(s&&s.p){S.p=Object.assign({},DEFAULT,s.p);S.example=!!s.example;S.done=s.done||{};S.step=s.step||0;S.settings=Object.assign(S.settings,s.settings||{})}
   else{const o=JSON.parse(localStorage.getItem("boussole-v1")||"null");if(o&&o.p&&!o.example){S.p=Object.assign({},DEFAULT,o.p);S.example=false;S.done=o.done||{};S.settings.mode="rapide"}}
 }catch(e){}
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.docs)S.docs=s.docs;if(s&&s.instHidden)S.instHidden=true;if(s){S.gdSeen=s.gdSeen||{};S.gdLast=s.gdLast||null;S.gdNew=s.gdNew||[];S.found=s.found||{}}}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({p:S.p,example:S.example,done:S.done,step:S.step,settings:S.settings,docs:S.docs||{},instHidden:!!S.instHidden,gdSeen:S.gdSeen||{},gdLast:S.gdLast||null,gdNew:S.gdNew||[],found:S.found||{}}))}catch(e){}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.docs)S.docs=s.docs;if(s&&s.instHidden)S.instHidden=true;if(s){S.gdSeen=s.gdSeen||{};S.gdLast=s.gdLast||null;S.gdNew=s.gdNew||[];S.found=s.found||{};S.classeur=s.classeur||{};S.src=s.src||{};S.confirmed=s.confirmed||null;S.guideHidden=!!s.guideHidden}}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify({p:S.p,example:S.example,done:S.done,step:S.step,settings:S.settings,docs:S.docs||{},instHidden:!!S.instHidden,gdSeen:S.gdSeen||{},gdLast:S.gdLast||null,gdNew:S.gdNew||[],found:S.found||{},classeur:S.classeur||{},src:S.src||{},confirmed:S.confirmed||null,guideHidden:!!S.guideHidden}))}catch(e){}};
 const mode=()=>S.settings.mode;
 function applyTheme(){const t=S.settings.theme;if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
 applyTheme();
@@ -1305,7 +1333,7 @@ $("fields").addEventListener("input",e=>{
   if(t.dataset.list&&t.dataset.f!=="type"){const it=S.p[t.dataset.list][+t.dataset.i];const raw=t.value.replace(/[^\d.,]/g,"");if(raw!==t.value)t.value=raw;it[t.dataset.f]=raw===""?"":num(raw);leaveExample();update();return}
   const k=t.dataset.k;if(!k)return;
   const clean=t.value.replace(/[^\d]/g,"");if(clean!==t.value)t.value=clean;
-  S.p[k]=clean===""?0:parseInt(clean,10);leaveExample();
+  S.p[k]=clean===""?0:parseInt(clean,10);leaveExample();S.src=S.src||{};S.src[k]="Saisi par toi";
   if(sig()!==lastSig){const id=t.id;renderFields();const el=$(id);if(el){el.focus();const n=el.value.length;try{el.setSelectionRange(n,n)}catch(_){}}}
   update();
 });
@@ -1318,7 +1346,7 @@ $("fields").addEventListener("click",e=>{
     const el=$(`${l}-${o.id}-${l==="placements"?"montant":l==="credits"?"capital":"valeur"}`);if(el)el.focus();return}
   const del=e.target.closest("[data-del]");if(del){S.p[del.dataset.del].splice(+del.dataset.i,1);leaveExample();renderFields();update();return}
   const b=e.target.closest("button[data-k]");if(!b)return;const k=b.dataset.k;
-  if(b.dataset.v!==undefined)S.p[k]=b.dataset.v;else S.p[k]=!S.p[k];leaveExample();renderFields();update();
+  if(b.dataset.v!==undefined)S.p[k]=b.dataset.v;else S.p[k]=!S.p[k];S.src=S.src||{};S.src[k]="Saisi par toi";leaveExample();renderFields();update();
 });
 $("stepper").addEventListener("click",e=>{const b=e.target.closest("[data-step]");if(!b)return;S.step=+b.dataset.step;renderStepper();renderFields();save()});
 $("modeSw").addEventListener("click",e=>{const b=e.target.closest("[data-mode]");if(!b)return;S.settings.mode=b.dataset.mode;renderStepper();renderFields();update()});
@@ -1481,6 +1509,7 @@ function update(){
   $("ringArc").style.strokeDashoffset=String(314.16*(1-score/100));$("ringPct").textContent=score+" %";
   $("ringCap").textContent=doneGain>0?`Tu as déjà sécurisé ${fmt(doneGain)} par an. Continue !`:"Coche \"C'est fait\" sur une action pour faire monter ton score.";
   {const nd=S.gdNew||[];$("newDocs").hidden=!nd.length;if(nd.length)$("newDocs").innerHTML=`<span class="tile c-epargne">${ic("upload")}</span><div style="min-width:0"><span class="eyebrow">${ic("spark")}Nouveau dans ton Drive</span><h3>${nd.length} nouveau${nd.length>1?"x":""} document${nd.length>1?"s":""} pour toi : ${nd.slice(0,2).map(x=>esc(x.name)).join(", ")}${nd.length>2?"...":""}</h3></div><button type="button" class="btn primary" id="useNew">Mettre à jour${ic("arrow")}</button>`}
+  $("guideBox").innerHTML=guideHTML();$("knowBox").innerHTML=knowHTML();
   const next=todo.slice().sort(sorter)[0];
   if(next){$("nextBox").hidden=false;$("nextBox").className="next c-"+next.k;
     $("nextBox").innerHTML=`<span class="tile">${ic(next.ic)}</span><div style="min-width:0"><span class="eyebrow">${ic("target")}Ta prochaine action</span><h3>${next.title}</h3></div><div class="decide"><button type="button" class="btn primary" data-goto="${next.id}">Voir comment${ic("arrow")}</button><button type="button" class="btn" data-st="${next.id}|later">${ic("clock")}Plus tard</button><button type="button" class="btn ghost" data-st="${next.id}|no">${ic("x")}Pas pour moi</button></div>`}
@@ -1861,7 +1890,7 @@ async function readFiles(files){
 const TARGETS={paie:[["1","Moi"],["2","Mon conjoint"]],tf:Object.entries(BIEN).map(([k,v])=>[k,v.l]),pret:Object.entries(CRED).map(([k,v])=>[k,v.l]),plac:Object.entries(PLAC).map(([k,v])=>[k,v.l])};
 const TLABEL={paie:"C'est la fiche de paie de",tf:"Ce bien est",pret:"C'est un",plac:"Type de placement"};
 function renderImport(){
-  if(currentView()!=="importer")return;$("docHub").innerHTML=docsHTML();
+  if(currentView()!=="importer")return;$("docHub").innerHTML=docsHTML();$("classeurBox").innerHTML=classeurHTML();$("classeurBox").hidden=!Object.keys(S.classeur||{}).length;
   const list=$("impList");
   list.innerHTML=IMP.map(d=>{const t=DT[d.type||"inconnu"]||DT.inconnu;
     const head=`<div class="imp-h"><span class="tile ${d.type==="inconnu"||d.status==="err"||d.status==="scan"?"c-famille":"c-case"}">${ic(d.status==="read"||d.status==="wait"?"clock":t[1])}</span><div style="min-width:0;flex:1"><b class="imp-n">${esc(d.name)}</b><span class="imp-t">${d.status==="wait"?"En attente...":d.status==="read"?"Lecture en cours...":t[0]}</span></div><button type="button" class="icon-btn" data-imp-del="${d.id}" aria-label="Retirer">${ic("x")}</button></div>`;
@@ -1879,7 +1908,9 @@ function applyImport(){
   if(mode()!=="complet"&&!p.placements.length&&!p.biens.length){if(p.epargne>0)p.placements.push({id:nid(),type:"livretA",montant:p.epargne,taux:""});
     if(p.loyersNu>0)p.biens.push({id:nid(),type:"nu",valeur:"",loyers:p.loyersNu,charges:p.chargesNu||""});if(p.proprio)p.biens.push({id:nid(),type:"rp",valeur:""})}
   let n=0;S.docs=S.docs||{};
-  IMP.filter(d=>d.status==="ok").forEach(d=>{const c={};d.fields.forEach(fl=>{if(!fl.on)return;const v=fl.unit==="flag"?fl.v:num(fl.v);fl.apply(p,v,c);n++});if(d.finish)d.finish(p,c);const k=(DT[d.type]||[])[2];if(k)S.docs[k]=true;
+  S.src=S.src||{};
+  IMP.filter(d=>d.status==="ok").forEach(d=>{const c={},bef=JSON.parse(JSON.stringify(p));d.fields.forEach(fl=>{if(!fl.on)return;const v=fl.unit==="flag"?fl.v:num(fl.v);fl.apply(p,v,c);n++});if(d.finish)d.finish(p,c);
+    Object.keys(p).forEach(k=>{if(JSON.stringify(p[k])!==JSON.stringify(bef[k]))S.src[k]=d.name.replace(/\.pdf$/i,"")});const k=(DT[d.type]||[])[2];if(k)S.docs[k]=true;
     S.found=S.found||{};S.found[d.type]={name:d.name,at:new Date().toISOString()};if(d.type==="paie"&&d.lines){const kk=docKey({lines:d.lines,name:d.name,date:new Date().toISOString(),type:"paie"});S.found.paieKeys=[...new Set([...(S.found.paieKeys||[]),kk])]}});
   S.p=Object.assign({},DEFAULT,p);S.example=false;S.settings.mode="complet";IMP=[];S.open=null;save();
   toast(n+" information"+(n>1?"s":"")+" ajoutée"+(n>1?"s":"")+" à ta situation");location.hash="#plan";
@@ -1950,7 +1981,7 @@ async function gdWatch(){if(!window.BOUSSOLE_PWA||GD.state!=="idle"&&GD.state!==
   try{const found=await gdCandidates(since);const fresh=found.filter(f=>!(S.gdSeen||{})[f.id]&&!f.dup);
     for(const f of fresh.slice(0,15)){try{const r=await gdApi("files/"+f.id+"?alt=media");f.file=new File([await r.blob()],f.name,{type:"application/pdf"});f.lines=await pdfLines(f.file);gdClassify(f)}catch(e){f.cat="out"}
       S.gdSeen=S.gdSeen||{};S.gdSeen[f.id]=1}
-    const mine=fresh.filter(f=>f.cat==="perso");
+    classeurAdd(fresh.filter(f=>f.cat));const mine=fresh.filter(f=>f.cat==="perso");
     if(mine.length){S.gdNew=(S.gdNew||[]).concat(mine.map(f=>({id:f.id,name:f.name,type:f.type,date:f.date})));GD.pending=(GD.pending||[]).concat(mine)}
     const cca=Math.max(0,...fresh.filter(f=>f.cca).map(f=>f.cca));if(cca>0)S.p.sciCCA=cca;
     S.gdLast=new Date().toISOString();save();update()}catch(e){}}
@@ -2001,7 +2032,7 @@ async function gdSearch(){
         arr.filter(x=>!x.on).forEach(x=>{x.cat="out";x.reason="Fiche de paie plus ancienne : pas nécessaire"})}
       else arr.forEach((x,j)=>{if(j<(GD_KEEP[t]||2)){x.on=true}else{x.cat="out";x.reason="Plus ancien : la version récente suffit"}})});
     const cca=Math.max(0,...GD.found.filter(f=>f.cca).map(f=>f.cca));if(cca>0){S.p.sciCCA=cca;save()}
-    GD.state="list";GD.prog="";S.gdSeen=S.gdSeen||{};GD.found.forEach(f=>S.gdSeen[f.id]=1);S.gdLast=new Date().toISOString();S.gdNew=[];save();
+    classeurAdd(GD.found);GD.state="list";GD.prog="";S.gdSeen=S.gdSeen||{};GD.found.forEach(f=>S.gdSeen[f.id]=1);S.gdLast=new Date().toISOString();S.gdNew=[];save();
   }catch(e){GD.state="idle";GD.msg=e.message==="auth"?"Ta connexion Google a expiré : touche à nouveau le bouton.":"Erreur Google Drive : "+e.message}
   renderGd()}
 async function gdRead(){
@@ -2118,6 +2149,67 @@ function renderMoney(){if(currentView()!=="argent")return;
 }
 $("moneySteps").addEventListener("click",e=>{const b=e.target.closest("[data-mskip]");if(!b)return;const k=b.dataset.mskip;S.p.budget=S.p.budget||{};const sk=S.p.budget.skip=S.p.budget.skip||{};sk[k]=!sk[k];S.example=false;save();update();toast(sk[k]?"Étape écartée : l'argent est réparti sur les autres":"Étape remise dans ton plan")});
 $("budForm").addEventListener("input",e=>{const k=e.target.dataset.bud;if(!k)return;const v=e.target.value.replace(/[^\d]/g,"");if(v!==e.target.value)e.target.value=v;S.p.budget=S.p.budget||{};S.p.budget[k]=v===""?0:+v;S.example=false;save();renderMoney()});
+
+/* ===== Par où commencer, ce que l'appli sait de toi, mon classeur ===== */
+const FOLDERS=[["impots","Impôts","receipt","Avis d'impôt, déclarations, relevés fiscaux de banque : la base de tous les calculs."],
+ ["salaire","Salaire","briefcase","Tes fiches de paie : la plus récente donne ton salaire de l'année."],
+ ["logement","Logement","home","Taxes foncières : charges déductibles si tu loues, utiles pour l'IFI."],
+ ["prets","Prêts et assurances","card","Tableaux d'amortissement et offres de prêt : crédits à rembourser ou à renégocier."],
+ ["epargne","Épargne","piggy","Relevés d'assurance vie, PEA, PER, livrets : frais, rendement, ancienneté."],
+ ["sci","Société (SCI)","building","Documents de ta société : suivis via ton appli SCI, pas mélangés à ta situation perso."],
+ ["autres","Autres personnes","users","Locataires, garants, associés : pas à ton nom, donc ignorés pour tes impôts."],
+ ["old","Anciens et doublons","clock","Une version plus récente existe déjà : inutile de les relire."],
+ ["inutile","Pas utiles pour tes impôts","x","Baux, diagnostics, contrats, scans illisibles..."]];
+function gdFolder(f){if(f.dup)return"old";if(f.cat==="sci")return"sci";const r=f.reason||"";if(/^Pas à ton nom/.test(r))return"autres";
+  if(f.cat==="perso"&&!f.on&&/ancien|plus ancienne/i.test(r))return"old";
+  if(f.cat==="perso")return {avis:"impots",decl:"impots",ifu:"impots",tf:"logement",paie:"salaire",pret:"prets",plac:"epargne"}[f.type]||"impots";
+  if(/ancien|Doublon/i.test(r))return"old";return"inutile"}
+function classeurAdd(list){S.classeur=S.classeur||{};list.forEach(f=>{if(!f||!f.id)return;const lab=(DT[f.type]||DT.inconnu)[0];
+  S.classeur[f.id]={n:f.name,d:f.date,fo:gdFolder(f),note:f.on||f.cat==="perso"&&!f.reason?("Utilisé : "+lab+(f.why?" · "+f.why:"")):(f.reason||"")}})}
+function classeurHTML(){const C=S.classeur||{},ids=Object.keys(C);if(!ids.length)return "";
+  const by={};ids.forEach(id=>{(by[C[id].fo]=by[C[id].fo]||[]).push([id,C[id]])});
+  return `<h3>${ic("list")}Mon classeur <span class="pill">${ids.length} documents</span></h3>
+  <p>L'appli a lu ces documents de ton Drive et les a rangés ici selon leur utilité. <b>Rien n'est déplacé ni modifié dans ton Drive.</b></p>
+  ${FOLDERS.filter(([k])=>by[k]).map(([k,l,i,why])=>`<details class="fold"${["impots","salaire"].includes(k)?" open":""}><summary><span class="tile ${["autres","old","inutile"].includes(k)?"c-travail":k==="sci"?"c-immo":"c-epargne"}">${ic(i)}</span><span style="min-width:0;flex:1"><b>${l}</b><small>${why}</small></span><span class="pill">${by[k].length}</span></summary>
+    ${by[k].sort((a,b)=>String(b[1].d).localeCompare(String(a[1].d))).map(([id,x])=>`<div class="fold-row"><span style="min-width:0;flex:1"><b>${esc(x.n)}</b><small>${x.d?new Date(x.d).toLocaleDateString("fr-FR")+" · ":""}${esc(x.note)}</small></span><a href="https://drive.google.com/file/d/${encodeURIComponent(id)}/view" target="_blank" rel="noopener">Ouvrir ↗</a></div>`).join("")}</details>`).join("")}`}
+function knowFacts(){const P=S.p,p=LAST.d||P,b=LAST.base||calc(p),src=S.src||{},F=[];
+  const sitL={celib:"Seul(e)",marie:"Marié(e)",pacse:"Pacsé(e)",concubin:"En couple sans Pacs",veuf:"Veuf / veuve"}[P.situation]||"?";
+  const sv=k=>src[k]?src[k]:S.example?"Profil d'exemple":"Par défaut : à vérifier";
+  const f=(lab,val,k,how)=>F.push({lab,val,src:how||sv(k),ok:!!(how||src[k])});
+  f("Situation familiale",sitL+(P.enfants?" · "+P.enfants+" enfant"+(P.enfants>1?"s":"")+" à charge":" · pas d'enfant à charge"),"situation");
+  if(P.sal1||!P.pension)f("Ton salaire net imposable sur l'année",fmt(P.sal1),"sal1");
+  if(hasPartner(P))f("Salaire de ton conjoint",fmt(P.sal2),"sal2");
+  if(P.pension)f("Retraites et pensions",fmt(P.pension),"pension");
+  if(p.loyersNu)f("Loyers de location vide",fmt(p.loyersNu),"loyersNu");
+  (P.sci||[]).forEach(c=>F.push({lab:"Ta part de "+c.nom+" ("+c.regime+")",val:c.share!=null?fmt(c.res*c.share):"?",src:"Ton appli SCI",ok:true}));
+  if(P.rfr)f("Revenu fiscal de référence (avis d'impôt)",fmt(P.rfr),"rfr");
+  if(p.epargne)f("Épargne disponible",fmt(p.epargne),"epargne");
+  if((P.credits||[]).length)F.push({lab:"Crédits en cours",val:P.credits.length+" crédit"+(P.credits.length>1?"s":""),src:src.credits||"Saisi par toi",ok:true});
+  F.push({lab:"Revenu imposable estimé",val:fmt(b.R),src:"Calculé à partir de ce qui précède",ok:true,calc:1});
+  F.push({lab:"Ta tranche d'impôt",val:Math.round(b.tmi*100)+" %",src:"Calculée",ok:true,calc:1});
+  F.push({lab:"Ton impôt estimé",val:fmt(Math.max(0,b.ir+b.vlTax+b.pfu)),src:"Calculé"+(P.impAvis?" · l'an dernier : "+fmt(P.impAvis):""),ok:true,calc:1});
+  return F}
+function knowHTML(){const F=knowFacts(),doubt=F.filter(x=>!x.ok).length;
+  return `<details class="box know" id="know"${S.confirmed?"":" open"}><summary><h3>${ic("user")}Ce que l'appli a compris de toi</h3>${S.confirmed?`<span class="pill ok">${ic("check")}Vérifié</span>`:doubt?`<span class="pill soon">${doubt} à vérifier</span>`:""}</summary>
+  <p>Tous les conseils partent de ces chiffres. Chaque ligne dit d'où vient l'info. Si une est fausse, corrige-la : le plan se recalcule.</p>
+  <div class="facts">${F.map(x=>`<div class="fact${x.ok?"":" doubt"}${x.calc?" calc":""}"><span class="fl">${x.lab}</span><b class="tnum">${x.val}</b><small>${x.ok?ic(x.calc?"spark":"check"):ic("alert")}${esc(x.src)}</small></div>`).join("")}</div>
+  <div class="decide"><button type="button" class="btn primary" id="knowOk">${ic("check")}C'est juste</button><a class="btn" href="#situation">${ic("list")}Corriger</a></div></details>`}
+function guideSteps(){const it=dossier(),miss=it.filter(x=>!x.ok).length,todo=(LAST.out||[]).filter(o=>!stOf(o.id)).length,nsrc=Object.keys(S.src||{}).length;
+  return [
+   {t:"Connecte ton Google Drive",why:"L'appli y trouve toute seule tes avis d'impôt, fiches de paie, prêts et relevés : tu n'as presque rien à taper. Elle ne fait que lire, elle ne modifie rien.",done:!!gdRT()||!!S.gdLast,go:"#importer",b:"Connecter mon Drive"},
+   {t:"Laisse l'appli lire et ranger tes documents",why:"Elle garde ceux à ton nom, écarte ceux de tes locataires ou de ta société, et range tout dans ton classeur. Tu valides les chiffres trouvés.",done:nsrc>0,go:"#importer",b:"Lancer la lecture"},
+   {t:"Vérifie ce que l'appli a compris de toi",why:"Situation, salaires, loyers : si un chiffre est faux, tous les conseils le sont aussi. Ça prend 30 secondes.",done:!!S.confirmed,go:"know",b:"Vérifier mes chiffres"},
+   {t:"Complète ce qui manque"+(miss?" ("+miss+" document"+(miss>1?"s":"")+")":""),why:"Chaque document en plus rend les conseils plus justes. Si un document ne te concerne pas, dis-le en un clic.",done:miss===0,go:"#importer",b:"Voir ce qui manque"},
+   {t:"Traite tes actions une par une",why:"Pour chaque action : tu la fais, tu la remets à plus tard, ou tu dis que ce n'est pas pour toi. Rien n'est obligatoire.",done:todo===0&&nsrc>0,go:"actions",b:"Voir mes actions"}]}
+function guideHTML(){const G=guideSteps(),ok=G.filter(x=>x.done).length,cur=G.findIndex(x=>!x.done);
+  if(cur<0||S.guideHidden)return "";
+  return `<div class="guide"><div class="guide-h"><div><span class="eyebrow">${ic("compass")}Par où commencer</span><h2>Étape ${cur+1} sur ${G.length}</h2></div><div class="gprog"><i style="width:${ok/G.length*100}%"></i></div><button type="button" class="icon-btn" id="guideHide" aria-label="Masquer le guide" title="Masquer le guide">${ic("x")}</button></div>
+   <ol class="gsteps">${G.map((x,i)=>`<li class="${x.done?"done":i===cur?"cur":""}"><span class="gn">${x.done?ic("check"):i+1}</span><div style="min-width:0;flex:1"><b>${x.t}</b>${i===cur?`<p>${x.why}</p><button type="button" class="btn primary" data-guide="${x.go}">${x.b}${ic("arrow")}</button>`:""}</div></li>`).join("")}</ol></div>`}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-guide]");if(g){const t=g.dataset.guide;if(t.startsWith("#")){location.hash=t;return}
+    const el=t==="know"?$("know"):$("groups");if(el){if(el.tagName==="DETAILS")el.open=true;el.scrollIntoView({behavior:"smooth",block:"start"})}return}
+  if(e.target.closest("#guideHide")){S.guideHidden=true;save();update();toast("Guide masqué. Tu peux le remettre dans le rond en haut à droite.")}
+  if(e.target.closest("#knowOk")){S.confirmed=new Date().toISOString();save();update();toast("Merci ! Les conseils sont calculés sur ces chiffres.")}
+  if(e.target.closest("#guideShow")){S.guideHidden=false;save();location.hash="#plan"}});
 
 /* ===== Tuto d'installation ===== */
 const MI={lock:'<svg viewBox="0 0 24 24"><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg>',
